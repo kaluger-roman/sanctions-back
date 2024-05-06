@@ -1,0 +1,22 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Sanction {
+  id             Int    @id @default(autoincrement())
+  sourceCountry  String
+  sourceDocument String
+  restriction    String
+  code           String
+  description    String
+}
+
+model User {
+  id Int @id
+}

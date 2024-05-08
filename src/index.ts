@@ -1,18 +1,19 @@
 import { Server, Socket } from "socket.io";
 import { searchApiHandlers, searchApi } from "./search-app";
-import { userService } from "./user";
+// import { userService } from "./user";
 import { registerApi } from "./helpers";
 import {
   sanctionsManagementApi,
   sanctionsManagementApiHandlers,
 } from "./sanctions-management";
 import { execSync } from "child_process";
+import { createServer } from "http";
+import * as express from "express";
+import * as path from "path";
 
-const express = require("express");
-const path = require("path");
 const app = express();
 
-const httpServer = require("http").createServer(app);
+const httpServer = createServer(app);
 
 const server = new Server(httpServer);
 

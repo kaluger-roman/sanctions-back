@@ -10,6 +10,8 @@ import { execSync } from "child_process";
 import { createServer } from "http";
 import * as express from "express";
 import * as path from "path";
+import * as https from "https";
+import { readFileSync } from "fs";
 
 const app = express();
 
@@ -18,6 +20,28 @@ const httpServer = createServer(app);
 const server = new Server(httpServer);
 
 httpServer.listen(80);
+
+app.use((req, res, next) => {
+  if (req.secure || req.path.includes("/.well-known/acme-challenge")) {
+    next();
+  } else {
+    res.redirect("https://" + req.hostname + req.url);
+  }
+});
+
+const httpsServer = https.createServer(
+  {
+    key: readFileSync(
+      `/etc/letsencrypt/live/goodsanctioncheck.com/privkey.pem`,
+    ),
+    cert: readFileSync(
+      `/etc/letsencrypt/live/goodsanctioncheck.com/fullchain.pem`,
+    ),
+  },
+  app,
+);
+
+httpsServer.listen(443);
 
 app.use(require("express").static(path.resolve(__dirname, "..", "public")));
 

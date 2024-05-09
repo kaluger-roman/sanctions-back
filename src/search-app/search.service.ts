@@ -23,28 +23,33 @@ class SearchService {
   }
 
   async applyIntermediateFilters({ countries, restrictions }: SearchFilters) {
-    const filteredSanctions = await prisma.sanction.findMany({
-      where: {
-        sourceCountry: countries.length
-          ? {
-              in: countries,
-            }
-          : undefined,
-        restriction: restrictions.length
-          ? {
-              in: restrictions,
-            }
-          : undefined,
-      },
-    });
-
     return {
-      countries: uniq(
-        filteredSanctions.map(({ sourceCountry }) => sourceCountry),
-      ),
-      restrictions: uniq(
-        filteredSanctions.map(({ restriction }) => restriction),
-      ),
+      countries: (
+        await prisma.sanction.findMany({
+          select: { sourceCountry: true },
+          distinct: ["sourceCountry"],
+          where: {
+            restriction: restrictions.length
+              ? {
+                  in: restrictions,
+                }
+              : undefined,
+          },
+        })
+      ).map(({ sourceCountry }) => sourceCountry),
+      restrictions: (
+        await prisma.sanction.findMany({
+          select: { restriction: true },
+          distinct: ["restriction"],
+          where: {
+            sourceCountry: countries.length
+              ? {
+                  in: countries,
+                }
+              : undefined,
+          },
+        })
+      ).map(({ restriction }) => restriction),
     };
   }
 
@@ -54,7 +59,7 @@ class SearchService {
     countries,
     restrictions,
   }: SearchFilters) {
-    const sanctions: Array<Sanction> = [];
+    const sanctions: Array<Sanction & { descriptionTag?: string }> = [];
 
     if (searchTypes.includes("code")) {
       sanctions.push(
@@ -84,30 +89,35 @@ class SearchService {
     }
 
     if (searchTypes.includes("description")) {
-      sanctions.push(
-        ...(await prisma.sanction.findMany({
-          where: {
-            description: searchTags.length
-              ? {
-                  search: searchTags
-                    .flatMap((tag) => tag.split(/\s+/g))
-                    .join(" | "),
-                }
-              : undefined,
-            sourceCountry: countries.length
-              ? {
-                  in: countries,
-                }
-              : undefined,
-            restriction: restrictions.length
-              ? {
-                  in: restrictions,
-                }
-              : undefined,
-          },
-          orderBy: { code: "asc" },
-        })),
-      );
+      for await (const descriptionTag of searchTags) {
+        sanctions.push(
+          ...(
+            await prisma.$queryRawUnsafe<any>(`
+          with tokens as (select unnest(string_to_array('${descriptionTag}',' ')) as t), 
+          all_rows as (select id, "sourceCountry", "sourceDocument", "restriction", code, description,
+          sum(1.0 - (tokens.t <<<-> description)) as score, count(tokens.t <<%  description) as match_count
+          from "Sanction" as s, tokens where tokens.t <<% description  
+          ${
+            countries.length
+              ? ` and "sourceCountry" in (${countries
+                  .map((x) => `'${x}' `)
+                  .join(",")})`
+              : ""
+          } 
+          ${
+            restrictions.length
+              ? ` and "restriction" in (${restrictions
+                  .map((x) => `'${x}'`)
+                  .join(",")}) `
+              : ""
+          } 
+          group by id, description)
+          select id, "sourceCountry", "sourceDocument", "restriction", code, description from all_rows WHERE match_count=${
+            descriptionTag.split(" ").length
+          } order by "code" asc;`)
+          ).map((x) => ({ ...x, descriptionTag })),
+        );
+      }
     }
 
     const groupedSanctions: Record<
@@ -115,17 +125,14 @@ class SearchService {
       Record<string, Array<Sanction & { tag: string }>>
     > = mapValues(
       groupBy(
-        sanctions.flatMap((sanction: Sanction) =>
+        sanctions.flatMap((sanction) =>
           searchTags.flatMap((tag) =>
             [
               searchTypes.includes("code") && tag.startsWith(sanction.code)
                 ? { ...sanction, tag }
                 : null,
               searchTypes.includes("description") &&
-              intersection(
-                tag.split(/\s+/g),
-                sanction.description.split(/\s+/g),
-              ).length
+              tag === sanction.descriptionTag
                 ? { ...sanction, tag }
                 : null,
             ].filter(Boolean),

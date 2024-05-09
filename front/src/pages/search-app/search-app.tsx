@@ -2,14 +2,12 @@ import {
   Box,
   Button,
   Checkbox,
-  CircularProgress,
   FormControl,
   InputLabel,
   ListItemText,
   MenuItem,
   OutlinedInput,
   Select,
-  Tooltip,
 } from "@mui/material";
 import { useUnit } from "effector-react";
 import { intersection, last } from "lodash";
@@ -90,17 +88,16 @@ export const SearchApp = () => {
           <FormControl fullWidth>
             <InputLabel>Cтрана</InputLabel>
             <Select
-              onBlur={() => syncFilters()}
+              onClose={() => syncFilters()}
               multiple
               value={selectedCountries}
-              disabled={filtersSyncPending}
               onChange={({ target }) => {
                 selectedCountriesChanged(
                   last(target.value) === "all"
                     ? isAllAvailableCountriesSelected
                       ? []
                       : availableFilters.countries
-                    : (target.value as Array<string>)
+                    : (target.value as Array<string>),
                 );
               }}
               input={<OutlinedInput label="Cтрана" />}
@@ -108,6 +105,7 @@ export const SearchApp = () => {
             >
               <MenuItem value={"all"}>
                 <Checkbox
+                  disabled={filtersSyncPending}
                   indeterminate={
                     selectedCountries.length > 0 &&
                     !isAllAvailableCountriesSelected
@@ -120,7 +118,10 @@ export const SearchApp = () => {
                 <MenuItem
                   key={country}
                   value={country}
-                  disabled={availableFilters.countries.indexOf(country) === -1}
+                  disabled={
+                    availableFilters.countries.indexOf(country) === -1 ||
+                    filtersSyncPending
+                  }
                 >
                   <Checkbox checked={selectedCountries.indexOf(country) > -1} />
                   <ListItemText primary={country} />
@@ -132,8 +133,7 @@ export const SearchApp = () => {
           <FormControl fullWidth>
             <InputLabel>Ограничения</InputLabel>
             <Select
-              disabled={filtersSyncPending}
-              onBlur={() => syncFilters()}
+              onClose={() => syncFilters()}
               multiple
               value={selectedRestrictions}
               onChange={({ target }) => {
@@ -142,15 +142,16 @@ export const SearchApp = () => {
                     ? isAllAvailableSanctionsSelected
                       ? []
                       : availableFilters.restrictions
-                    : (target.value as Array<string>)
+                    : (target.value as Array<string>),
                 );
               }}
               input={<OutlinedInput label="Ограничения" />}
               renderValue={(selected) => selected.join(", ")}
               MenuProps={{ sx: { maxHeight: 600, width: 200 } }}
             >
-              <MenuItem value={"all"}>
+              <MenuItem key="all" value={"all"}>
                 <Checkbox
+                  disabled={filtersSyncPending}
                   indeterminate={
                     selectedRestrictions.length > 0 &&
                     !isAllAvailableSanctionsSelected
@@ -162,7 +163,8 @@ export const SearchApp = () => {
               {restrictions.map((restriction) => (
                 <MenuItem
                   disabled={
-                    availableFilters.restrictions.indexOf(restriction) === -1
+                    availableFilters.restrictions.indexOf(restriction) === -1 ||
+                    filtersSyncPending
                   }
                   key={restriction}
                   value={restriction}

@@ -17,8 +17,6 @@ const app = express();
 
 const httpServer = createServer(app);
 
-const server = new Server(httpServer);
-
 httpServer.listen(80);
 
 app.use((req, res, next) => {
@@ -40,6 +38,8 @@ const httpsServer = https.createServer(
   },
   app,
 );
+
+const server = new Server(httpsServer);
 
 httpsServer.listen(443);
 

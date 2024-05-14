@@ -1,45 +1,31 @@
 import { createEffect, createEvent, createStore } from "effector";
-import { authTools, SocketResponse } from "@master_kufa/client-tools";
 import { io, Socket } from "socket.io-client";
 import { nanoid } from "nanoid";
+import { TOKEN_KEY } from "shared/authorization";
+
+export type SocketResponse<T = "success" | "error"> = {
+  requestId?: string;
+  error?: string;
+  payload: T;
+};
 
 class AppSocket {
   private pendingRequests: Record<
     string,
     (response: SocketResponse<any>) => void
   > = {};
-  private unAuthorizedFallbackUrl = "";
 
   client: Socket;
   $isConnected = createStore(false);
 
-  private buildAuth() {
-    return { token: authTools.getAuthToken() };
-  }
-  private handleUnAuthorized() {
-    this.client.disconnect();
-    authTools.handleUnAuthorized(this.unAuthorizedFallbackUrl, () => {
-      this.client.auth = this.buildAuth();
-      this.client.connect();
-    });
-  }
-
   connect() {
     this.client = io(process.env.REACT_APP_SERVER_HOST || "/", {
       transports: ["websocket"],
-      auth: this.buildAuth(),
     });
-
-    // this.client.on("connect_error", (err) => {
-    //   if (unAuthorizedFallbackUrl && err.message === "UNAUTHORIZED")
-    //     this.handleUnAuthorized();
-    // });
 
     this.init();
   }
-  disconnect() {
-    this.handleUnAuthorized();
-  }
+
   private init() {
     this.client.onAny((_, response: SocketResponse) => {
       if (response.requestId && this.pendingRequests[response.requestId]) {
@@ -56,7 +42,11 @@ class AppSocket {
 
   emitWithAnswer<T, V>(actions: string, payload?: T): Promise<V> {
     const requestId = nanoid();
-    this.client.emit(actions, { ...payload, requestId });
+    this.client.emit(actions, {
+      ...payload,
+      requestId,
+      token: localStorage[TOKEN_KEY],
+    });
 
     return new Promise((resolve, reject) => {
       this.pendingRequests[requestId] = (response: SocketResponse<V>) => {

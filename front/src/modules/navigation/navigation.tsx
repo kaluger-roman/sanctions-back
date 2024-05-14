@@ -1,11 +1,13 @@
 import {
   Box,
   Button,
+  ClickAwayListener,
   Drawer,
   IconButton,
   Paper,
   Popper,
   Stack,
+  Tooltip,
   Typography,
   useMediaQuery,
 } from "@mui/material";
@@ -17,9 +19,11 @@ import MenuIcon from "@mui/icons-material/Menu";
 import CloseIcon from "@mui/icons-material/Close";
 import { ReactComponent as VK } from "shared/icons/vk.svg";
 import { ReactComponent as TG } from "shared/icons/telegram.svg";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import LoginIcon from "@mui/icons-material/Login";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {
   LinksLargeContainer,
   LinksSmallContainer,
@@ -29,8 +33,12 @@ import {
   SmallMenuContainer,
 } from "./navigation.styles";
 import { LinkOption } from "./navigation.types";
+import { Paths } from "shared/paths";
+import { useUnit } from "effector-react";
+import { appModel } from "models";
+import { LogOut } from "models/app/app.model";
 
-const Link = ({ name, path, subLinks }: LinkOption) => {
+const Link = ({ name, path, subLinks, onClick }: LinkOption) => {
   const isSm = useMediaQuery(theme.breakpoints.down("md"));
   const [isHovered, setIsHovered] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
@@ -43,6 +51,7 @@ const Link = ({ name, path, subLinks }: LinkOption) => {
         key={path}
         variant="text"
         onClick={() => {
+          onClick?.();
           isSm && setIsOpened(!isOpened);
           path && navigation.navigate(path);
         }}
@@ -98,7 +107,14 @@ const Links = NAME_MAPPING.map((link) => <Link key={link.name} {...link} />);
 export const Navigation = () => {
   const isSm = useMediaQuery(theme.breakpoints.down("md"));
   const [isMenuOpened, setIsMenuOpened] = useState(false);
+  const [isAccountOpened, setIsAccountOpened] = useState(false);
   const isMd = useMediaQuery(theme.breakpoints.down("lg"));
+  const authorizationData = useUnit(appModel.$authorizationData);
+  const accountRef = useRef<HTMLButtonElement | null>(null);
+
+  useEffect(() => {
+    if (!authorizationData) setIsAccountOpened(false);
+  }, [authorizationData]);
 
   return (
     <Box sx={NavigationContainer({ isSm })}>
@@ -115,9 +131,77 @@ export const Navigation = () => {
       {!isSm && <Box sx={LinksLargeContainer}>{Links}</Box>}
 
       <Box sx={MediaLinksContainer({ isSm })}>
-        <VK height="100%" cursor="pointer" />
-        <TG height="100%" cursor="pointer" />
+        <VK height="28px" cursor="pointer" />
+        <TG height="28px" cursor="pointer" />
+
+        <>
+          <Tooltip title={authorizationData ? "Профиль" : "Вход"}>
+            <IconButton
+              ref={accountRef}
+              sx={{ height: 36, width: 36 }}
+              onClick={() => {
+                if (authorizationData) {
+                  setIsAccountOpened(!isAccountOpened);
+                } else navigation.navigate(Paths.auth);
+              }}
+            >
+              {authorizationData ? <AccountCircleIcon /> : <LoginIcon />}
+            </IconButton>
+          </Tooltip>
+        </>
       </Box>
+      {authorizationData && (
+        <Popper
+          id="account"
+          open={isAccountOpened}
+          anchorEl={accountRef.current}
+          placement="bottom-start"
+          sx={{ zIndex: 10 }}
+        >
+          <ClickAwayListener onClickAway={() => setIsAccountOpened(false)}>
+            <Paper sx={{ "& button": { justifyContent: "flex-start" } }}>
+              <Box sx={{ p: 2 }}>
+                <Typography
+                  variant="body1"
+                  fontWeight="bold"
+                  color={theme.palette.primary.main}
+                >
+                  {authorizationData.email}
+                </Typography>
+                {authorizationData.isAdmin && (
+                  <Typography
+                    variant="body2"
+                    color={theme.palette.primary.main}
+                  >
+                    Администратор
+                  </Typography>
+                )}
+              </Box>
+              <Box sx={{ p: 1 }}>
+                {authorizationData.isAdmin && (
+                  <Button
+                    sx={{ width: "100%" }}
+                    onClick={() =>
+                      navigation.navigate(Paths.resetSanctionsDatabase)
+                    }
+                  >
+                    Админ панель
+                  </Button>
+                )}
+                <Button
+                  sx={{ width: "100%" }}
+                  onClick={() => {
+                    LogOut();
+                    navigation.navigate(Paths.root);
+                  }}
+                >
+                  Выйти
+                </Button>
+              </Box>
+            </Paper>
+          </ClickAwayListener>
+        </Popper>
+      )}
 
       {isSm && (
         <Box sx={SmallMenuContainer({ isSm })}>

@@ -9,7 +9,7 @@ import {
   OutlinedInput,
   Select,
 } from "@mui/material";
-import { useUnit } from "effector-react";
+import { useGate, useUnit } from "effector-react";
 import { intersection, last } from "lodash";
 import { searchAppModel } from "models";
 import {
@@ -42,6 +42,8 @@ export const SearchApp = () => {
   const isAllAvailableCountriesSelected =
     intersection(selectedCountries, availableFilters.countries).length ===
     availableFilters.countries.length;
+
+  useGate(searchAppModel.SearchAppGate);
 
   return (
     <Box

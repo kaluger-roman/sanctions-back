@@ -1,11 +1,14 @@
 import { Backdrop, CircularProgress, Typography } from "@mui/material";
 import { ErrorContainer } from "./loader.styles";
 import { useUnit } from "effector-react";
-import { appModel } from "models";
+import { appModel, searchAppModel } from "models";
 
 export const Loader = () => {
   const isLoading = useUnit(appModel.$isLoading);
   const loadingProgress = useUnit(appModel.$loadingProgress);
+  const searchAppPageOpened = useUnit(searchAppModel.SearchAppGate.status);
+
+  if (!searchAppPageOpened) return null;
 
   return (
     <Backdrop sx={ErrorContainer} open={isLoading}>

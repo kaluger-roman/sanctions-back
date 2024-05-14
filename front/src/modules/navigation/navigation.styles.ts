@@ -8,7 +8,7 @@ export const NavigationContainer = ({ isSm }: { isSm: boolean }): SxProps => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "start",
-  gap: isSm ? 1 : 4,
+  gap: isSm ? 1 : 2,
   pr: 2,
   pl: 2,
   background: theme.palette.background.default,
@@ -16,7 +16,7 @@ export const NavigationContainer = ({ isSm }: { isSm: boolean }): SxProps => ({
 
 export const LinksLargeContainer: SxProps = {
   display: "flex",
-  gap: 1,
+  gap: 0.5,
   justifySelf: "start",
   ml: "auto",
 };
@@ -24,8 +24,9 @@ export const LinksLargeContainer: SxProps = {
 export const MediaLinksContainer = ({ isSm }: { isSm: boolean }): SxProps => ({
   height: "100%",
   display: "flex",
+  alignItems: "center",
   gap: 2,
-  padding: 2,
+  padding: 1,
   ml: isSm ? "auto" : 0,
 });
 

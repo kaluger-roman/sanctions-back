@@ -8,27 +8,21 @@ import { socket } from "@master_kufa/client-tools";
 import { appModel } from "models/app";
 import { Paths } from "shared/paths";
 import { Footer, Navigation } from "modules";
-import { Contacts, Main, SearchApp } from "pages";
+import { Auth, Contacts, Main, Register, SearchApp } from "pages";
 import { CompanyClients } from "pages/clients";
 import { useEffect } from "react";
 import { ManageSanctions } from "pages/manage-sanctions";
-import { blockedSocketLoaderPages } from "./app.constants";
 
 export const AppNavigation = () => {
   useInitNavigation();
+
   useGate(appModel.AppGate);
+
   const location = useLocation();
-  const isConnected = useUnit(socket.$isConnected);
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
-
-  if (
-    !isConnected &&
-    blockedSocketLoaderPages.some((x) => location.pathname.startsWith(x))
-  )
-    return null;
 
   return (
     <Stack sx={Container}>
@@ -38,6 +32,8 @@ export const AppNavigation = () => {
           <Route path="/">
             <Route element={<Navigate replace to={Paths.main} />} index />
             <Route path={Paths.root}>
+              <Route index path={Paths.auth} element={<Auth />} />
+              <Route path={Paths.register} element={<Register />} />
               <Route element={<Navigate replace to={Paths.main} />} index />
 
               <Route path={Paths.main} element={<Main />} />

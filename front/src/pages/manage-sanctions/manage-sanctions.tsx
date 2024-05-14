@@ -5,10 +5,13 @@ import {
   updateDB,
 } from "models/manage-sanctions/manage-sanctions.model";
 import { useUnit } from "effector-react";
-import { manageSanctionsModel } from "models";
+import { appModel, manageSanctionsModel } from "models";
 
 export const ManageSanctions = () => {
   const file = useUnit(manageSanctionsModel.$selectedFileDB);
+  const authorizationData = useUnit(appModel.$authorizationData);
+
+  if (!authorizationData) return <>You are not authorized</>;
 
   return (
     <Box sx={{ display: "flex", p: 2, gap: 2, alignItems: "center" }}>

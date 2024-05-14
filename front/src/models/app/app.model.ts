@@ -1,11 +1,21 @@
-import { appApi, sanctionsManagementApi, searchAppApi } from "api";
-import { Store, combine, createEvent, createStore, sample } from "effector";
+import { appApi, authApi, sanctionsManagementApi, searchAppApi } from "api";
+import {
+  Store,
+  combine,
+  createEffect,
+  createEvent,
+  createStore,
+  sample,
+} from "effector";
 import { Notification } from "@master_kufa/client-tools";
 import { createGate } from "effector-react";
 import { socket } from "api/app.api";
+import { TOKEN_KEY, User } from "shared/authorization";
+import { jwtDecode } from "jwt-decode";
 
 export const $isLoading = createStore<boolean>(true);
 export const $loadingProgress = createStore<number>(NaN);
+export const $authorizationData = createStore<User | null>(null);
 
 const $commonPendingRequests = combine(
   searchAppApi.loadCountriesFx.pending,
@@ -15,6 +25,7 @@ const $commonPendingRequests = combine(
 
 export const setIsLoading = createEvent<boolean>();
 export const setLoadingProgress = createEvent<number>();
+export const LogOut = createEvent();
 
 export const AppGate = createGate();
 
@@ -22,6 +33,33 @@ sample({
   clock: AppGate.open,
   target: appApi.connectSocketFx,
 });
+
+sample({
+  clock: AppGate.open,
+  target: authApi.verifyFx,
+});
+
+sample({
+  clock: [authApi.verifyFx.failData, LogOut],
+  target: createEffect(() => {
+    localStorage[TOKEN_KEY] = "";
+  }),
+});
+
+sample({
+  clock: authApi.authFx.doneData,
+  target: createEffect<string, void>((token) => {
+    localStorage[TOKEN_KEY] = token;
+  }),
+});
+
+sample({
+  clock: [authApi.verifyFx.doneData, authApi.authFx.doneData],
+  fn: (token) => jwtDecode<User>(token),
+  target: $authorizationData,
+});
+
+$authorizationData.reset(LogOut);
 
 sample({
   clock: [sanctionsManagementApi.uploadSanctionsFileFx.failData],

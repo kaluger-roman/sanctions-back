@@ -1,7 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { searchApiHandlers, searchApi } from "./search-app";
-// import { userService } from "./user";
-import { registerApi } from "./helpers";
+import { registerApi } from "./api.service";
 import {
   sanctionsManagementApi,
   sanctionsManagementApiHandlers,
@@ -12,6 +11,7 @@ import * as express from "express";
 import * as path from "path";
 import * as https from "https";
 import { readFileSync } from "fs";
+import { userApi, userApiHandlers } from "./user/user.api";
 
 const app = express();
 
@@ -19,29 +19,37 @@ const httpServer = createServer(app);
 
 httpServer.listen(80);
 
-app.use((req, res, next) => {
-  if (req.secure || req.path.includes("/.well-known/acme-challenge")) {
-    next();
-  } else {
-    res.redirect("https://" + req.hostname + req.url);
-  }
-});
+let server = null;
 
-const httpsServer = https.createServer(
-  {
-    key: readFileSync(
-      `/etc/letsencrypt/live/goodsanctioncheck.com/privkey.pem`,
-    ),
-    cert: readFileSync(
-      `/etc/letsencrypt/live/goodsanctioncheck.com/fullchain.pem`,
-    ),
-  },
-  app,
-);
+if (process.env.NODE_ENV !== "development") {
+  execSync(`certbot renew`);
 
-const server = new Server(httpsServer);
+  app.use((req, res, next) => {
+    if (req.secure || req.path.includes("/.well-known/acme-challenge")) {
+      next();
+    } else {
+      res.redirect("https://" + req.hostname + req.url);
+    }
+  });
 
-httpsServer.listen(443);
+  const httpsServer = https.createServer(
+    {
+      key: readFileSync(
+        `/etc/letsencrypt/live/goodsanctioncheck.com/privkey.pem`,
+      ),
+      cert: readFileSync(
+        `/etc/letsencrypt/live/goodsanctioncheck.com/fullchain.pem`,
+      ),
+    },
+    app,
+  );
+
+  server = new Server(httpsServer);
+
+  httpsServer.listen(443);
+} else {
+  server = new Server(httpServer);
+}
 
 app.use(require("express").static(path.resolve(__dirname, "..", "public")));
 
@@ -51,37 +59,8 @@ app.get("/*", (_, res) =>
   res.sendFile(path.join(__dirname, "..", "public", "index.html")),
 );
 
-// if (opts?.withAuthorization) {
-//   const clientUrl = new URL(process.env.AUTH_HOST);
-
-//   // const authSocket = io(clientUrl.origin, {
-//   //   path: clientUrl.pathname ? `${clientUrl.pathname}/socket.io` : undefined,
-//   //   transports: ["websocket"],
-//   // });
-
-//   server.use(async (socket, next) => {
-//     try {
-//       await emitWithAnswer(authSocket, SocketActions.VERIFY, {
-//         token: socket.handshake.auth.token,
-//       });
-
-//       socket.handshake.auth.decoded = jwt_decode(socket.handshake.auth.token);
-
-//       next();
-//     } catch (error) {
-//       next(new Error(error));
-//       socket.disconnect();
-//     }
-//   });
-// }
-
-// server.use(async (socket, next) => {
-//   // await userService.recordUser(socket.handshake.auth.decoded.id);
-
-//   next();
-// });
-
 server.on("connection", async (socket: Socket) => {
   registerApi(searchApiHandlers, searchApi, socket);
   registerApi(sanctionsManagementApiHandlers, sanctionsManagementApi, socket);
+  registerApi(userApiHandlers, userApi, socket);
 });

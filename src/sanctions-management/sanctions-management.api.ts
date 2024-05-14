@@ -1,7 +1,8 @@
 import { sanctionsManagementService } from "./sanctions-management.service";
 import { ACTIONS } from "../actions";
 
-import { Api, Request } from "@master_kufa/server-tools";
+import { Api } from "../api.service";
+import { Request } from "src/types";
 
 export const sanctionsManagementApiHandlers = {
   [ACTIONS.RESET_SANCTIONS_DB_WITH_FILE]: (

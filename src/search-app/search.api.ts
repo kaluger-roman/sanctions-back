@@ -1,8 +1,9 @@
 import { searchService } from "./search.service";
 import { ACTIONS } from "../actions";
 
-import { Api, Request } from "@master_kufa/server-tools";
 import { SearchFilters } from "./search-app.types";
+import { Api } from "../api.service";
+import { Request } from "src/types";
 
 export const searchApiHandlers = {
   [ACTIONS.LOAD_COUNTRIES]: () => searchService.loadCountries(),

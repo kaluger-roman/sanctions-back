@@ -1,5 +1,6 @@
 import { searchAppApi } from "api";
 import { createEvent, createStore, sample } from "effector";
+import { createGate } from "effector-react";
 import { appModel } from "models/app";
 import { SearchResult } from "shared/sanctions";
 import { SyncedFilters } from "shared/search";
@@ -31,6 +32,8 @@ export const syncFilters = createEvent<void>();
 export const search = createEvent<void>();
 
 export const $filtersSyncPending = searchAppApi.checkFiltersFx.pending;
+
+export const SearchAppGate = createGate();
 
 sample({
   clock: appModel.AppGate.open,

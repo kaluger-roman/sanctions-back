@@ -25,7 +25,6 @@ import { MuiChipsInput } from "mui-chips-input";
 import { SearchType, SearchTypeName } from "shared/search-type";
 import { theme } from "shared/theme";
 import { SearchTable } from "./search-table";
-import { useState } from "react";
 
 export const SearchApp = () => {
   const searchTags = useUnit(searchAppModel.$searchTags);
@@ -37,8 +36,6 @@ export const SearchApp = () => {
   const availableFilters = useUnit(searchAppModel.$availableFilters);
   const filtersSyncPending = useUnit(searchAppModel.$filtersSyncPending);
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
-
-  const [currentTagValue, setCurrentTagValue] = useState("");
 
   const isAllAvailableSanctionsSelected =
     intersection(selectedRestrictions, availableFilters.restrictions).length ===
@@ -72,17 +69,11 @@ export const SearchApp = () => {
         <Box sx={{ width: "100%", display: "flex", gap: 2 }}>
           <MuiChipsInput
             addOnBlur
-            placeholder="Введите коды или текст поиска (через Enter)"
+            placeholder="Коды или описание (через Enter)"
             sx={{ flexGrow: 1 }}
             value={searchTags}
             onChange={searchTagsChanged}
-            inputValue={currentTagValue}
             name="searchTags"
-            disableEdition
-            onInput={(e) => {
-              setCurrentTagValue((e.target as HTMLInputElement).value);
-            }}
-            onAddChip={() => setCurrentTagValue("")}
             onPaste={(e) => {
               e.preventDefault();
               const value = e.clipboardData.getData("text");
@@ -94,10 +85,7 @@ export const SearchApp = () => {
 
               if (newTags.length > 1) {
                 searchTagsChanged(newTags);
-                return setCurrentTagValue("");
               }
-
-              setCurrentTagValue(value);
             }}
           />
           {!isSm && (

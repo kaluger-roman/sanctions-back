@@ -169,7 +169,7 @@ export const SearchApp = () => {
               }}
               input={<OutlinedInput label="Ограничения" />}
               renderValue={(selected) => selected.join(", ")}
-              MenuProps={{ sx: { maxHeight: 600, width: 200 } }}
+              MenuProps={{ sx: { maxHeight: 600, width: 380 } }}
             >
               <MenuItem key="all" value={"all"}>
                 <Checkbox

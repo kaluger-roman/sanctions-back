@@ -8,6 +8,7 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
+  useMediaQuery,
 } from "@mui/material";
 import { useGate, useUnit } from "effector-react";
 import { intersection, last, sortBy } from "lodash";
@@ -35,6 +36,7 @@ export const SearchApp = () => {
   const selectedCountries = useUnit(searchAppModel.$selectedCountries);
   const availableFilters = useUnit(searchAppModel.$availableFilters);
   const filtersSyncPending = useUnit(searchAppModel.$filtersSyncPending);
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [currentTagValue, setCurrentTagValue] = useState("");
 
@@ -98,16 +100,25 @@ export const SearchApp = () => {
               setCurrentTagValue(value);
             }}
           />
-          <Button
-            disabled={!searchTags.length}
-            variant="contained"
-            onClick={() => search()}
-          >
-            Поиск
-          </Button>
+          {!isSm && (
+            <Button
+              disabled={!searchTags.length}
+              variant="contained"
+              onClick={() => search()}
+            >
+              Поиск
+            </Button>
+          )}
         </Box>
 
-        <Box sx={{ display: "flex", width: "100%", gap: 2 }}>
+        <Box
+          sx={{
+            display: "flex",
+            width: "100%",
+            gap: 2,
+            flexDirection: isSm ? "column" : "row",
+          }}
+        >
           <FormControl fullWidth>
             <InputLabel>Cтрана</InputLabel>
             <Select
@@ -169,7 +180,7 @@ export const SearchApp = () => {
               }}
               input={<OutlinedInput label="Ограничения" />}
               renderValue={(selected) => selected.join(", ")}
-              MenuProps={{ sx: { maxHeight: 600, width: 380 } }}
+              MenuProps={{ sx: { maxHeight: 600 } }}
             >
               <MenuItem key="all" value={"all"}>
                 <Checkbox
@@ -200,9 +211,7 @@ export const SearchApp = () => {
                     primaryTypographyProps={{
                       title: restriction,
                       sx: {
-                        extWrap: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
+                        whiteSpace: "normal",
                       },
                     }}
                     primary={restriction}
@@ -237,6 +246,15 @@ export const SearchApp = () => {
               </MenuItem>
             </Select>
           </FormControl>
+          {isSm && (
+            <Button
+              disabled={!searchTags.length}
+              variant="contained"
+              onClick={() => search()}
+            >
+              Поиск
+            </Button>
+          )}
         </Box>
 
         <SearchTable />

@@ -5,18 +5,22 @@ import PlaceIcon from "@mui/icons-material/Place";
 import EmailIcon from "@mui/icons-material/Email";
 import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import { adjustAppHeight } from "@master_kufa/client-tools";
+import { ContactUs } from "modules";
+import { useGate } from "effector-react";
+import { contactUsModel } from "models";
 
 export const Contacts = () => {
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+
+  useGate(contactUsModel.PageGate);
   return (
     <Box
       sx={{
         position: "relative",
-        overflow: "hidden",
+        gap: 2,
         display: "flex",
-        alignItems: "center",
         justifyContent: "center",
-        height: `calc(${adjustAppHeight()} - 60px)`,
+        minHeight: `calc(${adjustAppHeight()} - 60px)`,
       }}
     >
       <img
@@ -24,7 +28,8 @@ export const Contacts = () => {
         style={{
           position: "absolute",
           objectFit: "cover",
-          height: `calc(${adjustAppHeight()} - 40px)`,
+          minHeight: `calc(${adjustAppHeight()} - 40px)`,
+          height: "calc(100% + 20px)",
           filter: "blur(5px)",
           width: "calc(100% + 20px)",
           marginLeft: "-10px",
@@ -33,66 +38,77 @@ export const Contacts = () => {
       />
       <Box
         sx={{
-          p: 4,
+          gap: 2,
+          display: "flex",
+          justifyContent: "center",
+          flexWrap: "wrap",
           position: "relative",
-          borderRadius: 4,
-          maxWidth: "1200px",
-          background: alpha(theme.palette.grey[900], 0.8),
-          mr: 2,
-          ml: 2,
+          p: 3,
         }}
       >
-        <Typography
-          sx={{
-            mb: 4,
-            color: theme.palette.primary.main,
-          }}
-          variant="h3"
-        >
-          Контакты
-        </Typography>
         <Box
           sx={{
-            color: theme.palette.secondary.light,
-            display: "grid",
-            gridTemplateColumns: "1fr 3fr",
-            columnGap: 2,
+            p: 3,
+            position: "relative",
+            borderRadius: 4,
+            background: alpha(theme.palette.grey[900], 0.8),
+            flexGrow: 1,
+            flexBasis: "50%",
           }}
         >
-          {(
-            [
-              ["Адрес", PlaceIcon, "2-я Пугачевская улица, дом 8, корпус 3"],
-              ["Телефон", LocalPhoneIcon, "8 (499) 780-74-97"],
-              ["Почта", EmailIcon, "oao_master_ok@bk.ru"],
-            ] as const
-          ).map(([Label, Icon, text]) => (
-            <>
-              <Typography
-                variant={isSm ? "body1" : "h5"}
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  mt: 2,
-                }}
-              >
-                {Label}
-              </Typography>
-              <Typography
-                variant={isSm ? "body1" : "h5"}
-                sx={{
-                  display: "flex",
-                  gap: 1,
-                  alignItems: "center",
-                  mt: 2,
-                  wordBreak: "break-word",
-                }}
-              >
-                <Icon />
-                {text}
-              </Typography>
-            </>
-          ))}
+          <Typography
+            sx={{
+              mb: 1,
+              color: theme.palette.primary.main,
+            }}
+            variant="h3"
+          >
+            Контакты
+          </Typography>
+          <Box
+            sx={{
+              color: theme.palette.secondary.light,
+              display: "grid",
+              gridTemplateColumns: "1fr 3fr",
+              columnGap: 2,
+            }}
+          >
+            {(
+              [
+                ["Адрес", PlaceIcon, "2-я Пугачевская улица, дом 8, корпус 3"],
+                ["Телефон", LocalPhoneIcon, "8 (499) 780-74-97"],
+                ["Почта", EmailIcon, "oao_master_ok@bk.ru"],
+              ] as const
+            ).map(([Label, Icon, text]) => (
+              <>
+                <Typography
+                  variant={isSm ? "body1" : "h6"}
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    mt: 1,
+                  }}
+                >
+                  {Label}
+                </Typography>
+                <Typography
+                  variant={isSm ? "body1" : "h6"}
+                  sx={{
+                    display: "flex",
+                    gap: 1,
+                    alignItems: "center",
+                    mt: 1,
+                    wordBreak: "break-word",
+                  }}
+                >
+                  <Icon />
+                  {text}
+                </Typography>
+              </>
+            ))}
+          </Box>
         </Box>
+        <ContactUs />
       </Box>
     </Box>
   );

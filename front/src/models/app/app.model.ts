@@ -1,4 +1,10 @@
-import { appApi, authApi, sanctionsManagementApi, searchAppApi } from "api";
+import {
+  appApi,
+  authApi,
+  contactUsApi,
+  sanctionsManagementApi,
+  searchAppApi,
+} from "api";
 import {
   Store,
   combine,
@@ -62,7 +68,10 @@ sample({
 $authorizationData.reset(LogOut);
 
 sample({
-  clock: [sanctionsManagementApi.uploadSanctionsFileFx.failData],
+  clock: [
+    sanctionsManagementApi.uploadSanctionsFileFx.failData,
+    contactUsApi.submitForm.failData,
+  ],
   fn: (error?: string): Notification.PayloadType => ({
     type: "error",
     message: error || "An error occurred. Please try again later.",

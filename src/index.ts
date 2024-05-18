@@ -12,6 +12,7 @@ import * as path from "path";
 import * as https from "https";
 import { readFileSync } from "fs";
 import { userApi, userApiHandlers } from "./user/user.api";
+import { contactApi, contactApiHandlers } from "./contact";
 
 const app = express();
 
@@ -63,4 +64,5 @@ server.on("connection", async (socket: Socket) => {
   registerApi(searchApiHandlers, searchApi, socket);
   registerApi(sanctionsManagementApiHandlers, sanctionsManagementApi, socket);
   registerApi(userApiHandlers, userApi, socket);
+  registerApi(contactApiHandlers, contactApi, socket);
 });

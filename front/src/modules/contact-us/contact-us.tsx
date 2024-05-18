@@ -25,8 +25,7 @@ const Input = (props: TextFieldProps & { isMd?: boolean }) => (
     {...props}
     required
     sx={{
-      minWidth: "350px",
-      // maxWidth: "calc(50% - 4px)",
+      minWidth: "300px",
       flexBasis: props.isMd ? "100%" : "calc(50% - 4px)",
       ...props.sx,
     }}

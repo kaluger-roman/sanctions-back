@@ -4,8 +4,7 @@
   "description": "sanctions-back",
   "scripts": {
     "watch": "nodemon -e ts -w ./src -x npx ts-node ./src/index.ts",
-    "serve": "(cd front && npm run build) && npx prisma migrate deploy && npx ts-node ./src/index.ts",
-    "serve1": "npx prisma migrate deploy && npx ts-node ./src/index.ts",
+    "serve": "npm ci && npx prisma migrate deploy && npx ts-node ./src/index.ts",
     "migrate": "prisma migrate dev"
   },
   "author": "Roman Kaluger",

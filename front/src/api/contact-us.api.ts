@@ -10,6 +10,9 @@ type ContactUsForm = {
   message: string;
 };
 
-export const submitForm = createEffect<void, ContactUsForm, string>(() =>
-  socket.emitWithAnswer<void, ContactUsForm>(ACTIONS.SUBMIT_CONTACT_FORM),
+export const submitForm = createEffect<void, ContactUsForm, string>((payload) =>
+  socket.emitWithAnswer<void, ContactUsForm>(
+    ACTIONS.SUBMIT_CONTACT_FORM,
+    payload,
+  ),
 );

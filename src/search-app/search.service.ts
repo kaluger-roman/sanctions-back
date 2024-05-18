@@ -22,21 +22,8 @@ class SearchService {
     return restrictions.map(({ restriction }) => restriction);
   }
 
-  async applyIntermediateFilters({ countries, restrictions }: SearchFilters) {
+  async applyIntermediateFilters({ countries }: { countries: Array<string> }) {
     return {
-      countries: (
-        await prisma.sanction.findMany({
-          select: { sourceCountry: true },
-          distinct: ["sourceCountry"],
-          where: {
-            restriction: restrictions.length
-              ? {
-                  in: restrictions,
-                }
-              : undefined,
-          },
-        })
-      ).map(({ sourceCountry }) => sourceCountry),
       restrictions: (
         await prisma.sanction.findMany({
           select: { restriction: true },
@@ -59,33 +46,37 @@ class SearchService {
     countries,
     restrictions,
   }: SearchFilters) {
-    const sanctions: Array<Sanction & { descriptionTag?: string }> = [];
+    const sanctions: Array<
+      Sanction & { descriptionTag?: string; codeTag?: string }
+    > = [];
 
     if (searchTypes.includes("code")) {
-      sanctions.push(
-        ...(await prisma.sanction.findMany({
-          where: {
-            code: {
-              in: searchTags.length
-                ? searchTags
-                    .filter((tag) => tag.match(/^\d*$/g))
-                    .flatMap(splitCodeTag)
-                : undefined,
-            },
-            sourceCountry: countries.length
-              ? {
-                  in: countries,
-                }
-              : undefined,
-            restriction: restrictions.length
-              ? {
-                  in: restrictions,
-                }
-              : undefined,
-          },
-          orderBy: { code: "asc" },
-        })),
-      );
+      for await (const codeTag of searchTags.filter((tag) =>
+        tag.match(/^\d*$/g),
+      )) {
+        sanctions.push(
+          ...(
+            await prisma.sanction.findMany({
+              where: {
+                code: {
+                  in: splitCodeTag(codeTag),
+                },
+                sourceCountry: countries.length
+                  ? {
+                      in: countries,
+                    }
+                  : undefined,
+                restriction: restrictions.length
+                  ? {
+                      in: restrictions,
+                    }
+                  : undefined,
+              },
+              orderBy: { code: "asc" },
+            })
+          ).map((x) => ({ ...x, codeTag })),
+        );
+      }
     }
 
     if (searchTypes.includes("description")) {
@@ -128,7 +119,7 @@ class SearchService {
         sanctions.flatMap((sanction) =>
           searchTags.flatMap((tag) =>
             [
-              searchTypes.includes("code") && tag.startsWith(sanction.code)
+              searchTypes.includes("code") && tag === sanction.codeTag
                 ? { ...sanction, tag }
                 : null,
               searchTypes.includes("description") &&

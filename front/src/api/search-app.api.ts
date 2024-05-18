@@ -13,11 +13,11 @@ export const loadRestrictionsFx = createEffect<void, Array<string>, string>(
 );
 
 export const checkFiltersFx = createEffect<
-  SearchFilters,
+  { countries: Array<string> },
   SyncedFilters,
   string
 >((payload) =>
-  socket.emitWithAnswer<SearchFilters, SyncedFilters>(
+  socket.emitWithAnswer<{ countries: Array<string> }, SyncedFilters>(
     ACTIONS.CHECK_FILTERS,
     payload,
   ),

@@ -19,9 +19,14 @@ class AppSocket {
   $isConnected = createStore(false);
 
   connect() {
-    this.client = io(process.env.REACT_APP_SERVER_HOST || "/", {
-      transports: ["websocket"],
-    });
+    this.client = io(
+      (process.env.NODE_ENV === "production"
+        ? process.env.REACT_APP_SERVER_HOST
+        : process.env.REACT_APP_SERVER_HOST_DEV) || "/",
+      {
+        transports: ["websocket"],
+      },
+    );
 
     this.init();
   }

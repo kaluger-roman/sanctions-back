@@ -8,7 +8,7 @@ import { Request } from "src/types";
 export const searchApiHandlers = {
   [ACTIONS.LOAD_COUNTRIES]: () => searchService.loadCountries(),
   [ACTIONS.LOAD_RESTRICTIONS]: () => searchService.loadRestrictions(),
-  [ACTIONS.CHECK_FILTERS]: (payload: Request<SearchFilters>) =>
+  [ACTIONS.CHECK_FILTERS]: (payload: Request<{ countries: Array<string> }>) =>
     searchService.applyIntermediateFilters(payload),
   [ACTIONS.SEARCH]: (payload: Request<SearchFilters>) =>
     searchService.search(payload),

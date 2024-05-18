@@ -10,7 +10,7 @@ import {
   Select,
 } from "@mui/material";
 import { useGate, useUnit } from "effector-react";
-import { intersection, last } from "lodash";
+import { intersection, last, sortBy } from "lodash";
 import { searchAppModel } from "models";
 import {
   search,
@@ -24,6 +24,7 @@ import { MuiChipsInput } from "mui-chips-input";
 import { SearchType, SearchTypeName } from "shared/search-type";
 import { theme } from "shared/theme";
 import { SearchTable } from "./search-table";
+import { useState } from "react";
 
 export const SearchApp = () => {
   const searchTags = useUnit(searchAppModel.$searchTags);
@@ -35,13 +36,11 @@ export const SearchApp = () => {
   const availableFilters = useUnit(searchAppModel.$availableFilters);
   const filtersSyncPending = useUnit(searchAppModel.$filtersSyncPending);
 
+  const [currentTagValue, setCurrentTagValue] = useState("");
+
   const isAllAvailableSanctionsSelected =
     intersection(selectedRestrictions, availableFilters.restrictions).length ===
     availableFilters.restrictions.length;
-
-  const isAllAvailableCountriesSelected =
-    intersection(selectedCountries, availableFilters.countries).length ===
-    availableFilters.countries.length;
 
   useGate(searchAppModel.SearchAppGate);
 
@@ -75,7 +74,29 @@ export const SearchApp = () => {
             sx={{ flexGrow: 1 }}
             value={searchTags}
             onChange={searchTagsChanged}
+            inputValue={currentTagValue}
             name="searchTags"
+            disableEdition
+            onInput={(e) => {
+              setCurrentTagValue((e.target as HTMLInputElement).value);
+            }}
+            onAddChip={() => setCurrentTagValue("")}
+            onPaste={(e) => {
+              e.preventDefault();
+              const value = e.clipboardData.getData("text");
+
+              const newTags = [
+                ...searchTags,
+                ...value.split(/(\r)?\n/g).filter(Boolean),
+              ];
+
+              if (newTags.length > 1) {
+                searchTagsChanged(newTags);
+                return setCurrentTagValue("");
+              }
+
+              setCurrentTagValue(value);
+            }}
           />
           <Button
             disabled={!searchTags.length}
@@ -96,9 +117,9 @@ export const SearchApp = () => {
               onChange={({ target }) => {
                 selectedCountriesChanged(
                   last(target.value) === "all"
-                    ? isAllAvailableCountriesSelected
+                    ? countries.length === selectedCountries.length
                       ? []
-                      : availableFilters.countries
+                      : countries
                     : (target.value as Array<string>),
                 );
               }}
@@ -110,9 +131,9 @@ export const SearchApp = () => {
                   disabled={filtersSyncPending}
                   indeterminate={
                     selectedCountries.length > 0 &&
-                    !isAllAvailableCountriesSelected
+                    countries.length !== selectedCountries.length
                   }
-                  checked={isAllAvailableCountriesSelected}
+                  checked={countries.length === selectedCountries.length}
                 />
                 <ListItemText primary="Все страны" />
               </MenuItem>
@@ -121,8 +142,7 @@ export const SearchApp = () => {
                   key={country}
                   value={country}
                   disabled={
-                    availableFilters.countries.indexOf(country) === -1 ||
-                    filtersSyncPending
+                    countries.indexOf(country) === -1 || filtersSyncPending
                   }
                 >
                   <Checkbox checked={selectedCountries.indexOf(country) > -1} />
@@ -162,7 +182,9 @@ export const SearchApp = () => {
                 />
                 <ListItemText primary="Все ограничения" />
               </MenuItem>
-              {restrictions.map((restriction) => (
+              {sortBy(restrictions, (a) =>
+                availableFilters.restrictions.includes(a) ? -1 : 1,
+              ).map((restriction) => (
                 <MenuItem
                   disabled={
                     availableFilters.restrictions.indexOf(restriction) === -1 ||

@@ -21,7 +21,7 @@ export const SearchTable = () => {
   const countries = useUnit(searchAppModel.$countries);
 
   return (
-    <Box sx={{ position: "relative", width: "100%", overflow: "scroll" }}>
+    <Box sx={{ position: "relative", width: "100%" }}>
       {isSearchHappened && isEmpty(searchResult) && (
         <Typography variant="body1">Поиск не дал результатов</Typography>
       )}
@@ -34,7 +34,6 @@ export const SearchTable = () => {
               fontWeight: "bold",
               fontSize: "18px",
               background: theme.palette.grey[300],
-              overflow: "scroll",
             },
           }}
         >

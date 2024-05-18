@@ -8,6 +8,5 @@ export type SearchFilters = {
 };
 
 export type SyncedFilters = {
-  countries: Array<string>;
   restrictions: Array<string>;
 };

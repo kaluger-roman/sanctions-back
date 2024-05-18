@@ -15,7 +15,6 @@ export const $searchType = createStore<Array<SearchType>>([
 ]);
 export const $searchResult = createStore<SearchResult>({});
 export const $availableFilters = createStore<SyncedFilters>({
-  countries: [],
   restrictions: [],
 });
 
@@ -86,6 +85,14 @@ sample({
 });
 
 sample({
+  clock: $availableFilters,
+  source: $selectedRestrictions,
+  fn: (selectedRestrictions, { restrictions }) =>
+    selectedRestrictions.filter((x) => restrictions.includes(x)),
+  target: $selectedRestrictions,
+});
+
+sample({
   clock: searchAppApi.loadRestrictionsFx.doneData,
   source: $availableFilters,
   fn: (availableFilters, restrictions) => ({
@@ -97,17 +104,9 @@ sample({
 
 sample({
   clock: syncFilters,
-  source: [
-    $selectedCountries,
-    $selectedRestrictions,
-    $searchType,
-    $searchTags,
-  ] as const,
-  fn: ([countries, restrictions, searchTypes, searchTags]) => ({
+  source: [$selectedCountries] as const,
+  fn: ([countries]) => ({
     countries,
-    restrictions,
-    searchTypes,
-    searchTags,
   }),
   target: searchAppApi.checkFiltersFx,
 });

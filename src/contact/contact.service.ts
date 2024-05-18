@@ -20,16 +20,27 @@ const options = {
 class ContactService {
   async processContactForm(payload: ContactForm) {
     try {
-      transporter.sendMail({
-        ...options,
-        html: `Имя: ${payload.name};<br/>Email: ${
-          payload.email
-        };<br/>Организация: ${
-          payload.organizationName || "Не указано"
-        };<br/>Телефон: ${payload.phoneNumber};<br/>Текст заявки:<br/>${
-          payload.message
-        }`,
+      await new Promise((resolve, reject) => {
+        transporter.sendMail(
+          {
+            ...options,
+            html: `Имя: ${payload.name};<br/>Email: ${
+              payload.email
+            };<br/>Организация: ${
+              payload.organizationName || "Не указано"
+            };<br/>Телефон: ${payload.phoneNumber};<br/>Текст заявки:<br/>${
+              payload.message
+            }`,
+          },
+          (err, info) => {
+            if (err) return reject(err);
+
+            resolve(info);
+          },
+        );
       });
+
+      return "success";
     } catch (error) {
       throw new Error("Ошибка. Попробуйте позже.");
     }

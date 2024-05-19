@@ -90,7 +90,11 @@ export const SearchApp = () => {
             }}
           />
           {!isSm && (
-            <Button variant="contained" onClick={() => search()}>
+            <Button
+              disabled={false}
+              variant="contained"
+              onClick={() => search()}
+            >
               Поиск
             </Button>
           )}

@@ -19,12 +19,19 @@ export const SearchTable = () => {
   const searchResult = useUnit(searchAppModel.$searchResult);
   const isSearchHappened = useUnit(searchAppModel.$isSearchHappened);
   const countries = useUnit(searchAppModel.$countries);
+  const searchTags = useUnit(searchAppModel.$searchTags);
 
   return (
     <Box sx={{ position: "relative", width: "100%", overflowX: "auto" }}>
-      {isSearchHappened && isEmpty(searchResult) && (
-        <Typography variant="body1">Поиск не дал результатов</Typography>
-      )}
+      {isSearchHappened &&
+        isEmpty(searchResult) &&
+        (searchTags.length ? (
+          <Typography variant="body1">Поиск не дал результатов</Typography>
+        ) : (
+          <Typography variant="body1">
+            Введите хотя бы один поисковый код / описание
+          </Typography>
+        ))}
 
       {!isEmpty(searchResult) && (
         <Table

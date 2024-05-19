@@ -11,7 +11,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useGate, useUnit } from "effector-react";
-import { intersection, last, sortBy } from "lodash";
+import { intersection, last, sortBy, trim } from "lodash";
 import { searchAppModel } from "models";
 import {
   search,
@@ -80,12 +80,13 @@ export const SearchApp = () => {
 
               const newTags = [
                 ...searchTags,
-                ...value.split(/(\r)?\n/g).filter(Boolean),
+                ...value
+                  .split(/(\r)?\n/g)
+                  .map(trim)
+                  .filter(Boolean),
               ];
 
-              if (newTags.length > 1) {
-                searchTagsChanged(newTags);
-              }
+              searchTagsChanged(newTags);
             }}
           />
           {!isSm && (

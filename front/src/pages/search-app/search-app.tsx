@@ -90,11 +90,7 @@ export const SearchApp = () => {
             }}
           />
           {!isSm && (
-            <Button
-              disabled={false}
-              variant="contained"
-              onClick={() => search()}
-            >
+            <Button variant="contained" onClick={() => search()}>
               Поиск
             </Button>
           )}
@@ -236,11 +232,7 @@ export const SearchApp = () => {
             </Select>
           </FormControl>
           {isSm && (
-            <Button
-              disabled={!searchTags.length}
-              variant="contained"
-              onClick={() => search()}
-            >
+            <Button variant="contained" onClick={() => search()}>
               Поиск
             </Button>
           )}

@@ -31,7 +31,7 @@ export const SearchAppMetadata = () => (
       <List sx={{ display: "flex", flexWrap: "wrap" }}>
         {ACTUAL_DATES.map((item) => (
           <ListItem sx={{ gap: 2, width: "min-content", mr: 8 }}>
-            <ListItemIcon>{item.flag}</ListItemIcon>
+            <ListItemIcon sx={{ height: "40px" }}>{item.flag}</ListItemIcon>
             <ListItemText primary={item.country} secondary={`${item.date}`} />
           </ListItem>
         ))}

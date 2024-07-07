@@ -8,6 +8,7 @@
     "@master_kufa/client-tools": "^0.22.37",
     "@mui/icons-material": "^5.11.16",
     "@mui/material": "^5.13.4",
+    "country-flag-icons": "^1.5.12",
     "effector": "^22.8.8",
     "effector-react": "^22.5.4",
     "jwt-decode": "^4.0.0",

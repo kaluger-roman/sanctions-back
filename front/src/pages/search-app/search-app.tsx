@@ -25,6 +25,7 @@ import { MuiChipsInput } from "mui-chips-input";
 import { SearchType, SearchTypeName } from "shared/search-type";
 import { theme } from "shared/theme";
 import { SearchTable } from "./search-table";
+import { SearchAppMetadata } from "modules/search-app-metadata";
 
 export const SearchApp = () => {
   const searchTags = useUnit(searchAppModel.$searchTags);
@@ -49,6 +50,7 @@ export const SearchApp = () => {
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
+        flexDirection: "column",
         m: 4,
       }}
     >
@@ -240,6 +242,7 @@ export const SearchApp = () => {
 
         <SearchTable />
       </Box>
+      <SearchAppMetadata />
     </Box>
   );
 };

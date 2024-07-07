@@ -19,9 +19,9 @@ export const Footer = () => (
   >
     {(
       [
-        [PlaceIcon, "2-я Пугачевская улица, дом 8, корпус 3"],
-        [LocalPhoneIcon, "8 (499) 780-74-97"],
-        [EmailIcon, "oao_master_ok@bk.ru"],
+        [PlaceIcon, "Работаем онлайн, основное местоположение – Москва"],
+        [LocalPhoneIcon, "+7 (916) 823-21-98"],
+        [EmailIcon, "goodsanctionsearch@gmail.com"],
       ] as const
     ).map(([Icon, text]) => (
       <Box sx={{ display: "flex", gap: 1, width: "max-content" }}>

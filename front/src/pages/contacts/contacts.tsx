@@ -75,9 +75,13 @@ export const Contacts = () => {
           >
             {(
               [
-                ["Адрес", PlaceIcon, "2-я Пугачевская улица, дом 8, корпус 3"],
-                ["Телефон", LocalPhoneIcon, "8 (499) 780-74-97"],
-                ["Почта", EmailIcon, "oao_master_ok@bk.ru"],
+                [
+                  "Адрес",
+                  PlaceIcon,
+                  "Работаем онлайн, основное местоположение – Москва",
+                ],
+                ["Телефон", LocalPhoneIcon, "+7 (916) 823-21-98"],
+                ["Почта", EmailIcon, "goodsanctionsearch@gmail.com"],
               ] as const
             ).map(([Label, Icon, text]) => (
               <>

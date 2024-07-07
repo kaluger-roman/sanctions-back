@@ -25,12 +25,12 @@ const ACTUAL_DATES: Array<{
 ];
 
 export const SearchAppMetadata = () => (
-  <Box>
+  <Box sx={{ maxWidth: 1200, mr: "auto", ml: "auto", position: "relative" }}>
     <Box sx={{ pt: 6, pb: 6 }}>
       <Typography variant="h6">Списки актуальны на следующие даты:</Typography>
-      <List sx={{ display: "flex" }}>
+      <List sx={{ display: "flex", flexWrap: "wrap" }}>
         {ACTUAL_DATES.map((item) => (
-          <ListItem sx={{ gap: 2 }}>
+          <ListItem sx={{ gap: 2, width: "min-content", mr: 8 }}>
             <ListItemIcon>{item.flag}</ListItemIcon>
             <ListItemText primary={item.country} secondary={`${item.date}`} />
           </ListItem>
@@ -47,9 +47,10 @@ export const SearchAppMetadata = () => (
           justifyContent: "space-between",
           gap: 4,
           alignItems: "center",
+          flexWrap: "wrap",
         }}
       >
-        <Typography variant="h4">
+        <Typography variant="h4" sx={{ flexBasis: "350px", flexGrow: 1 }}>
           Остались вопросы или предложения по улучшению сервиса?
         </Typography>
 
@@ -71,9 +72,10 @@ export const SearchAppMetadata = () => (
           justifyContent: "space-between",
           gap: 4,
           alignItems: "center",
+          flexWrap: "wrap",
         }}
       >
-        <Typography variant="h6">
+        <Typography variant="h6" sx={{ flexBasis: "350px", flexGrow: 1 }}>
           Мы с удовольствием рассмотрим и ответим на вашу заявку, а также внесем
           изменения, которые будут учитывать Ваши пожелания!
         </Typography>

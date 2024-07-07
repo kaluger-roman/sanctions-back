@@ -24,8 +24,8 @@ export const Footer = () => (
         [EmailIcon, "goodsanctionsearch@gmail.com"],
       ] as const
     ).map(([Icon, text]) => (
-      <Box sx={{ display: "flex", gap: 1, width: "max-content" }}>
-        <Icon />
+      <Box sx={{ textAlign: "center", display: "flex" }}>
+        <Icon sx={{ mr: 1 }} />
         {text}
       </Box>
     ))}

@@ -278,7 +278,7 @@ export const Main = () => (
           {[
             <>
               <HightlightPluses>Более пяти лет опыта</HightlightPluses> в
-              банковском комплаенс и{" "}
+              комплаенсе и консалтинге, а также{" "}
               <HightlightPluses>более 3 лет опыта</HightlightPluses> в сфере
               санкционного права
             </>,

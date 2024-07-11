@@ -1,14 +1,14 @@
 import { SxProps } from "@mui/material";
 import { theme } from "shared/theme";
 
-export const NavigationContainer = ({ isSm }: { isSm: boolean }): SxProps => ({
+export const NavigationContainer = ({ isMd }: { isMd: boolean }): SxProps => ({
   width: "100vw",
   height: "60px",
   zIndex: 10,
   display: "flex",
   alignItems: "center",
   justifyContent: "start",
-  gap: isSm ? 1 : 2,
+  gap: isMd ? 1 : 2,
   pr: 2,
   pl: 2,
   background: theme.palette.background.default,
@@ -21,20 +21,20 @@ export const LinksLargeContainer: SxProps = {
   ml: "auto",
 };
 
-export const MediaLinksContainer = ({ isSm }: { isSm: boolean }): SxProps => ({
+export const MediaLinksContainer = ({ isMd }: { isMd: boolean }): SxProps => ({
   height: "100%",
   display: "flex",
   alignItems: "center",
   gap: 2,
   padding: 1,
-  ml: isSm ? "auto" : 0,
+  ml: isMd ? "auto" : 0,
 });
 
-export const SmallMenuContainer = ({ isSm }: { isSm: boolean }): SxProps => ({
+export const SmallMenuContainer = ({ isMd }: { isMd: boolean }): SxProps => ({
   display: "flex",
   gap: 1,
   justifySelf: "start",
-  ml: isSm ? 0 : "auto",
+  ml: isMd ? 0 : "auto",
 });
 
 export const MenuPaperStyles: SxProps = {

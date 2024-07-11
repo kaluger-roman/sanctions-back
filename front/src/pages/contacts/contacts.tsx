@@ -20,6 +20,7 @@ export const Contacts = () => {
         gap: 2,
         display: "flex",
         justifyContent: "center",
+        alignItems: "flex-start",
         minHeight: `calc(${adjustAppHeight()} - 60px)`,
       }}
     >
@@ -54,6 +55,8 @@ export const Contacts = () => {
             background: alpha(theme.palette.grey[900], 0.8),
             flexGrow: 1,
             flexBasis: "50%",
+            maxWidth: 1200,
+            height: "fit-content",
           }}
         >
           <Typography
@@ -96,7 +99,7 @@ export const Contacts = () => {
                   {Label}
                 </Typography>
                 <Typography
-                  variant={isSm ? "body1" : "h6"}
+                  variant={isSm ? "body2" : "h6"}
                   sx={{
                     display: "flex",
                     gap: 1,

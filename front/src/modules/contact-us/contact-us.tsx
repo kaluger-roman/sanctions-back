@@ -24,6 +24,7 @@ const Input = (props: TextFieldProps & { isMd?: boolean }) => (
   <TextField
     {...props}
     required
+    size={props.isMd ? "small" : "medium"}
     sx={{
       minWidth: "300px",
       flexBasis: props.isMd ? "100%" : "calc(50% - 4px)",
@@ -54,6 +55,8 @@ export const ContactUs = () => {
         position: "relative",
         borderRadius: 4,
         background: alpha(theme.palette.grey[900], 0.8),
+        maxWidth: 1200,
+        height: "fit-content",
       }}
     >
       <Typography

@@ -39,7 +39,7 @@ import { appModel } from "models";
 import { LogOut } from "models/app/app.model";
 
 const Link = ({ name, path, subLinks, onClick }: LinkOption) => {
-  const isSm = useMediaQuery(theme.breakpoints.down("md"));
+  const isMd = useMediaQuery(theme.breakpoints.down("lg"));
   const [isHovered, setIsHovered] = useState(false);
   const [isOpened, setIsOpened] = useState(false);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
@@ -52,12 +52,12 @@ const Link = ({ name, path, subLinks, onClick }: LinkOption) => {
         variant="text"
         onClick={() => {
           onClick?.();
-          isSm && setIsOpened(!isOpened);
+          isMd && setIsOpened(!isOpened);
           path && navigation.navigate(path);
         }}
         endIcon={
           subLinks &&
-          (isSm && isOpened ? (
+          (isMd && isOpened ? (
             <KeyboardArrowUpIcon />
           ) : (
             <KeyboardArrowDownIcon />
@@ -68,7 +68,7 @@ const Link = ({ name, path, subLinks, onClick }: LinkOption) => {
         onMouseLeave={() => setIsHovered(false)}
       >
         {name}
-        {!isSm && subLinks && (
+        {!isMd && subLinks && (
           <Popper
             id={name}
             open={isHovered}
@@ -85,7 +85,7 @@ const Link = ({ name, path, subLinks, onClick }: LinkOption) => {
           </Popper>
         )}
       </Button>
-      {isSm && isOpened && subLinks && (
+      {isMd && isOpened && subLinks && (
         <Stack
           sx={{
             mb: 3,
@@ -105,10 +105,11 @@ const Link = ({ name, path, subLinks, onClick }: LinkOption) => {
 const Links = NAME_MAPPING.map((link) => <Link key={link.name} {...link} />);
 
 export const Navigation = () => {
-  const isSm = useMediaQuery(theme.breakpoints.down("md"));
   const [isMenuOpened, setIsMenuOpened] = useState(false);
   const [isAccountOpened, setIsAccountOpened] = useState(false);
   const isMd = useMediaQuery(theme.breakpoints.down("lg"));
+  const isLg = useMediaQuery(theme.breakpoints.up("lg"));
+  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   const authorizationData = useUnit(appModel.$authorizationData);
   const accountRef = useRef<HTMLButtonElement | null>(null);
 
@@ -117,22 +118,51 @@ export const Navigation = () => {
   }, [authorizationData]);
 
   return (
-    <Box sx={NavigationContainer({ isSm })}>
+    <Box sx={NavigationContainer({ isMd })}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-        <img style={{ height: isMd ? 44 : 56 }} src={Logo} alt="Logo" />
+        <img style={{ height: isMd ? 32 : 56 }} src={Logo} alt="Logo" />
         <Typography
           color={theme.palette.primary.main}
-          variant={isMd ? "body1" : "h4"}
+          variant={isSm ? "h6" : isMd ? "body1" : "h5"}
+          fontWeight="bold"
         >
           Good Sanction Check
         </Typography>
       </Box>
 
-      {!isSm && <Box sx={LinksLargeContainer}>{Links}</Box>}
+      {isLg && (
+        <>
+          <Box sx={LinksLargeContainer}>
+            {Links}{" "}
+            <Box sx={{ ml: 1 }}>
+              <Button
+                onClick={() => navigation.navigate(Paths.billing)}
+                variant="contained"
+              >
+                Оформить доступ
+              </Button>
+            </Box>
+          </Box>
+        </>
+      )}
 
-      <Box sx={MediaLinksContainer({ isSm })}>
-        <VK height="28px" cursor="pointer" />
-        <TG height="28px" cursor="pointer" />
+      <Box sx={MediaLinksContainer({ isMd })}>
+        {!isSm && isMd && (
+          <Button
+            size="small"
+            variant="contained"
+            onClick={() => navigation.navigate(Paths.billing)}
+          >
+            Оформить доступ
+          </Button>
+        )}
+
+        {!isSm && (
+          <>
+            <VK height="28px" cursor="pointer" />
+            <TG height="28px" cursor="pointer" />
+          </>
+        )}
 
         <>
           <Tooltip title={authorizationData ? "Профиль" : "Вход"}>
@@ -203,21 +233,51 @@ export const Navigation = () => {
         </Popper>
       )}
 
-      {isSm && (
-        <Box sx={SmallMenuContainer({ isSm })}>
+      {isMd && (
+        <Box sx={SmallMenuContainer({ isMd })}>
           <IconButton onClick={() => setIsMenuOpened(true)}>
             <MenuIcon />
           </IconButton>
+
           <Drawer
             anchor="right"
-            open={isSm && isMenuOpened}
+            open={isMd && isMenuOpened}
             onClose={() => setIsMenuOpened(false)}
             PaperProps={{ sx: MenuPaperStyles }}
           >
             <IconButton onClick={() => setIsMenuOpened(false)}>
               <CloseIcon />
             </IconButton>
-            <Box sx={LinksSmallContainer}>{Links}</Box>
+            <Box sx={LinksSmallContainer}>
+              <Button
+                sx={{ mb: 2 }}
+                variant="contained"
+                onClick={() => navigation.navigate(Paths.billing)}
+              >
+                Оформить доступ
+              </Button>
+
+              {Links}
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: 1,
+                  mb: 4,
+                  justifyContent: "flex-end",
+                  alignItems: "center",
+                  position: "absolute",
+                  bottom: 0,
+                  right: 20,
+                }}
+              >
+                <Typography variant="body1" sx={{ mr: 2 }}>
+                  Наши Соцсети:
+                </Typography>
+
+                <VK height="28px" cursor="pointer" />
+                <TG height="28px" cursor="pointer" />
+              </Box>
+            </Box>
           </Drawer>
         </Box>
       )}

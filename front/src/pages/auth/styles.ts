@@ -15,8 +15,8 @@ export const AuthContainer: SxProps = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  mt: "auto",
   mb: "auto",
+  mt: 2,
 };
 
 export const FormFields: SxProps = { gap: 1 };

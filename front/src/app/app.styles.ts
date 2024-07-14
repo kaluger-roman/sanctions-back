@@ -14,4 +14,5 @@ export const NavigationContainer: SxProps = {
   minHeight: adjustAppHeight(),
   display: "flex",
   flexDirection: "column",
+  gap: 2,
 };

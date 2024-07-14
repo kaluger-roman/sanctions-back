@@ -1,14 +1,5 @@
+import { transporter } from "../shared/email-transporter";
 import { ContactForm } from "./types";
-import { createTransport } from "nodemailer";
-
-const transporter = createTransport({
-  secure: true,
-  service: "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
 
 const options = {
   to: process.env.EMAIL_USER,

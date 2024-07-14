@@ -2,13 +2,17 @@ import { Backdrop, CircularProgress, Typography } from "@mui/material";
 import { ErrorContainer } from "./loader.styles";
 import { useUnit } from "effector-react";
 import { appModel, searchAppModel } from "models";
+import { recoverPasswordModel } from "models/recover";
 
 export const Loader = () => {
   const isLoading = useUnit(appModel.$isLoading);
   const loadingProgress = useUnit(appModel.$loadingProgress);
   const searchAppPageOpened = useUnit(searchAppModel.SearchAppGate.status);
+  const recoverPasswordOpened = useUnit(
+    recoverPasswordModel.RecoverRequestPageGate.status,
+  );
 
-  if (!searchAppPageOpened) return null;
+  if (!searchAppPageOpened && !recoverPasswordOpened) return null;
 
   return (
     <Backdrop sx={ErrorContainer} open={isLoading}>

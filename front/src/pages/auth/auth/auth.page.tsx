@@ -60,6 +60,14 @@ export const Auth = () => {
             onClick={() => navigation.navigate(Paths.register)}
             label="Регистрация"
           />
+          <Button
+            variant="text"
+            onClick={() => navigation.navigate(Paths.recoverPasswordRequest)}
+            sx={{ mt: 4 }}
+            size="small"
+          >
+            Забыли пароль?
+          </Button>
         </Stack>
       </Paper>
     </Box>

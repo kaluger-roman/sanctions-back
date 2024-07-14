@@ -6,11 +6,11 @@ import {
   sample,
 } from "effector";
 import { authApi } from "../../api";
-import { validatePassword } from "./register.helpers";
 import { createGate } from "effector-react";
 import { navigation } from "shared/navigate";
 import { Notification } from "@master_kufa/client-tools";
 import { Paths } from "../../shared/paths";
+import { validatePassword } from "shared/auth.helpers";
 
 export const emailTextChanged = createEvent<string>();
 export const passwordTextChanged = createEvent<string>();
@@ -47,10 +47,7 @@ sample({
 sample({
   clock: registerClicked,
   source: $passwordText,
-  fn: (password) =>
-    validatePassword(password)
-      ? ""
-      : "Пароль должен содержать более 6 символов, включая прописные/строчные буквы и цифры.",
+  fn: (password) => validatePassword(password),
   target: $passwordTextError,
 });
 

@@ -1,6 +1,11 @@
 import { createEffect } from "effector";
 import { ACTIONS } from "../actions";
-import { AuthPayload, RegisterPayload } from "./auth.types";
+import {
+  AuthPayload,
+  RecoverConfirmPayload,
+  RecoverRequestPayload,
+  RegisterPayload,
+} from "./auth.types";
 import { socket } from "api/app.api";
 
 export const authFx = createEffect<AuthPayload, string, string>((payload) =>
@@ -14,4 +19,26 @@ export const registerFx = createEffect<RegisterPayload, string, string>(
 
 export const verifyFx = createEffect<void, string, string>(() =>
   socket.emitWithAnswer<void, string>(ACTIONS.VERIFY),
+);
+
+export const recoverRequestFx = createEffect<
+  RecoverRequestPayload,
+  string,
+  string
+>((payload) =>
+  socket.emitWithAnswer<RecoverRequestPayload, string>(
+    ACTIONS.RECOVER_PASSWORD_REQUEST,
+    payload,
+  ),
+);
+
+export const recoverConfirmFx = createEffect<
+  RecoverConfirmPayload,
+  string,
+  string
+>((payload) =>
+  socket.emitWithAnswer<RecoverConfirmPayload, string>(
+    ACTIONS.RECOVER_PASSWORD_CONFIRM,
+    payload,
+  ),
 );

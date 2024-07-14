@@ -12,6 +12,8 @@ import { Auth, Billing, Contacts, Main, Register, SearchApp } from "pages";
 import { CompanyClients } from "pages/clients";
 import { useEffect } from "react";
 import { ManageSanctions } from "pages/manage-sanctions";
+import { RecoverRequest } from "pages/auth/recover-request";
+import { RecoverConfirm } from "pages/auth";
 
 export const AppNavigation = () => {
   useInitNavigation();
@@ -42,6 +44,14 @@ export const AppNavigation = () => {
                 element={<CompanyClients isCorporate />}
               />
               <Route path={Paths.billing} element={<Billing />} />
+              <Route
+                path={Paths.recoverPasswordRequest}
+                element={<RecoverRequest />}
+              />
+              <Route
+                path={Paths.recoverPasswordConfirm}
+                element={<RecoverConfirm />}
+              />
               <Route
                 path={Paths.servicesPrivate}
                 element={<CompanyClients />}

@@ -224,7 +224,8 @@ sample({
   clock: authApi.registerFx.done,
   fn: (): Notification.PayloadType => ({
     type: "success",
-    message: "Пользователь успешно создан.",
+    message:
+      "Пользователь успешно создан. На почту отправлено письмо для подтверждения регистрации.",
   }),
   target: Notification.add,
 });

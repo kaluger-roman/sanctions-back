@@ -36,6 +36,8 @@ class UserService {
     if (existedUser)
       throw new Error("Пользователь с таким Email уже существует");
 
+    const registrationConfirmToken = nanoid();
+
     await prisma.user.create({
       data: {
         email: payload.email,
@@ -46,10 +48,9 @@ class UserService {
         phone: payload.phone,
         category: payload.clientCategory,
         isConfirmed: false,
+        registrationConfirmToken,
       },
     });
-
-    const registrationConfirmToken = nanoid();
 
     await new Promise((resolve, reject) => {
       transporter.sendMail(

@@ -8,6 +8,7 @@ export enum Paths {
   resetSanctionsDatabase = "/admin/reset_sanctions_database",
   auth = "/auth",
   register = "/register",
+  registrationConfirm = "/registration_confirm/:token",
   recoverPasswordRequest = "/recover_password_request",
   recoverPasswordConfirm = "/recover_password_confirm/:token",
 

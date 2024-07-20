@@ -35,12 +35,12 @@ export const $filtersSyncPending = searchAppApi.checkFiltersFx.pending;
 export const SearchAppGate = createGate();
 
 sample({
-  clock: appModel.AppGate.open,
+  clock: SearchAppGate.open,
   target: searchAppApi.loadCountriesFx,
 });
 
 sample({
-  clock: appModel.AppGate.open,
+  clock: SearchAppGate.open,
   target: searchAppApi.loadRestrictionsFx,
 });
 

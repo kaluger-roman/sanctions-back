@@ -26,6 +26,7 @@ export const $authorizationData = createStore<User | null>(null);
 const $commonPendingRequests = combine(
   searchAppApi.loadCountriesFx.pending,
   authApi.recoverRequestFx.pending,
+  authApi.registrationConfirmFx.pending,
   socket.$isConnected.map((isConnected) => !isConnected),
   (...requests: Array<boolean>) => requests.some(Boolean),
 ) as unknown as Store<boolean>;
@@ -74,6 +75,7 @@ sample({
     contactUsApi.submitForm.failData,
     authApi.recoverRequestFx.failData,
     authApi.recoverConfirmFx.failData,
+    authApi.registrationConfirmFx.failData,
   ],
   fn: (error?: string): Notification.PayloadType => ({
     type: "error",

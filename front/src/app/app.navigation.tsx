@@ -13,7 +13,7 @@ import { CompanyClients } from "pages/clients";
 import { useEffect } from "react";
 import { ManageSanctions } from "pages/manage-sanctions";
 import { RecoverRequest } from "pages/auth/recover-request";
-import { RecoverConfirm } from "pages/auth";
+import { RecoverConfirm, RegistrationConfirm } from "pages/auth";
 
 export const AppNavigation = () => {
   useInitNavigation();
@@ -36,6 +36,10 @@ export const AppNavigation = () => {
             <Route path={Paths.root}>
               <Route index path={Paths.auth} element={<Auth />} />
               <Route path={Paths.register} element={<Register />} />
+              <Route
+                path={Paths.registrationConfirm}
+                element={<RegistrationConfirm />}
+              />
               <Route element={<Navigate replace to={Paths.main} />} index />
 
               <Route path={Paths.main} element={<Main />} />

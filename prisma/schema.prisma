@@ -25,4 +25,12 @@ model User {
   isAdmin                    Boolean   @default(false)
   recoverPasswordToken       String?
   recoverPasswordRequestTime DateTime?
+  name                       String
+  surname                    String
+  secondName                 String?
+  phone                      String
+  INN                        String?
+  category                   String
+  isConfirmed                Boolean   @default(false)
+  registrationConfirmToken   String?
 }

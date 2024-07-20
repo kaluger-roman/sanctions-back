@@ -3,6 +3,7 @@ import {
   RecoverConfirmPayload,
   RecoverTokenRequestPayload,
   RegisterPayload,
+  RegistrationConfirmPayload,
 } from "./types";
 import { ACTIONS } from "../actions";
 import { Api } from "../api.service";
@@ -20,6 +21,9 @@ export const userApiHandlers = {
   [ACTIONS.RECOVER_PASSWORD_CONFIRM]: (
     payload: Request<RecoverConfirmPayload>,
   ) => userService.recoverPasswordConfirm(payload),
+  [ACTIONS.REGISTRATION_CONFIRM]: (
+    payload: Request<RegistrationConfirmPayload>,
+  ) => userService.registrationConfirm(payload),
 };
 
 export const userApi = new Api(userApiHandlers);

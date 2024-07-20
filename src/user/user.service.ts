@@ -3,6 +3,7 @@ import {
   RecoverConfirmPayload,
   RecoverTokenRequestPayload,
   RegisterPayload,
+  RegistrationConfirmPayload,
 } from "./types";
 import { createHash } from "crypto";
 import * as jwt from "jsonwebtoken";
@@ -32,16 +33,63 @@ class UserService {
       where: { email: payload.email },
     });
 
-    if (existedUser) throw new Error("User already exists");
+    if (existedUser)
+      throw new Error("Пользователь с таким Email уже существует");
 
     await prisma.user.create({
       data: {
         email: payload.email,
         passwordHash: this.buildPasswordHash(payload.password),
+        name: payload.name,
+        surname: payload.surname,
+        secondName: payload.secondName,
+        phone: payload.phone,
+        category: payload.clientCategory,
+        isConfirmed: false,
       },
     });
 
+    const registrationConfirmToken = nanoid();
+
+    await new Promise((resolve, reject) => {
+      transporter.sendMail(
+        {
+          to: payload.email,
+          subject: "Регистрация на сайте GoodSanctionCheck",
+          text: `Вы зарегистрировались на сайте GoodSanctionCheck. Для подтверждения перейдите по ссылке: https://goodsanctioncheck.com/registration_confirm/${registrationConfirmToken}`,
+          textEncoding: "base64",
+        },
+        (err, info) => {
+          if (err) return reject(err);
+
+          resolve(info);
+        },
+      );
+    });
+
     return payload.email;
+  }
+
+  async registrationConfirm(payload: RegistrationConfirmPayload) {
+    const user =
+      payload.confirmToken &&
+      (await prisma.user.findFirst({
+        where: { registrationConfirmToken: payload.confirmToken },
+      }));
+
+    if (!user) {
+      throw new Error("Нет активной сессии подтверждения регистрации");
+    }
+
+    await prisma.user.updateMany({
+      where: { registrationConfirmToken: payload.confirmToken },
+      data: {
+        isConfirmed: true,
+        registrationConfirmToken: null,
+      },
+    });
+
+    return "success";
   }
 
   async auth(payload: AuthPayload) {

@@ -3,6 +3,7 @@ import { ErrorContainer } from "./loader.styles";
 import { useUnit } from "effector-react";
 import { appModel, searchAppModel } from "models";
 import { recoverPasswordModel } from "models/recover";
+import { registerConfirmModel } from "models/register";
 
 export const Loader = () => {
   const isLoading = useUnit(appModel.$isLoading);
@@ -11,8 +12,12 @@ export const Loader = () => {
   const recoverPasswordOpened = useUnit(
     recoverPasswordModel.RecoverRequestPageGate.status,
   );
+  const registerConfirmOpened = useUnit(
+    registerConfirmModel.RegisterConfirmPageGate.status,
+  );
 
-  if (!searchAppPageOpened && !recoverPasswordOpened) return null;
+  if (!searchAppPageOpened && !recoverPasswordOpened && !registerConfirmOpened)
+    return null;
 
   return (
     <Backdrop sx={ErrorContainer} open={isLoading}>

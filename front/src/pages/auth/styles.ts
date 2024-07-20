@@ -19,4 +19,4 @@ export const AuthContainer: SxProps = {
   mt: 2,
 };
 
-export const FormFields: SxProps = { gap: 1 };
+export const FormFields: SxProps = { gap: 2 };

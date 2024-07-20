@@ -10,6 +10,10 @@ async function main() {
       email: process.env.ADMIN_USER,
       passwordHash: userService.buildPasswordHash(process.env.ADMIN_PASSWORD),
       isAdmin: true,
+      name: "Admin",
+      surname: "Admin",
+      phone: "123456789",
+      category: "private",
     },
   });
 }

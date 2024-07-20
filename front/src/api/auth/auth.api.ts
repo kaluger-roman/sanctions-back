@@ -5,6 +5,7 @@ import {
   RecoverConfirmPayload,
   RecoverRequestPayload,
   RegisterPayload,
+  RegistrationConfirmPayload,
 } from "./auth.types";
 import { socket } from "api/app.api";
 
@@ -39,6 +40,17 @@ export const recoverConfirmFx = createEffect<
 >((payload) =>
   socket.emitWithAnswer<RecoverConfirmPayload, string>(
     ACTIONS.RECOVER_PASSWORD_CONFIRM,
+    payload,
+  ),
+);
+
+export const registrationConfirmFx = createEffect<
+  RegistrationConfirmPayload,
+  string,
+  string
+>((payload) =>
+  socket.emitWithAnswer<RegistrationConfirmPayload, string>(
+    ACTIONS.REGISTRATION_CONFIRM,
     payload,
   ),
 );

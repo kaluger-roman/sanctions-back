@@ -208,6 +208,12 @@ export const Navigation = () => {
                 )}
               </Box>
               <Box sx={{ p: 1 }}>
+                <Button
+                  sx={{ width: "100%" }}
+                  onClick={() => navigation.navigate(Paths.profile)}
+                >
+                  Личный кабинет
+                </Button>
                 {authorizationData.isAdmin && (
                   <Button
                     sx={{ width: "100%" }}

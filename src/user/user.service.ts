@@ -49,6 +49,8 @@ class UserService {
         category: payload.clientCategory,
         isConfirmed: false,
         registrationConfirmToken,
+        INN: payload.INN,
+        companyName: payload.companyName,
       },
     });
 

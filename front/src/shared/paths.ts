@@ -5,6 +5,7 @@ export enum Paths {
   contacts = "/contacts",
   search_app = "/search_app",
   billing = "/billing",
+  profile = "/profile",
   resetSanctionsDatabase = "/admin/reset_sanctions_database",
   auth = "/auth",
   register = "/register",

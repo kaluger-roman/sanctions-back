@@ -39,6 +39,7 @@ export const $passwordTextError = createStore("");
 export const $passwordConfirmTextError = createStore("");
 export const $phoneError = createStore("");
 export const $INNError = createStore("");
+export const $companyNameError = createStore("");
 export const $nameError = createStore("");
 export const $surnameError = createStore("");
 export const $isRegisterStarted = createStore<boolean>(false);
@@ -119,12 +120,11 @@ sample({
   clock: registerClicked,
   source: [$clientCategory, $INN] as const,
   fn: ([clientCategory, INN]) =>
-    !/^\d{10}$/g.test(clientCategory) &&
-    clientCategory === ClientCategory.company
+    !/^\d{10}$/g.test(INN) && clientCategory === ClientCategory.company
       ? "Некорректный ИНН"
       : "",
 
-  target: $INN,
+  target: $INNError,
 });
 
 sample({
@@ -139,6 +139,13 @@ sample({
   source: $surname,
   fn: (surname) => (surname ? "" : "Поле обязательно для заполнения"),
   target: $surnameError,
+});
+
+sample({
+  clock: registerClicked,
+  source: $companyName,
+  fn: (companyName) => (companyName ? "" : "Поле обязательно для заполнения"),
+  target: $companyNameError,
 });
 
 sample({
@@ -169,6 +176,7 @@ sample({
     secondName: $secondName,
     phone: $phone,
     companyName: $companyName,
+    companyNameError: $companyNameError,
     INN: $INN,
     nameError: $nameError,
     surnameError: $surnameError,
@@ -185,12 +193,14 @@ sample({
     phoneError,
     INNError,
     clientCategory,
+    companyNameError,
   }) =>
     !emailTextError &&
     !passwordTextError &&
     !passwordConfirmTextError &&
     !nameError &&
     !surnameError &&
+    !companyNameError &&
     !phoneError &&
     !(INNError && clientCategory === ClientCategory.company),
   fn: ({
@@ -202,6 +212,7 @@ sample({
     phone,
     secondName,
     clientCategory,
+    companyName,
   }) => ({
     email,
     password,
@@ -210,6 +221,7 @@ sample({
     INN,
     phone,
     secondName,
+    companyName,
     clientCategory,
   }),
   target: authApi.registerFx,
@@ -262,6 +274,7 @@ $INNError.reset(PageGate.close, $clientCategory);
 $nameError.reset(PageGate.close, $clientCategory);
 $surnameError.reset(PageGate.close, $clientCategory);
 $phoneError.reset(PageGate.close, $clientCategory);
+$companyNameError.reset(PageGate.close, $clientCategory);
 $isRegisterStarted.reset(PageGate.close);
 
 $clientCategory.reset(PageGate.close);

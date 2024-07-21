@@ -8,6 +8,7 @@ import {
 import { ACTIONS } from "../actions";
 import { Api } from "../api.service";
 import { Request } from "../types";
+import { profileService } from "./profile.service";
 
 export const userApiHandlers = {
   [ACTIONS.AUTH]: (payload: Request<RegisterPayload>) =>
@@ -24,6 +25,8 @@ export const userApiHandlers = {
   [ACTIONS.REGISTRATION_CONFIRM]: (
     payload: Request<RegistrationConfirmPayload>,
   ) => userService.registrationConfirm(payload),
+  [ACTIONS.LOAD_PROFILE]: (payload: Request<void>) =>
+    profileService.loadProfile(payload.token),
 };
 
 export const userApi = new Api(userApiHandlers);

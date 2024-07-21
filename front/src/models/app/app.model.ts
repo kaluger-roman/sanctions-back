@@ -2,6 +2,7 @@ import {
   appApi,
   authApi,
   contactUsApi,
+  profileApi,
   sanctionsManagementApi,
   searchAppApi,
 } from "api";
@@ -27,6 +28,7 @@ const $commonPendingRequests = combine(
   searchAppApi.loadCountriesFx.pending,
   authApi.recoverRequestFx.pending,
   authApi.registrationConfirmFx.pending,
+  profileApi.loadCurrentProfileFx.pending,
   socket.$isConnected.map((isConnected) => !isConnected),
   (...requests: Array<boolean>) => requests.some(Boolean),
 ) as unknown as Store<boolean>;

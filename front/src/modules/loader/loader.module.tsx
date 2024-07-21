@@ -1,7 +1,7 @@
 import { Backdrop, CircularProgress, Typography } from "@mui/material";
 import { ErrorContainer } from "./loader.styles";
 import { useUnit } from "effector-react";
-import { appModel, searchAppModel } from "models";
+import { appModel, profileModel, searchAppModel } from "models";
 import { recoverPasswordModel } from "models/recover";
 import { registerConfirmModel } from "models/register";
 
@@ -15,8 +15,14 @@ export const Loader = () => {
   const registerConfirmOpened = useUnit(
     registerConfirmModel.RegisterConfirmPageGate.status,
   );
+  const profileOpened = useUnit(profileModel.ProfileGate.status);
 
-  if (!searchAppPageOpened && !recoverPasswordOpened && !registerConfirmOpened)
+  if (
+    !searchAppPageOpened &&
+    !recoverPasswordOpened &&
+    !registerConfirmOpened &&
+    !profileOpened
+  )
     return null;
 
   return (

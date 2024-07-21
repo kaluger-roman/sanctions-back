@@ -30,6 +30,7 @@ model User {
   secondName                 String?
   phone                      String
   INN                        String?
+  companyName                String?
   category                   String
   isConfirmed                Boolean   @default(false)
   registrationConfirmToken   String?

@@ -8,7 +8,15 @@ import { socket } from "@master_kufa/client-tools";
 import { appModel } from "models/app";
 import { Paths } from "shared/paths";
 import { Footer, Navigation } from "modules";
-import { Auth, Billing, Contacts, Main, Register, SearchApp } from "pages";
+import {
+  Auth,
+  Billing,
+  Contacts,
+  Main,
+  Profile,
+  Register,
+  SearchApp,
+} from "pages";
 import { CompanyClients } from "pages/clients";
 import { useEffect } from "react";
 import { ManageSanctions } from "pages/manage-sanctions";
@@ -48,6 +56,7 @@ export const AppNavigation = () => {
                 element={<CompanyClients isCorporate />}
               />
               <Route path={Paths.billing} element={<Billing />} />
+              <Route path={Paths.profile} element={<Profile />} />
               <Route
                 path={Paths.recoverPasswordRequest}
                 element={<RecoverRequest />}

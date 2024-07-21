@@ -40,6 +40,7 @@ export const Register = () => {
   const companyName = useUnit(registerModel.$companyName);
   const INN = useUnit(registerModel.$INN);
   const INNError = useUnit(registerModel.$INNError);
+  const companyNameError = useUnit(registerModel.$companyNameError);
   const phoneError = useUnit(registerModel.$phoneError);
   const nameError = useUnit(registerModel.$nameError);
   const surnameError = useUnit(registerModel.$surnameError);
@@ -85,6 +86,8 @@ export const Register = () => {
                 required
                 label="Наименование организации"
                 value={companyName}
+                error={Boolean(companyNameError)}
+                helperText={companyNameError}
                 onChange={({ target }) =>
                   registerModel.changeCompanyName(target.value)
                 }

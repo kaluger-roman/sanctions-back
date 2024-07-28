@@ -2,6 +2,7 @@ import { Notification } from "@master_kufa/client-tools";
 import { authApi } from "api";
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { createGate } from "effector-react";
+import { appModel } from "models/app";
 import { validatePassword } from "shared/auth.helpers";
 import { navigation } from "shared/navigate";
 import { Paths } from "shared/paths";
@@ -42,9 +43,9 @@ sample({
 
 sample({
   clock: recoverClicked,
-  source: $email,
-  fn: (email) => ({
-    email,
+  source: [$email, appModel.$authorizationData] as const,
+  fn: ([email, authorizationData]) => ({
+    email: email || authorizationData?.email || "",
   }),
   target: authApi.recoverRequestFx,
 });

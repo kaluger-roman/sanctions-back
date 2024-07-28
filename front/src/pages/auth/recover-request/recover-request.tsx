@@ -10,6 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useGate, useUnit } from "effector-react";
+import { appModel } from "models";
 import { recoverPasswordModel } from "models/recover";
 import { navigation } from "shared/navigate";
 import { Paths } from "shared/paths";
@@ -18,6 +19,7 @@ import { theme } from "shared/theme";
 export const RecoverRequest = () => {
   const email = useUnit(recoverPasswordModel.$email);
   const isConfirmApproved = useUnit(recoverPasswordModel.$isConfirmApproved);
+  const authorizationData = useUnit(appModel.$authorizationData);
 
   useGate(recoverPasswordModel.RecoverRequestPageGate);
 
@@ -55,15 +57,25 @@ export const RecoverRequest = () => {
         >
           Восстановление пароля
         </Typography>
-        <TextField
-          fullWidth
-          label="Email"
-          value={email}
-          onChange={(e) => recoverPasswordModel.changeEmail(e.target.value)}
-        />
+        {authorizationData ? (
+          <Typography variant="h5" textAlign="center">
+            После подтверждения вы получите письмо на{" "}
+            <b style={{ color: theme.palette.primary.main }}>
+              {authorizationData.email}
+            </b>{" "}
+            для восстановления пароля
+          </Typography>
+        ) : (
+          <TextField
+            fullWidth
+            label="Email"
+            value={email}
+            onChange={(e) => recoverPasswordModel.changeEmail(e.target.value)}
+          />
+        )}
         <Button
           fullWidth
-          disabled={!email}
+          disabled={!email && !authorizationData}
           onClick={() => recoverPasswordModel.recoverClicked()}
           variant="contained"
         >
@@ -71,7 +83,7 @@ export const RecoverRequest = () => {
         </Button>
 
         <Dialog
-          open={isConfirmApproved}
+          open={Boolean(isConfirmApproved)}
           onClose={() => navigation.navigate(Paths.auth)}
         >
           <DialogTitle>Запрос принят</DialogTitle>

@@ -114,7 +114,12 @@ export class UserService {
       throw new Error("Неверный логин или пароль");
 
     return jwt.sign(
-      { email: user.email, id: user.id, isAdmin: user.isAdmin },
+      {
+        email: user.email,
+        id: user.id,
+        isAdmin: user.isAdmin,
+        isConfirmed: user.isConfirmed,
+      },
       process.env.JWT_SECRET,
     );
   }

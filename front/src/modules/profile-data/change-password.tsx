@@ -9,6 +9,8 @@ import { useUnit } from "effector-react";
 import { profileModel } from "models";
 import { DataChip } from "./data-chip";
 import { theme } from "shared/theme";
+import { navigation } from "shared/navigate";
+import { Paths } from "shared/paths";
 
 export const ChangePassword = () => {
   const isChangePasswordActive = useUnit(profileModel.$isChangePasswordActive);
@@ -113,7 +115,9 @@ export const ChangePassword = () => {
                   maxWidth: isSm ? undefined : "190px",
                   ml: isSm ? 0 : "auto",
                 }}
-                onClick={() => profileModel.toggleChangePassword()}
+                onClick={() =>
+                  navigation.navigate(Paths.recoverPasswordRequest)
+                }
               >
                 Забыли пароль?
               </Button>

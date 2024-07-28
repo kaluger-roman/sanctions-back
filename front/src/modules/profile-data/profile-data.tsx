@@ -1,13 +1,17 @@
-import { Alert, Box, Typography, useMediaQuery } from "@mui/material";
+import { Alert, Box, Button, Typography, useMediaQuery } from "@mui/material";
 import { useUnit } from "effector-react";
 import { profileModel } from "models";
 import { ClientCategory } from "shared/billing";
 import { theme } from "shared/theme";
 import { DataChip } from "./data-chip";
 import { ChangePassword } from "./change-password";
+import { isEqual } from "lodash";
+import { required, validateINN, validatePhone } from "shared/auth.helpers";
 
 export const ProfileData = () => {
   const profile = useUnit(profileModel.$profile);
+  const initialProfile = useUnit(profileModel.$initialProfile);
+  const editErrorKeys = useUnit(profileModel.$editErrorKeys);
 
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -40,6 +44,7 @@ export const ProfileData = () => {
         </Alert>
       )}
       <DataChip
+        id="category"
         label="Категория клиента"
         value={
           profile.category === ClientCategory.private
@@ -47,30 +52,84 @@ export const ProfileData = () => {
             : "Юридическое лицо"
         }
       />
-      <DataChip label="Почта" value={profile.email} />
+      <DataChip id="email" label="Почта" value={profile.email} />
 
       {profile.category === ClientCategory.company && (
         <>
           <DataChip
+            id="companyName"
             isEditable
             label="Наименование организации"
             value={profile.companyName}
+            validate={required}
+            onChange={(value) =>
+              profileModel.changeProfileField({ field: "companyName", value })
+            }
           />
-          <DataChip isEditable label="ИНН" value={profile.INN} />
+          <DataChip
+            id="INN"
+            isEditable
+            label="ИНН"
+            value={profile.INN}
+            validate={validateINN}
+            onChange={(value) =>
+              profileModel.changeProfileField({ field: "INN", value })
+            }
+          />
           <Typography variant="h6" sx={{ mb: 1, mt: 2 }}>
             Контактное лицо
           </Typography>
         </>
       )}
-      <DataChip isEditable label="Фамилия" value={profile.surname} />
-      <DataChip isEditable label="Имя" value={profile.name} />
       <DataChip
+        id="surname"
         isEditable
+        validate={required}
+        label="Фамилия"
+        value={profile.surname}
+        onChange={(value) =>
+          profileModel.changeProfileField({ field: "surname", value })
+        }
+      />
+      <DataChip
+        id="name"
+        onChange={(value) =>
+          profileModel.changeProfileField({ field: "name", value })
+        }
+        isEditable
+        validate={required}
+        label="Имя"
+        value={profile.name}
+      />
+      <DataChip
+        id="secondName"
+        isEditable
+        onChange={(value) =>
+          profileModel.changeProfileField({ field: "secondName", value })
+        }
+        validate={required}
         label="Отчество"
         value={profile.secondName}
         placeholder="Не указано"
       />
-      <DataChip isEditable label="Телефон" value={profile.phone} />
+      <DataChip
+        id="phone"
+        onChange={(value) =>
+          profileModel.changeProfileField({ field: "phone", value })
+        }
+        validate={validatePhone}
+        isEditable
+        label="Телефон"
+        value={profile.phone}
+      />
+      <Button
+        disabled={isEqual(profile, initialProfile) || !!editErrorKeys.length}
+        sx={{ maxWidth: isSm ? undefined : "200px", mt: 2 }}
+        fullWidth={isSm ? true : false}
+        variant="contained"
+      >
+        Сохранить
+      </Button>
       <ChangePassword />
     </Box>
   );

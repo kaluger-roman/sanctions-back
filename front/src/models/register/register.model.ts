@@ -10,7 +10,7 @@ import { createGate } from "effector-react";
 import { navigation } from "shared/navigate";
 import { Notification } from "@master_kufa/client-tools";
 import { Paths } from "../../shared/paths";
-import { validatePassword } from "shared/auth.helpers";
+import { validateINN, validatePassword } from "shared/auth.helpers";
 import { ClientCategory } from "shared/billing";
 
 export const emailTextChanged = createEvent<string>();
@@ -120,10 +120,7 @@ sample({
   clock: registerClicked,
   source: [$clientCategory, $INN] as const,
   fn: ([clientCategory, INN]) =>
-    !/^\d{10}$/g.test(INN) && clientCategory === ClientCategory.company
-      ? "Некорректный ИНН"
-      : "",
-
+    clientCategory === ClientCategory.company ? validateINN(INN) : "",
   target: $INNError,
 });
 

@@ -30,6 +30,7 @@ export const ChangePassword = () => {
         Учетные данные
       </Typography>
       <DataChip
+        id="lastPasswordChangeTime"
         label="Последняя смена пароля"
         value={
           profile.lastPasswordChangeTime &&

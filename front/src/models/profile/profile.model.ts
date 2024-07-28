@@ -12,9 +12,11 @@ export const $newPasswordRepeat = createStore("");
 
 export const $newPasswordError = createStore<string>("");
 export const $newPasswordRepeatError = createStore<string>("");
+export const $editErrorKeys = createStore<string[]>([]);
 
 export const $tab = createStore<"profile" | "tarrif">("profile");
 export const $isChangePasswordActive = createStore(false);
+export const $initialProfile = createStore<Profile | null>(null);
 
 export const ProfileGate = createGate<void>();
 
@@ -24,6 +26,12 @@ export const changeOldPassword = createEvent<string>();
 export const changeNewPassword = createEvent<string>();
 export const changeNewPasswordRepeat = createEvent<string>();
 export const changePasswordClicked = createEvent();
+export const changeProfileField = createEvent<{
+  field: keyof Profile;
+  value: string;
+}>();
+export const addEditErrorKey = createEvent<string>();
+export const removeEditErrorKey = createEvent<string>();
 
 export const saveClicked = createEvent();
 
@@ -83,6 +91,14 @@ sample({
 });
 
 sample({
+  clock: changeProfileField,
+  source: $profile,
+  fn: (profile, { field, value }) =>
+    ({ ...profile, [field]: value } as Profile),
+  target: $profile,
+});
+
+sample({
   clock: profileApi.changePasswordFx.done,
   fn: (): Notification.PayloadType => ({
     type: "success",
@@ -98,7 +114,22 @@ sample({
 
 sample({
   clock: profileApi.loadCurrentProfileFx.doneData,
-  target: $profile,
+  target: [$profile, $initialProfile],
+});
+
+sample({
+  clock: addEditErrorKey,
+  source: $editErrorKeys,
+  fn: (editErrorKeys, key) => [...editErrorKeys, key],
+  target: $editErrorKeys,
+});
+
+sample({
+  clock: removeEditErrorKey,
+  source: $editErrorKeys,
+  fn: (editErrorKeys, key) =>
+    editErrorKeys.filter((editErrorKey) => editErrorKey !== key),
+  target: $editErrorKeys,
 });
 
 $isChangePasswordActive.reset(
@@ -114,6 +145,7 @@ $newPasswordRepeatError.reset(
 $oldPassword.reset(ProfileGate.close, profileApi.changePasswordFx.done);
 $newPassword.reset(ProfileGate.close, profileApi.changePasswordFx.done);
 $newPasswordRepeat.reset(ProfileGate.close, profileApi.changePasswordFx.done);
+$editErrorKeys.reset(ProfileGate.close, profileApi.changePasswordFx.done);
 
 $profile.reset(ProfileGate.close);
 $tab.reset(ProfileGate.close);

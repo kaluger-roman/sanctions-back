@@ -2,6 +2,7 @@ import { contactUsApi } from "api";
 import { createEvent, createStore, sample } from "effector";
 import { createGate } from "effector-react";
 import { Notification } from "@master_kufa/client-tools";
+import { validatePhone } from "shared/auth.helpers";
 
 export const $organizationName = createStore("");
 export const $name = createStore("");
@@ -56,12 +57,7 @@ sample({
 sample({
   clock: submit,
   source: $phoneNumber,
-  fn: (phoneNumber) =>
-    phoneNumber.match(
-      /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/g,
-    )
-      ? ""
-      : "Номер телефона введен некорректно",
+  fn: (phoneNumber) => validatePhone(phoneNumber),
   target: $phoneError,
 });
 

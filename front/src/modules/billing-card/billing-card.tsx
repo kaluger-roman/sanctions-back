@@ -26,11 +26,18 @@ export const BillingCard = ({ item }: { item: Tarrif }) => (
       sx={{ flexGrow: 1, display: "flex", alignItems: "flex-start" }}
       disableRipple
     >
-      <CardContent>
+      <CardContent
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          height: "100%",
+        }}
+      >
         <Typography sx={{ mb: 1 }} variant="h4">
           {item.durationTitle}
         </Typography>
-        <Typography sx={{ mb: 4 }} variant="body1">
+        <Typography sx={{ mb: 3 }} variant="body1">
           {item.description}
         </Typography>
 
@@ -50,6 +57,21 @@ export const BillingCard = ({ item }: { item: Tarrif }) => (
             </Typography>
           ))}
         </Box>
+        <Typography
+          fontWeight="bold"
+          textAlign="center"
+          variant="h4"
+          color="secondary.dark"
+          sx={{
+            mt: 3,
+            flexGrow: 1,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "flex-end",
+          }}
+        >
+          {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, " ")} руб.
+        </Typography>
       </CardContent>
     </CardActionArea>
     <CardActions>

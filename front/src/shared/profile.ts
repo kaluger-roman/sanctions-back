@@ -12,4 +12,10 @@ export type Profile = {
   category: ClientCategory;
   isConfirmed: boolean;
   companyName?: string;
+  lastPasswordChangeTime?: string;
+};
+
+export type ChangePasswordPayload = {
+  oldPassword: string;
+  newPassword: string;
 };

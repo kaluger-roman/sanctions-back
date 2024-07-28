@@ -34,4 +34,5 @@ model User {
   category                   String
   isConfirmed                Boolean   @default(false)
   registrationConfirmToken   String?
+  lastPasswordChangeTime     DateTime? @default(now())
 }

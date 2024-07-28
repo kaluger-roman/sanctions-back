@@ -1,78 +1,14 @@
-import {
-  Alert,
-  Box,
-  Chip,
-  IconButton,
-  Typography,
-  useMediaQuery,
-} from "@mui/material";
+import { Alert, Box, Typography, useMediaQuery } from "@mui/material";
 import { useUnit } from "effector-react";
 import { profileModel } from "models";
 import { ClientCategory } from "shared/billing";
-import EditIcon from "@mui/icons-material/Edit";
 import { theme } from "shared/theme";
-
-const DataChip = ({
-  label = "",
-  value = "",
-  placeholder = "Не указано",
-  isEditable,
-}: {
-  label?: string;
-  value?: string;
-  placeholder?: string;
-  isEditable?: boolean;
-}) => (
-  <Box
-    sx={{
-      display: "flex",
-      gap: 1,
-      alignItems: "stretch",
-      justifyContent: "center",
-      width: "100%",
-    }}
-  >
-    <Chip
-      sx={{
-        flexBasis: "50%",
-        textAlign: "center",
-        height: "auto",
-        p: "6px",
-        "& .MuiChip-label": {
-          display: "block",
-          whiteSpace: "normal",
-          wordBreak: "break-word",
-        },
-      }}
-      label={label}
-    />
-    <Chip
-      label={value || placeholder}
-      variant="outlined"
-      sx={{
-        flexBasis: "50%",
-        color: !value ? theme.palette.grey[500] : theme.palette.text.primary,
-        textAlign: "center",
-        height: "auto",
-        p: "6px",
-        "& .MuiChip-label": {
-          display: "block",
-          whiteSpace: "normal",
-          wordBreak: "break-word",
-        },
-      }}
-    />
-    <IconButton
-      size="small"
-      sx={{ visibility: isEditable ? "visible" : "hidden" }}
-    >
-      <EditIcon />
-    </IconButton>
-  </Box>
-);
+import { DataChip } from "./data-chip";
+import { ChangePassword } from "./change-password";
 
 export const ProfileData = () => {
   const profile = useUnit(profileModel.$profile);
+
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   if (!profile) return null;
@@ -93,7 +29,11 @@ export const ProfileData = () => {
       <Typography variant="h6" sx={{ mb: 1, mt: 2 }}>
         Профиль
       </Typography>
-      {!profile.isConfirmed && (
+      {profile.isConfirmed ? (
+        <Alert sx={{ mt: 1, mb: 2 }} severity="success">
+          Почта подтверждена.
+        </Alert>
+      ) : (
         <Alert sx={{ mt: 1, mb: 2 }} severity="warning">
           Почта не подтверждена. Пожалуйста, перейдите по ссылке в письме. До
           подтверждения часть функционала может быть ограниччена.
@@ -131,6 +71,7 @@ export const ProfileData = () => {
         placeholder="Не указано"
       />
       <DataChip isEditable label="Телефон" value={profile.phone} />
+      <ChangePassword />
     </Box>
   );
 };

@@ -35,7 +35,6 @@ export const Profile = () => {
       >
         <Tab label="Профиль" value="profile" />
         <Tab label="Тариф" value="tarrif" />
-        <Tab label="Учетные данные" value="credentials" />
       </Tabs>
 
       {tab === "profile" && <ProfileData />}

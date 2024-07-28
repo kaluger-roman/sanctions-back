@@ -1,5 +1,6 @@
 import {
   AuthPayload,
+  ChangePasswordPayload,
   RecoverConfirmPayload,
   RecoverTokenRequestPayload,
   RegisterPayload,
@@ -11,8 +12,15 @@ import { SocketErrors } from "@master_kufa/server-tools";
 import { prisma } from "../../prisma";
 import { nanoid } from "nanoid";
 import { transporter } from "../shared/email-transporter";
+import { Request } from "../types";
 
-class UserService {
+export class UserService {
+  static async getUserByToken(token: string) {
+    const userCreds = jwt.decode(token);
+    const user = await prisma.user.findUnique({ where: { id: userCreds.id } });
+
+    return user;
+  }
   buildPasswordHash(password: string) {
     return createHash("sha256").update(password).digest("hex");
   }
@@ -188,6 +196,31 @@ class UserService {
         passwordHash: this.buildPasswordHash(payload.password),
         recoverPasswordToken: null,
         recoverPasswordRequestTime: null,
+      },
+    });
+
+    return "success";
+  }
+  async changePassword({
+    token,
+    oldPassword,
+    newPassword,
+  }: Request<ChangePasswordPayload>) {
+    const user = await UserService.getUserByToken(token);
+
+    if (!user) {
+      throw new Error("Пользователь не найден");
+    }
+
+    if (this.buildPasswordHash(oldPassword) !== user.passwordHash) {
+      throw new Error("Старый пароль был введен неверно");
+    }
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        passwordHash: this.buildPasswordHash(newPassword),
+        lastPasswordChangeTime: new Date(),
       },
     });
 

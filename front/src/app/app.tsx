@@ -5,17 +5,21 @@ import { ThemeProvider } from "@emotion/react";
 import { theme } from "shared/theme";
 import { CssBaseline } from "@mui/material";
 import { Loader } from "modules";
+import { CoockieNotice } from "./cookie-notice";
 
-export const App = () => (
-  <ThemeProvider theme={theme}>
-    <CssBaseline />
-    {/*  not move notifications to browser router, effector store initialize incorrectly, should be at top */}
-    <Notification.Component />
-    <Confirm.Component />
+export const App = () => {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      {/*  not move notifications to browser router, effector store initialize incorrectly, should be at top */}
+      <Notification.Component />
+      <Confirm.Component />
 
-    <Loader />
-    <BrowserRouter>
-      <AppNavigation />
-    </BrowserRouter>
-  </ThemeProvider>
-);
+      <Loader />
+      <BrowserRouter>
+        <AppNavigation />
+      </BrowserRouter>
+      <CoockieNotice />
+    </ThemeProvider>
+  );
+};

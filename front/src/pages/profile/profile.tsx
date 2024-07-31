@@ -1,7 +1,7 @@
 import { Box, Tab, Tabs, useMediaQuery } from "@mui/material";
 import { useGate, useUnit } from "effector-react";
 import { profileModel } from "models";
-import { ProfileData } from "modules";
+import { ProfileData, Tarrif } from "modules";
 import { theme } from "shared/theme";
 
 export const Profile = () => {
@@ -38,6 +38,7 @@ export const Profile = () => {
       </Tabs>
 
       {tab === "profile" && <ProfileData />}
+      {tab === "tarrif" && <Tarrif />}
     </Box>
   );
 };

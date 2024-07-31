@@ -37,6 +37,11 @@ export const savePasswordClicked = createEvent();
 export const saveProfileClicked = createEvent();
 
 sample({
+  clock: changeTab,
+  target: $tab,
+});
+
+sample({
   clock: toggleChangePassword,
   source: $isChangePasswordActive,
   fn: (isChangePasswordActive) => !isChangePasswordActive,

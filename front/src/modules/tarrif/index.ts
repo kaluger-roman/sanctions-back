@@ -1,0 +1,1 @@
+export { Tarrif } from "./tarrif";

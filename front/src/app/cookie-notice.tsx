@@ -7,7 +7,6 @@ export const CoockieNotice = () => {
   return (
     <Snackbar
       open={!cookies}
-      onClose={() => setCookies(true)}
       message={
         <Box sx={{ display: "flex", alignItems: "center", gap: 4 }}>
           <Typography variant="body1">

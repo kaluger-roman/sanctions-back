@@ -2,8 +2,9 @@ import { Box, Chip, IconButton, TextField } from "@mui/material";
 import { theme } from "shared/theme";
 import EditIcon from "@mui/icons-material/Edit";
 import CheckIcon from "@mui/icons-material/Check";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { profileModel } from "models";
+import { useUnit } from "effector-react";
 
 export const DataChip = ({
   label = "",
@@ -26,8 +27,27 @@ export const DataChip = ({
 }) => {
   const [isEdit, setIsEdit] = useState(false);
   const [error, setError] = useState("");
+  const initialProfile = useUnit(profileModel.$initialProfile);
 
   const [innerValue, setInnerValue] = useState(value);
+
+  useEffect(() => {
+    setIsEdit(false);
+  }, [initialProfile]);
+
+  const onChangeGlobal = () => {
+    const err = validate?.(innerValue) || "";
+
+    setError(err);
+
+    if (err) {
+      profileModel.addEditErrorKey(id);
+    } else {
+      profileModel.removeEditErrorKey(id);
+    }
+
+    onChange?.(innerValue);
+  };
 
   return (
     <Box
@@ -45,6 +65,7 @@ export const DataChip = ({
           textAlign: "center",
           height: "auto",
           p: "6px",
+
           "& .MuiChip-label": {
             display: "block",
             whiteSpace: "normal",
@@ -59,21 +80,7 @@ export const DataChip = ({
           sx={{ flexBasis: "50%" }}
           variant="standard"
           error={!!error}
-          onBlur={(e) => {
-            const err = validate?.(e.target.value) || "";
-
-            setError(err);
-
-            if (err) {
-              profileModel.addEditErrorKey(id);
-            } else {
-              profileModel.removeEditErrorKey(id);
-            }
-
-            if (!error) {
-              onChange?.(e.target.value);
-            }
-          }}
+          onBlur={onChangeGlobal}
           helperText={error}
           value={innerValue}
           onChange={(e) => {
@@ -86,11 +93,14 @@ export const DataChip = ({
           variant="outlined"
           sx={{
             flexBasis: "50%",
-            color: !value
+            color: error
+              ? theme.palette.error.main
+              : !value
               ? theme.palette.grey[500]
               : theme.palette.text.primary,
             textAlign: "center",
             height: "auto",
+            borderColor: error ? theme.palette.error.main : undefined,
             p: "6px",
             "& .MuiChip-label": {
               display: "block",
@@ -102,11 +112,14 @@ export const DataChip = ({
       )}
       <IconButton
         size="small"
-        onClick={() => setIsEdit(!isEdit)}
-        disabled={Boolean(error && isEdit)}
+        onMouseDown={(e) => {
+          onChangeGlobal();
+          setIsEdit(!isEdit);
+        }}
         sx={{
           visibility: isEditable ? "visible" : "hidden",
           display: isEditSpacePreserve ? "block" : "none",
+          color: error ? theme.palette.error.main : undefined,
         }}
       >
         {isEdit ? <CheckIcon /> : <EditIcon />}

@@ -30,6 +30,7 @@ const $commonPendingRequests = combine(
   authApi.registrationConfirmFx.pending,
   profileApi.loadCurrentProfileFx.pending,
   profileApi.changePasswordFx.pending,
+  profileApi.changeProfileFx.pending,
   socket.$isConnected.map((isConnected) => !isConnected),
   (...requests: Array<boolean>) => requests.some(Boolean),
 ) as unknown as Store<boolean>;
@@ -80,6 +81,7 @@ sample({
     authApi.recoverConfirmFx.failData,
     authApi.registrationConfirmFx.failData,
     profileApi.changePasswordFx.failData,
+    profileApi.changeProfileFx.failData,
   ],
   fn: (error?: string): Notification.PayloadType => ({
     type: "error",

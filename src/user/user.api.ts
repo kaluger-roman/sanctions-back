@@ -1,6 +1,7 @@
 import { userService } from "./user.service";
 import {
   ChangePasswordPayload,
+  Profile,
   RecoverConfirmPayload,
   RecoverTokenRequestPayload,
   RegisterPayload,
@@ -30,6 +31,8 @@ export const userApiHandlers = {
     profileService.loadProfile(payload.token),
   [ACTIONS.CHANGE_PASSWORD]: (payload: Request<ChangePasswordPayload>) =>
     userService.changePassword(payload),
+  [ACTIONS.CHANGE_PROFILE]: (payload: Request<Profile>) =>
+    profileService.changeProfile(payload),
 };
 
 export const userApi = new Api(userApiHandlers);

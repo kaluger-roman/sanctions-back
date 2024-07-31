@@ -127,6 +127,7 @@ export const ProfileData = () => {
         sx={{ maxWidth: isSm ? undefined : "200px", mt: 2 }}
         fullWidth={isSm ? true : false}
         variant="contained"
+        onClick={() => profileModel.saveProfileClicked()}
       >
         Сохранить
       </Button>

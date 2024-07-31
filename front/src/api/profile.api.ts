@@ -17,3 +17,7 @@ export const changePasswordFx = createEffect<
     data,
   ),
 );
+
+export const changeProfileFx = createEffect<Profile, void, string>((data) =>
+  socket.emitWithAnswer<Profile, void>(ACTIONS.CHANGE_PROFILE, data),
+);

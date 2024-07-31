@@ -94,7 +94,7 @@ export const ChangePassword = () => {
                 size="large"
                 fullWidth={isSm ? true : false}
                 sx={{ maxWidth: isSm ? undefined : "190px" }}
-                onClick={() => profileModel.saveClicked()}
+                onClick={() => profileModel.savePasswordClicked()}
               >
                 Сохранить
               </Button>

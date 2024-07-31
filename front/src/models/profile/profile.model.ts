@@ -33,7 +33,8 @@ export const changeProfileField = createEvent<{
 export const addEditErrorKey = createEvent<string>();
 export const removeEditErrorKey = createEvent<string>();
 
-export const saveClicked = createEvent();
+export const savePasswordClicked = createEvent();
+export const saveProfileClicked = createEvent();
 
 sample({
   clock: toggleChangePassword,
@@ -58,14 +59,14 @@ sample({
 });
 
 sample({
-  clock: saveClicked,
+  clock: savePasswordClicked,
   source: $newPassword,
   fn: (password) => validatePassword(password),
   target: $newPasswordError,
 });
 
 sample({
-  clock: saveClicked,
+  clock: savePasswordClicked,
   source: [$newPassword, $newPasswordRepeat],
   fn: ([password, confirmation]) =>
     password === confirmation ? "" : "Пароли не совпадают",
@@ -73,7 +74,7 @@ sample({
 });
 
 sample({
-  clock: saveClicked,
+  clock: savePasswordClicked,
   source: {
     oldPassword: $oldPassword,
     newPassword: $newPassword,
@@ -99,10 +100,26 @@ sample({
 });
 
 sample({
+  clock: saveProfileClicked,
+  source: $profile,
+  filter: (profile): profile is Profile => !!profile,
+  target: profileApi.changeProfileFx,
+});
+
+sample({
   clock: profileApi.changePasswordFx.done,
   fn: (): Notification.PayloadType => ({
     type: "success",
     message: "Пароль успешно изменен",
+  }),
+  target: Notification.add,
+});
+
+sample({
+  clock: profileApi.changeProfileFx.done,
+  fn: (): Notification.PayloadType => ({
+    type: "success",
+    message: "Профиль успешно обновлен",
   }),
   target: Notification.add,
 });
@@ -115,6 +132,12 @@ sample({
 sample({
   clock: profileApi.loadCurrentProfileFx.doneData,
   target: [$profile, $initialProfile],
+});
+
+sample({
+  clock: profileApi.changeProfileFx.done,
+  source: $profile,
+  target: $initialProfile,
 });
 
 sample({
@@ -148,4 +171,5 @@ $newPasswordRepeat.reset(ProfileGate.close, profileApi.changePasswordFx.done);
 $editErrorKeys.reset(ProfileGate.close, profileApi.changePasswordFx.done);
 
 $profile.reset(ProfileGate.close);
+$initialProfile.reset(ProfileGate.close);
 $tab.reset(ProfileGate.close);

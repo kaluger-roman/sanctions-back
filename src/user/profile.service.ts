@@ -1,7 +1,7 @@
 import { prisma } from "../../prisma";
 import { ClientCategory, Profile } from "./types";
+import { Request } from "../types";
 
-import * as jwt from "jsonwebtoken";
 import { UserService } from "./user.service";
 
 class ProfileService {
@@ -22,6 +22,23 @@ class ProfileService {
       companyName: user.companyName,
       lastPasswordChangeTime: user.lastPasswordChangeTime.toISOString(),
     };
+  }
+  async changeProfile(profile: Request<Profile>) {
+    const user = await UserService.getUserByToken(profile.token);
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        name: profile.name,
+        surname: profile.surname,
+        secondName: profile.secondName,
+        phone: profile.phone,
+        INN: profile.INN,
+        companyName: profile.companyName,
+      },
+    });
+
+    return "success";
   }
 }
 

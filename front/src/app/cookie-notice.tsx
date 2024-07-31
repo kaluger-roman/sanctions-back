@@ -14,7 +14,11 @@ export const CoockieNotice = () => {
             Данный сайт собирает cookie и использует аналогичные технологии.{" "}
             <Link>Узнать подробнее.</Link>
           </Typography>
-          <Button variant="outlined" onClick={() => setCookies(true)}>
+          <Button
+            sx={{ minWidth: "100px" }}
+            variant="outlined"
+            onClick={() => setCookies(true)}
+          >
             <Typography variant="body1" onClick={() => setCookies(true)}>
               Согласен
             </Typography>

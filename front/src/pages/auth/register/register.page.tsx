@@ -2,12 +2,15 @@ import { useGate, useUnit } from "effector-react";
 import {
   Box,
   Button,
+  Checkbox,
   Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  FormControlLabel,
+  Link,
   Paper,
   Stack,
   TextField,
@@ -21,6 +24,7 @@ import { AuthContainer, FormContainer, FormFields } from "../styles";
 import { navigation } from "../../../shared/navigate";
 import { Paths } from "../../../shared/paths";
 import { ClientCategory } from "shared/billing";
+import policies from "../../../modules/footer/Политики конфиденциальности.docx";
 
 export const Register = () => {
   const clientCategory = useUnit(registerModel.$clientCategory);
@@ -45,6 +49,7 @@ export const Register = () => {
   const nameError = useUnit(registerModel.$nameError);
   const surnameError = useUnit(registerModel.$surnameError);
   const isRegisterStarted = useUnit(registerModel.$isRegisterStarted);
+  const isPoliciesAccepted = useUnit(registerModel.$isPoliciesAccepted);
 
   const actions = {
     registerClicked: useUnit(registerModel.registerClicked),
@@ -173,11 +178,33 @@ export const Register = () => {
             error={Boolean(passwordConfirmTextError)}
             helperText={passwordConfirmTextError}
           />
+          <FormControlLabel
+            control={
+              <Checkbox
+                required
+                value={isPoliciesAccepted}
+                onChange={() => registerModel.toggleAcceptPolicies()}
+              />
+            }
+            label={
+              <Typography variant="body1">
+                Я согласен с{" "}
+                <Link
+                  href={policies}
+                  download="Политика конфиденциальности.docx"
+                >
+                  Политикой конфиденциальности
+                </Link>
+              </Typography>
+            }
+          />
+
           <Button
             sx={{ mt: 2 }}
             endIcon={registerPending && <HourglassTopIcon />}
             variant="outlined"
             onClick={actions.registerClicked}
+            disabled={!isPoliciesAccepted || registerPending}
           >
             Зарегистрироваться
           </Button>

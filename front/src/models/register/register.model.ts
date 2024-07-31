@@ -24,6 +24,7 @@ export const changeSecondName = createEvent<string>();
 export const changePhone = createEvent<string>();
 export const changeCompanyName = createEvent<string>();
 export const changeINN = createEvent<string>();
+export const toggleAcceptPolicies = createEvent();
 
 export const registerClicked = createEvent();
 
@@ -43,6 +44,7 @@ export const $companyNameError = createStore("");
 export const $nameError = createStore("");
 export const $surnameError = createStore("");
 export const $isRegisterStarted = createStore<boolean>(false);
+export const $isPoliciesAccepted = createStore<boolean>(false);
 
 export const $name = createStore("");
 export const $surname = createStore("");
@@ -59,6 +61,13 @@ export const PageGate = createGate();
 export const redirectToAuthFx = createEffect(() =>
   navigation.navigate(Paths.auth),
 );
+
+sample({
+  clock: toggleAcceptPolicies,
+  source: $isPoliciesAccepted,
+  fn: (isPoliciesAccepted) => !isPoliciesAccepted,
+  target: $isPoliciesAccepted,
+});
 
 sample({
   clock: changeclientCategory,
@@ -272,6 +281,7 @@ $nameError.reset(PageGate.close, $clientCategory);
 $surnameError.reset(PageGate.close, $clientCategory);
 $phoneError.reset(PageGate.close, $clientCategory);
 $companyNameError.reset(PageGate.close, $clientCategory);
+$isPoliciesAccepted.reset(PageGate.close, $clientCategory);
 $isRegisterStarted.reset(PageGate.close);
 
 $clientCategory.reset(PageGate.close);

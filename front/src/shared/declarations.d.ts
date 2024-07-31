@@ -38,3 +38,9 @@ declare module "*.pdf" {
 
   export default content;
 }
+
+declare module "*.docx" {
+  const content: string;
+
+  export default content;
+}

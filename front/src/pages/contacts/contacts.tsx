@@ -83,7 +83,7 @@ export const Contacts = () => {
                   PlaceIcon,
                   "Работаем онлайн, основное местоположение – Москва",
                 ],
-                ["Телефон", LocalPhoneIcon, "+7 (916) 823-21-98"],
+                // ["Телефон", LocalPhoneIcon, "+7 (916) 823-21-98"],
                 ["Почта", EmailIcon, "goodsanctionsearch@gmail.com"],
               ] as const
             ).map(([Label, Icon, text]) => (

@@ -7,7 +7,7 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { US, EU, GB } from "country-flag-icons/react/3x2";
+import { US, EU, GB, AU, KR } from "country-flag-icons/react/3x2";
 import DownloadIcon from "@mui/icons-material/Download";
 import EmailIcon from "@mui/icons-material/Email";
 import { theme } from "shared/theme";
@@ -22,11 +22,30 @@ const ACTUAL_DATES: Array<{
   { country: "ЕС", date: "24.06.2024", flag: <EU /> },
   { country: "Великобритания", date: "28.05.2024", flag: <GB /> },
   { country: "США", date: "18.06.2024", flag: <US /> },
+  { country: "Южная Корея", date: "09.09.2024", flag: <KR /> },
+  { country: "Австралия", date: "08.04.2024", flag: <AU /> },
 ];
 
 export const SearchAppMetadata = () => (
   <Box sx={{ maxWidth: 1200, mr: "auto", ml: "auto", position: "relative" }}>
-    <Box sx={{ pt: 6, pb: 6 }}>
+    <Box
+      sx={{
+        mt: 4,
+        p: 2,
+        borderRadius: 4,
+        background: theme.palette.grey[300],
+      }}
+    >
+      <Typography variant="body1">
+        Уважаемые пользователи! Данный сервис живет за счет энтузиазма
+        создателей, которые хотят создать единый удобный портал со всеми
+        санкционными ограничениями по товарам (в скором времени и по услугам).
+        Однако это достаточно трудоемкая работа, в связи с чем в скором времени
+        будет деление на бесплатный и платный контуры. Очень надеемся на Ваше
+        понимание.
+      </Typography>
+    </Box>
+    <Box sx={{ pt: 4, pb: 4 }}>
       <Typography variant="h6">Списки актуальны на следующие даты:</Typography>
       <List sx={{ display: "flex", flexWrap: "wrap" }}>
         {ACTUAL_DATES.map((item) => (

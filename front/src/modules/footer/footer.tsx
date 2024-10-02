@@ -43,7 +43,7 @@ export const Footer = () => {
           [
             [CopyrightIcon, "2024, Все права защищены"],
             [PlaceIcon, "Работаем онлайн, основное местоположение – Москва"],
-            [LocalPhoneIcon, "+7 (916) 823-21-98"],
+            // [LocalPhoneIcon, "+7 (916) 823-21-98"],
             [EmailIcon, "goodsanctionsearch@gmail.com"],
             [
               LockIcon,

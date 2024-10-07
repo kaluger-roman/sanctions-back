@@ -236,7 +236,7 @@ export const SearchApp = () => {
           {isSm && (
             <Button
               variant="contained"
-              onClick={() => setTimeout(() => search(), 200)}
+              onClick={() => setTimeout(() => search(), 800)}
             >
               Поиск
             </Button>

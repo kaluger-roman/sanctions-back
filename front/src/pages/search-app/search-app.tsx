@@ -239,7 +239,12 @@ export const SearchApp = () => {
           {isSm && (
             <Button
               variant="contained"
-              onClick={() => setTimeout(() => search(), 500)}
+              onClick={() => setTimeout(() => search(), 0)}
+              onTouchEnd={() =>
+                setTimeout(() => {
+                  search();
+                }, 0)
+              }
             >
               Поиск
             </Button>

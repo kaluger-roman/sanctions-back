@@ -92,7 +92,10 @@ export const SearchApp = () => {
             }}
           />
           {!isSm && (
-            <Button variant="contained" onClick={() => search()}>
+            <Button
+              variant="contained"
+              onClick={() => setTimeout(() => search(), 0)}
+            >
               Поиск
             </Button>
           )}
@@ -234,7 +237,10 @@ export const SearchApp = () => {
             </Select>
           </FormControl>
           {isSm && (
-            <Button variant="contained" onClick={() => search()}>
+            <Button
+              variant="contained"
+              onClick={() => setTimeout(() => search(), 0)}
+            >
               Поиск
             </Button>
           )}

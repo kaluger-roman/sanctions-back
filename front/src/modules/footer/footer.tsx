@@ -1,11 +1,13 @@
 import { Box, Link, Typography, useMediaQuery } from "@mui/material";
 import PlaceIcon from "@mui/icons-material/Place";
 import EmailIcon from "@mui/icons-material/Email";
-import LocalPhoneIcon from "@mui/icons-material/LocalPhone";
 import CopyrightIcon from "@mui/icons-material/Copyright";
 import { ReactComponent as VK } from "shared/icons/vk.svg";
 import { ReactComponent as TG } from "shared/icons/telegram.svg";
-import policies from "./Политики конфиденциальности.docx";
+import PermIdentityIcon from "@mui/icons-material/PermIdentity";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
+import policies from "./Politika_konfidentsialnosti.docx";
+import oferta from "./Publichnaya_oferta.docx";
 import { theme } from "shared/theme";
 import LockIcon from "@mui/icons-material/Lock";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
@@ -13,6 +15,7 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 export const Footer = () => {
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   const isMd = useMediaQuery(theme.breakpoints.down("md"));
+  const isLg = useMediaQuery(theme.breakpoints.down("lg"));
   return (
     <Box
       sx={{
@@ -27,24 +30,23 @@ export const Footer = () => {
     >
       <Box
         sx={{
-          gridTemplateColumns: isSm
-            ? "1fr"
-            : isMd
-            ? "repeat(2, auto)"
-            : "repeat(3, auto)",
-          columnGap: 6,
-          rowGap: 2,
+          display: "flex",
+          flexDirection: "column",
+          columnGap: 3,
+          rowGap: 3,
           justifyItems: "start",
-          alignItems: "center",
+          alignItems: "flex-start",
+          flexWrap: "wrap",
+
+          height: isSm ? 540 : isMd ? 300 : isLg ? 170 : 110,
         }}
-        display="grid"
       >
         {(
           [
             [CopyrightIcon, "2024, Все права защищены"],
-            [PlaceIcon, "Работаем онлайн, основное местоположение – Москва"],
-            // [LocalPhoneIcon, "+7 (916) 823-21-98"],
-            [EmailIcon, "goodsanctionsearch@gmail.com"],
+            [PermIdentityIcon, "ИП Авдеев Дмитрий Александрович"],
+            [BookmarkIcon, "ИНН: 771540131275"],
+            [BookmarkIcon, "ОГРНИП: 324774600705838"],
             [
               LockIcon,
               <Link href={policies} download="Политика конфиденциальности.docx">
@@ -55,16 +57,20 @@ export const Footer = () => {
             ],
             [
               ReceiptLongIcon,
-              <Link href={policies} download="Публичная оферта">
+              <Link href={oferta} download="Публичная оферта">
                 <Typography variant="caption">Публичная оферта</Typography>
               </Link>,
             ],
+            [PlaceIcon, "Работаем онлайн, основное местоположение – Москва"],
+            [EmailIcon, "goodsanctionsearch@gmail.com"],
           ] as const
         ).map(([Icon, text]) => (
           <Box
             sx={{
               display: "flex",
               alignItems: "center",
+              maxWidth: 280,
+              minHeight: 40,
             }}
           >
             <Icon sx={{ mr: 1 }} />

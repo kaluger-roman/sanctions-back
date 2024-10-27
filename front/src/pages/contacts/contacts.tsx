@@ -8,6 +8,8 @@ import { adjustAppHeight } from "@master_kufa/client-tools";
 import { ContactUs } from "modules";
 import { useGate } from "effector-react";
 import { contactUsModel } from "models";
+import PermIdentityIcon from "@mui/icons-material/PermIdentity";
+import BookmarkIcon from "@mui/icons-material/Bookmark";
 
 export const Contacts = () => {
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
@@ -85,6 +87,9 @@ export const Contacts = () => {
                 ],
                 // ["Телефон", LocalPhoneIcon, "+7 (916) 823-21-98"],
                 ["Почта", EmailIcon, "goodsanctionsearch@gmail.com"],
+                ["ИП", PermIdentityIcon, "Авдеев Дмитрий Александрович"],
+                ["ИНН:", BookmarkIcon, "771540131275"],
+                ["ОГРНИП:", BookmarkIcon, "324774600705838"],
               ] as const
             ).map(([Label, Icon, text]) => (
               <>

@@ -1,6 +1,7 @@
 import {
   appApi,
   authApi,
+  billingApi,
   contactUsApi,
   profileApi,
   sanctionsManagementApi,
@@ -31,6 +32,7 @@ const $commonPendingRequests = combine(
   profileApi.loadCurrentProfileFx.pending,
   profileApi.changePasswordFx.pending,
   profileApi.changeProfileFx.pending,
+  billingApi.createPaymentFx.pending,
   socket.$isConnected.map((isConnected) => !isConnected),
   (...requests: Array<boolean>) => requests.some(Boolean),
 ) as unknown as Store<boolean>;
@@ -82,6 +84,7 @@ sample({
     authApi.registrationConfirmFx.failData,
     profileApi.changePasswordFx.failData,
     profileApi.changeProfileFx.failData,
+    billingApi.createPaymentFx.failData,
   ],
   fn: (error?: string): Notification.PayloadType => ({
     type: "error",

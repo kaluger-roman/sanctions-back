@@ -35,8 +35,13 @@ import {
 import { LinkOption } from "./navigation.types";
 import { Paths } from "shared/paths";
 import { useUnit } from "effector-react";
-import { appModel } from "models";
+import { appModel, profileModel } from "models";
 import { LogOut } from "models/app/app.model";
+import {
+  CategoryNames,
+  TarrifCategories,
+  TarrifNames,
+} from "pages/billing/constants";
 
 const Link = ({ name, path, subLinks, onClick }: LinkOption) => {
   const isMd = useMediaQuery(theme.breakpoints.down("lg"));
@@ -111,6 +116,7 @@ export const Navigation = () => {
   const isLg = useMediaQuery(theme.breakpoints.up("lg"));
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   const authorizationData = useUnit(appModel.$authorizationData);
+  const currentTarrif = useUnit(profileModel.$currentTarrif);
   const accountRef = useRef<HTMLButtonElement | null>(null);
 
   useEffect(() => {
@@ -206,11 +212,23 @@ export const Navigation = () => {
                     Администратор
                   </Typography>
                 )}
+                {currentTarrif && (
+                  <Typography
+                    variant="body2"
+                    color={theme.palette.primary.main}
+                  >
+                    Тариф - {TarrifNames[currentTarrif.tarrif.identifier]} (
+                    {(CategoryNames as any)[
+                      TarrifCategories[currentTarrif.tarrif.identifier]
+                    ] || "Общий"}
+                    )
+                  </Typography>
+                )}
               </Box>
               <Box sx={{ p: 1 }}>
                 <Button
                   sx={{ width: "100%" }}
-                  onClick={() => navigation.navigate(Paths.profile)}
+                  onClick={() => navigation.navigate(Paths.profileMy)}
                 >
                   Личный кабинет
                 </Button>

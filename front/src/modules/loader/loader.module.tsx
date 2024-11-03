@@ -1,7 +1,7 @@
 import { Backdrop, CircularProgress, Typography } from "@mui/material";
 import { ErrorContainer } from "./loader.styles";
 import { useUnit } from "effector-react";
-import { appModel, profileModel, searchAppModel } from "models";
+import { appModel, billingModel, profileModel, searchAppModel } from "models";
 import { recoverPasswordModel } from "models/recover";
 import { registerConfirmModel } from "models/register";
 
@@ -12,6 +12,7 @@ export const Loader = () => {
   const recoverPasswordOpened = useUnit(
     recoverPasswordModel.RecoverRequestPageGate.status,
   );
+  const isBillingOpened = useUnit(billingModel.BillingGate.status);
   const registerConfirmOpened = useUnit(
     registerConfirmModel.RegisterConfirmPageGate.status,
   );
@@ -21,6 +22,7 @@ export const Loader = () => {
     !searchAppPageOpened &&
     !recoverPasswordOpened &&
     !registerConfirmOpened &&
+    !isBillingOpened &&
     !profileOpened
   )
     return null;

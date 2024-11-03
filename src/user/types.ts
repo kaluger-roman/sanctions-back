@@ -1,3 +1,5 @@
+import { UserTarrif } from "@prisma/client";
+
 export type AuthPayload = { email: string; password: string };
 export type RegisterPayload = {
   email: string;
@@ -39,6 +41,7 @@ export type Profile = {
   isConfirmed: boolean;
   companyName?: string;
   lastPasswordChangeTime?: string;
+  tarrifs: Array<UserTarrif>;
 };
 
 export type ChangePasswordPayload = {

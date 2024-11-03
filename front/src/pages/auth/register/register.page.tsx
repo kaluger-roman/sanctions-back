@@ -24,7 +24,7 @@ import { AuthContainer, FormContainer, FormFields } from "../styles";
 import { navigation } from "../../../shared/navigate";
 import { Paths } from "../../../shared/paths";
 import { ClientCategory } from "shared/billing";
-import policies from "../../../modules/footer/Политики конфиденциальности.docx";
+import policies from "../../../modules/footer/Politika_konfidentsialnosti.docx";
 
 export const Register = () => {
   const clientCategory = useUnit(registerModel.$clientCategory);
@@ -179,6 +179,7 @@ export const Register = () => {
             helperText={passwordConfirmTextError}
           />
           <FormControlLabel
+            key={String(isPoliciesAccepted)}
             control={
               <Checkbox
                 required

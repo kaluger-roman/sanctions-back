@@ -3,10 +3,24 @@ export enum ClientCategory {
   company = "company",
 }
 
-export type Tarrif = {
+export type TarrifCard = {
   durationTitle: string;
-  category: ClientCategory;
   description: string;
   features: Array<string>;
   price: number;
+  kind: TarrifKind;
 };
+
+export type CreatePaymentPayload = {
+  tariffKind: TarrifKind;
+};
+
+export enum TarrifKind {
+  free = "free",
+  physBasic = "physBasic",
+  physUpper = "physUpper",
+  physPro = "physPro",
+  jurBasic = "jurBasic",
+  jurUpper = "jurUpper",
+  jurPro = "jurPro",
+}

@@ -1,12 +1,13 @@
 import { Box, Tab, Tabs, useMediaQuery } from "@mui/material";
-import { useGate, useUnit } from "effector-react";
+import { useGate } from "effector-react";
 import { profileModel } from "models";
 import { ProfileData, Tarrif } from "modules";
+import { navigation } from "shared/navigate";
+import { Paths } from "shared/paths";
 import { theme } from "shared/theme";
 
 export const Profile = () => {
-  const tab = useUnit(profileModel.$tab);
-  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+  const isSm = useMediaQuery(theme.breakpoints.down("md"));
 
   useGate(profileModel.ProfileGate);
 
@@ -25,20 +26,20 @@ export const Profile = () => {
       <Tabs
         orientation={isSm ? "horizontal" : "vertical"}
         variant="scrollable"
-        value={tab}
-        onChange={(_, value) => profileModel.changeTab(value)}
+        value={window.location?.pathname}
+        onChange={(_, value) => navigation.navigate(value)}
         sx={{
           borderRight: isSm ? 0 : 1,
           borderBottom: isSm ? 1 : 0,
           borderColor: "divider",
         }}
       >
-        <Tab label="Профиль" value="profile" />
-        <Tab label="Тариф" value="tarrif" />
+        <Tab label="Профиль" value={Paths.profileMy} />
+        <Tab label="Тариф" value={Paths.profileTariff} />
       </Tabs>
 
-      {tab === "profile" && <ProfileData />}
-      {tab === "tarrif" && <Tarrif />}
+      {window.location?.pathname === Paths.profileMy && <ProfileData />}
+      {window.location?.pathname === Paths.profileTariff && <Tarrif />}
     </Box>
   );
 };

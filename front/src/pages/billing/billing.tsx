@@ -1,58 +1,74 @@
 import { Box, Typography, useMediaQuery } from "@mui/material";
-import { TARRIFS_COMPANY, TARRIFS_PRIVATE } from "./constants";
+import { TarrifCategories, TARRIFS } from "./constants";
 import { BillingCard } from "modules";
-import { Tarrif } from "shared/billing";
+import { ClientCategory, TarrifCard } from "shared/billing";
 import { theme } from "shared/theme";
+import { useGate } from "effector-react";
+import { billingModel } from "models";
 
 const BillingGroup = ({
   title,
   items,
 }: {
   title: string;
-  items: Array<Tarrif>;
-}) => (
-  <Box
-    sx={{
-      p: 4,
-      display: "flex",
-      flexDirection: "column",
-      gap: 4,
-      alignItems: "center",
-      background: theme.palette.secondary.light,
-      borderRadius: 4,
-    }}
-  >
-    <Typography
-      color="secondary.dark"
-      variant="h3"
-      sx={{ textAlign: "center" }}
-    >
-      {title}
-    </Typography>
+  items: Array<TarrifCard>;
+}) => {
+  return (
     <Box
       sx={{
+        p: 4,
         display: "flex",
-        gap: 8,
-        flexWrap: "wrap",
-        justifyContent: "center",
+        flexDirection: "column",
+        gap: 4,
+        alignItems: "center",
+        background: theme.palette.secondary.light,
+        borderRadius: 4,
       }}
     >
-      {items.map((item) => (
-        <BillingCard item={item} />
-      ))}
+      <Typography
+        color="secondary.dark"
+        variant="h3"
+        sx={{ textAlign: "center" }}
+      >
+        {title}
+      </Typography>
+      <Box
+        sx={{
+          display: "flex",
+          gap: 8,
+          flexWrap: "wrap",
+          justifyContent: "center",
+        }}
+      >
+        {items.map((item) => (
+          <BillingCard key={item.kind} item={item} />
+        ))}
+      </Box>
     </Box>
-  </Box>
-);
+  );
+};
 
 export const Billing = () => {
   const isMd = useMediaQuery(theme.breakpoints.down("md"));
+
+  useGate(billingModel.BillingGate);
 
   return (
     <Box
       sx={{ display: "flex", flexDirection: "column", gap: 4, p: isMd ? 2 : 6 }}
     >
-      <BillingGroup title="Для физических лиц" items={TARRIFS_PRIVATE} />
-      <BillingGroup title="Для юридических лиц" items={TARRIFS_COMPANY} />
+      <BillingGroup
+        title="Для физических лиц"
+        items={TARRIFS.filter(
+          (x) => TarrifCategories[x.kind] === ClientCategory.private,
+        )}
+      />
+      <BillingGroup
+        title="Для юридических лиц"
+        items={TARRIFS.filter(
+          (x) => TarrifCategories[x.kind] === ClientCategory.company,
+        )}
+      />
     </Box>
   );
 };

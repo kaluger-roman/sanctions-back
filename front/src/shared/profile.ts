@@ -1,4 +1,4 @@
-import { ClientCategory } from "./billing";
+import { ClientCategory, TarrifKind } from "./billing";
 
 export type Profile = {
   id: number;
@@ -13,9 +13,20 @@ export type Profile = {
   isConfirmed: boolean;
   companyName?: string;
   lastPasswordChangeTime?: string;
+  tarrifs: Array<UserTarrif>;
 };
 
 export type ChangePasswordPayload = {
   oldPassword: string;
   newPassword: string;
+};
+
+export type UserTarrif = {
+  start: string;
+  end: string;
+  tarrif: Tarrif;
+};
+
+export type Tarrif = {
+  identifier: TarrifKind;
 };

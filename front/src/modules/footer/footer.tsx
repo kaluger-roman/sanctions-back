@@ -64,8 +64,9 @@ export const Footer = () => {
             [PlaceIcon, "Работаем онлайн, основное местоположение – Москва"],
             [EmailIcon, "goodsanctionsearch@gmail.com"],
           ] as const
-        ).map(([Icon, text]) => (
+        ).map(([Icon, text], inx) => (
           <Box
+            key={inx}
             sx={{
               display: "flex",
               alignItems: "center",

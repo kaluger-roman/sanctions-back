@@ -13,6 +13,9 @@ import * as https from "https";
 import { readFileSync } from "fs";
 import { userApi, userApiHandlers } from "./user/user.api";
 import { contactApi, contactApiHandlers } from "./contact";
+import { billingApi, billingApiHandlers } from "./billing";
+import { deleteActiveUserConnection } from "./active-connections";
+import { initConnection } from "./init-connection";
 
 const app = express();
 
@@ -61,8 +64,11 @@ app.get("/*", (_, res) =>
 );
 
 server.on("connection", async (socket: Socket) => {
+  initConnection(socket);
+
   registerApi(searchApiHandlers, searchApi, socket);
   registerApi(sanctionsManagementApiHandlers, sanctionsManagementApi, socket);
   registerApi(userApiHandlers, userApi, socket);
   registerApi(contactApiHandlers, contactApi, socket);
+  registerApi(billingApiHandlers, billingApi, socket);
 });

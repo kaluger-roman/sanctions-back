@@ -6,7 +6,16 @@ import { UserService } from "./user.service";
 
 class ProfileService {
   async loadProfile(token): Promise<Profile> {
-    const user = await UserService.getUserByToken(token);
+    const user = await UserService.getUserByToken(token, {
+      tarrifs: {
+        include: {
+          tarrif: true,
+        },
+        orderBy: {
+          end: "asc",
+        },
+      } as any,
+    });
 
     return {
       id: user.id,
@@ -21,6 +30,7 @@ class ProfileService {
       isConfirmed: user.isConfirmed,
       companyName: user.companyName,
       lastPasswordChangeTime: user.lastPasswordChangeTime.toISOString(),
+      tarrifs: user.tarrifs,
     };
   }
   async changeProfile(profile: Request<Profile>) {

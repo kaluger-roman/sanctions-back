@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "UserTarrif" ALTER COLUMN "start" DROP NOT NULL,
+ALTER COLUMN "end" DROP NOT NULL;

@@ -13,11 +13,18 @@ import { prisma } from "../../prisma";
 import { nanoid } from "nanoid";
 import { transporter } from "../shared/email-transporter";
 import { Request } from "../types";
+import { TarrifKind } from "src/billing/types";
 
 export class UserService {
-  static async getUserByToken(token: string) {
+  static async getUserByToken(
+    token: string,
+    include?: { tarrifs: boolean | { include: { tarrif: boolean } } },
+  ) {
     const userCreds = jwt.decode(token);
-    const user = await prisma.user.findUnique({ where: { id: userCreds.id } });
+    const user = await prisma.user.findUnique({
+      where: { id: userCreds.id },
+      include,
+    });
 
     return user;
   }
@@ -46,7 +53,7 @@ export class UserService {
 
     const registrationConfirmToken = nanoid();
 
-    await prisma.user.create({
+    const user = await prisma.user.create({
       data: {
         email: payload.email,
         passwordHash: this.buildPasswordHash(payload.password),
@@ -59,6 +66,17 @@ export class UserService {
         registrationConfirmToken,
         INN: payload.INN,
         companyName: payload.companyName,
+      },
+    });
+
+    const freeTariff = await prisma.tarrif.findFirst({
+      where: { identifier: TarrifKind.free },
+    });
+
+    await prisma.userTarrif.create({
+      data: {
+        userId: user.id,
+        tarrifId: freeTariff.id,
       },
     });
 

@@ -8,10 +8,12 @@ import {
   Box,
 } from "@mui/material";
 import CheckIcon from "@mui/icons-material/Check";
-import { Tarrif } from "shared/billing";
+import { TarrifCard } from "shared/billing";
 import { theme } from "shared/theme";
+import { billingModel } from "models";
+import { TarrifNames } from "pages/billing/constants";
 
-export const BillingCard = ({ item }: { item: Tarrif }) => (
+export const BillingCard = ({ item }: { item: TarrifCard }) => (
   <Card
     sx={{
       maxWidth: "400px",
@@ -34,7 +36,8 @@ export const BillingCard = ({ item }: { item: Tarrif }) => (
           height: "100%",
         }}
       >
-        <Typography sx={{ mb: 1 }} variant="h4">
+        <Typography variant="h4">{TarrifNames[item.kind]}</Typography>
+        <Typography sx={{ mb: 2 }} variant="h6">
           {item.durationTitle}
         </Typography>
         <Typography sx={{ mb: 3 }} variant="body1">
@@ -44,6 +47,7 @@ export const BillingCard = ({ item }: { item: Tarrif }) => (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           {item.features.map((feature) => (
             <Typography
+              key={feature}
               sx={{
                 display: "flex",
                 alignItems: "center",
@@ -75,7 +79,12 @@ export const BillingCard = ({ item }: { item: Tarrif }) => (
       </CardContent>
     </CardActionArea>
     <CardActions>
-      <Button size="large" variant="contained" fullWidth>
+      <Button
+        onClick={() => billingModel.createPayment(item.kind)}
+        size="large"
+        variant="contained"
+        fullWidth
+      >
         Купить!
       </Button>
     </CardActions>

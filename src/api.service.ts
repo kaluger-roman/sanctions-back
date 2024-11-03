@@ -2,6 +2,7 @@ import { Socket } from "socket.io";
 import { ApiHandlers, SocketResponse } from "./types";
 import { userService } from "./user";
 import { ACTIONS, UNAUTHORIZED_ACTIONS } from "./actions";
+import { beforeAction, afterAction } from "./init-user-connection";
 
 export class Api<T extends string> {
   constructor(private handlers: ApiHandlers<T>) {}
@@ -9,9 +10,11 @@ export class Api<T extends string> {
   async handle(
     action: T,
     socket: Socket,
-    payload: { requestId?: string; token: string },
+    payload: { requestId?: string; token?: string },
   ) {
     try {
+      beforeAction(payload.token, socket);
+
       if (!UNAUTHORIZED_ACTIONS.includes(action as ACTIONS)) {
         const decoded = userService.verify(payload.token);
         if (decoded) {
@@ -31,6 +34,8 @@ export class Api<T extends string> {
 
         socket.emit(action, successResponse);
       }
+
+      afterAction(payload.token, socket);
     } catch ({ message }) {
       payload.requestId &&
         socket.emit(action, { requestId: payload.requestId, error: message });

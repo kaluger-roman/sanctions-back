@@ -1,6 +1,31 @@
-import { ClientCategory, Tarrif } from "shared/billing";
+import { ClientCategory, TarrifCard, TarrifKind } from "shared/billing";
 
-export const TARRIFS_PRIVATE: Array<Tarrif> = [
+export const TarrifNames = {
+  [TarrifKind.free]: "Бесплатный",
+  [TarrifKind.physBasic]: "Базовый",
+  [TarrifKind.physUpper]: "Продвинутый",
+  [TarrifKind.physPro]: "Про",
+  [TarrifKind.jurBasic]: "Базовый",
+  [TarrifKind.jurUpper]: "Продвинутый",
+  [TarrifKind.jurPro]: "Про",
+};
+
+export const TarrifCategories = {
+  [TarrifKind.free]: "Бесплатный",
+  [TarrifKind.physBasic]: ClientCategory.private,
+  [TarrifKind.physUpper]: ClientCategory.private,
+  [TarrifKind.physPro]: ClientCategory.private,
+  [TarrifKind.jurBasic]: ClientCategory.company,
+  [TarrifKind.jurUpper]: ClientCategory.company,
+  [TarrifKind.jurPro]: ClientCategory.company,
+};
+
+export const CategoryNames = {
+  [ClientCategory.private]: "Физическое лицо",
+  [ClientCategory.company]: "Юридическое лицо",
+};
+
+export const TARRIFS: Array<TarrifCard> = [
   {
     durationTitle: "1 месяц",
     description: "Подойдет, если вы не ведете проверки на постоянной основе",
@@ -8,10 +33,10 @@ export const TARRIFS_PRIVATE: Array<Tarrif> = [
       "Полный доступ ко всем спискам",
       "Поддержка 24/7",
       "300 запросов в месяц",
-      "3 устройства для доступа",
+      "3 устройств для доступа",
     ],
     price: 5000,
-    category: ClientCategory.private,
+    kind: TarrifKind.physBasic,
   },
   {
     durationTitle: "6 месяцев",
@@ -21,11 +46,11 @@ export const TARRIFS_PRIVATE: Array<Tarrif> = [
       "Полный доступ ко всем спискам",
       "Поддержка 24/7",
       "Неограниченное число запросов",
-      "3 устройства для доступа",
+      "3 устройств для доступа",
       "Экономия 17%",
     ],
     price: 25000,
-    category: ClientCategory.private,
+    kind: TarrifKind.physUpper,
   },
   {
     durationTitle: "12 месяцев",
@@ -35,15 +60,12 @@ export const TARRIFS_PRIVATE: Array<Tarrif> = [
       "Полный доступ ко всем спискам",
       "Поддержка 24/7",
       "Неограниченное число запросов",
-      "3 устройства для доступа",
+      "3 устройств для доступа",
       "Экономия 25%",
     ],
     price: 45000,
-    category: ClientCategory.private,
+    kind: TarrifKind.physPro,
   },
-];
-
-export const TARRIFS_COMPANY: Array<Tarrif> = [
   {
     durationTitle: "1 месяц",
     description: "Подойдет, если вы не ведете проверки на постоянной основе",
@@ -54,7 +76,7 @@ export const TARRIFS_COMPANY: Array<Tarrif> = [
       "Неограниченное число устройств для доступа",
     ],
     price: 15000,
-    category: ClientCategory.company,
+    kind: TarrifKind.jurBasic,
   },
   {
     durationTitle: "6 месяцев",
@@ -68,7 +90,7 @@ export const TARRIFS_COMPANY: Array<Tarrif> = [
       "Экономия 17%",
     ],
     price: 75000,
-    category: ClientCategory.company,
+    kind: TarrifKind.jurUpper,
   },
   {
     durationTitle: "12 месяцев",
@@ -82,6 +104,6 @@ export const TARRIFS_COMPANY: Array<Tarrif> = [
       "Экономия 25%",
     ],
     price: 135000,
-    category: ClientCategory.company,
+    kind: TarrifKind.jurPro,
   },
 ];

@@ -206,9 +206,9 @@ sample({
     !passwordConfirmTextError &&
     !nameError &&
     !surnameError &&
-    !companyNameError &&
     !phoneError &&
-    !(INNError && clientCategory === ClientCategory.company),
+    !(INNError && clientCategory === ClientCategory.company) &&
+    !(companyNameError && clientCategory === ClientCategory.company),
   fn: ({
     email,
     password,

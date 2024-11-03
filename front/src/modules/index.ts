@@ -5,3 +5,4 @@ export { ContactUs } from "./contact-us";
 export { BillingCard } from "./billing-card";
 export { ProfileData } from "./profile-data";
 export { Tarrif } from "./tarrif";
+export { PermanentNotifications } from "./notifications";

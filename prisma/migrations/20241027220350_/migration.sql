@@ -1,0 +1,4 @@
+-- AlterTable
+ALTER TABLE "Tarrif" ALTER COLUMN "duration" SET DATA TYPE BIGINT,
+ALTER COLUMN "allowedRequests" SET DATA TYPE BIGINT,
+ALTER COLUMN "allowedDevices" SET DATA TYPE BIGINT;

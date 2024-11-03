@@ -1,0 +1,5 @@
+-- AlterTable
+ALTER TABLE "Tarrif" ALTER COLUMN "duration" DROP NOT NULL,
+ALTER COLUMN "allowedRequests" DROP NOT NULL,
+ALTER COLUMN "allowedDevices" DROP NOT NULL,
+ALTER COLUMN "price" DROP NOT NULL;

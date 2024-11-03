@@ -2,9 +2,8 @@ import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import { useInitNavigation } from "../shared/navigate";
 
 import { Box, Stack } from "@mui/material";
-import { useGate, useUnit } from "effector-react";
+import { useGate } from "effector-react";
 import { Container, NavigationContainer } from "./app.styles";
-import { socket } from "@master_kufa/client-tools";
 import { appModel } from "models/app";
 import { Paths } from "shared/paths";
 import { Footer, Navigation } from "modules";
@@ -56,7 +55,13 @@ export const AppNavigation = () => {
                 element={<CompanyClients isCorporate />}
               />
               <Route path={Paths.billing} element={<Billing />} />
-              <Route path={Paths.profile} element={<Profile />} />
+              <Route path={`${Paths.profile}/*`} element={<Profile />} />
+              <Route
+                path={Paths.profile}
+                element={<Navigate replace to={Paths.profileMy} />}
+                index
+              />
+
               <Route
                 path={Paths.recoverPasswordRequest}
                 element={<RecoverRequest />}

@@ -1,11 +1,22 @@
 import { Notification } from "@master_kufa/client-tools";
-import { profileApi } from "api";
+import { authApi, profileApi } from "api";
 import { createEvent, createStore, sample } from "effector";
 import { createGate } from "effector-react";
+import { appModel } from "models/app/";
 import { validatePassword } from "shared/auth.helpers";
+import { TarrifKind } from "shared/billing";
 import { Profile } from "shared/profile";
 
 export const $profile = createStore<Profile | null>(null);
+export const $currentTarrif = $profile.map(
+  (profile) =>
+    profile?.tarrifs.find(
+      (x) =>
+        new Date(x.start).getTime() < new Date().getTime() &&
+        new Date(x.end).getTime() > new Date().getTime(),
+    ) || profile?.tarrifs.find((x) => x.tarrif.identifier === TarrifKind.free),
+);
+
 export const $oldPassword = createStore("");
 export const $newPassword = createStore("");
 export const $newPasswordRepeat = createStore("");
@@ -14,13 +25,11 @@ export const $newPasswordError = createStore<string>("");
 export const $newPasswordRepeatError = createStore<string>("");
 export const $editErrorKeys = createStore<string[]>([]);
 
-export const $tab = createStore<"profile" | "tarrif">("profile");
 export const $isChangePasswordActive = createStore(false);
 export const $initialProfile = createStore<Profile | null>(null);
 
 export const ProfileGate = createGate<void>();
 
-export const changeTab = createEvent<"profile" | "tarrif">();
 export const toggleChangePassword = createEvent();
 export const changeOldPassword = createEvent<string>();
 export const changeNewPassword = createEvent<string>();
@@ -35,11 +44,6 @@ export const removeEditErrorKey = createEvent<string>();
 
 export const savePasswordClicked = createEvent();
 export const saveProfileClicked = createEvent();
-
-sample({
-  clock: changeTab,
-  target: $tab,
-});
 
 sample({
   clock: toggleChangePassword,
@@ -130,7 +134,7 @@ sample({
 });
 
 sample({
-  clock: ProfileGate.open,
+  clock: [appModel.AppGate.open, authApi.authFx.doneData],
   target: profileApi.loadCurrentProfileFx,
 });
 
@@ -164,7 +168,6 @@ $isChangePasswordActive.reset(
   ProfileGate.close,
   profileApi.changePasswordFx.done,
 );
-$tab.reset(ProfileGate.close, profileApi.changePasswordFx.done);
 $newPasswordError.reset(ProfileGate.close, profileApi.changePasswordFx.done);
 $newPasswordRepeatError.reset(
   ProfileGate.close,
@@ -175,6 +178,4 @@ $newPassword.reset(ProfileGate.close, profileApi.changePasswordFx.done);
 $newPasswordRepeat.reset(ProfileGate.close, profileApi.changePasswordFx.done);
 $editErrorKeys.reset(ProfileGate.close, profileApi.changePasswordFx.done);
 
-$profile.reset(ProfileGate.close);
 $initialProfile.reset(ProfileGate.close);
-$tab.reset(ProfileGate.close);

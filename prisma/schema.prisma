@@ -39,15 +39,32 @@ model User {
 }
 
 model UserTarrif {
-  id            Int       @id @default(autoincrement())
-  user          User      @relation(fields: [userId], references: [id])
-  tarrif        Tarrif    @relation(fields: [tarrifId], references: [id])
+  id            Int             @id @default(autoincrement())
+  user          User            @relation(fields: [userId], references: [id])
+  tarrif        Tarrif          @relation(fields: [tarrifId], references: [id])
   start         DateTime?
   end           DateTime?
   userId        Int
   tarrifId      Int
-  isUserNoticed Boolean   @default(false)
-  doneRequests  Int       @default(0)
+  isUserNoticed Boolean         @default(false)
+  devices       Device[]
+  searchRequest SearchRequest[]
+}
+
+model SearchRequest {
+  id           Int         @id @default(autoincrement())
+  countries    String[]
+  searchTypes  String[]
+  restrictions String[]
+  searchTags   String[]
+  UserTarrif   UserTarrif? @relation(fields: [userTarrifId], references: [id])
+  userTarrifId Int?
+}
+
+model Device {
+  id           String      @id
+  UserTarrif   UserTarrif? @relation(fields: [userTarrifId], references: [id])
+  userTarrifId Int?
 }
 
 model Tarrif {

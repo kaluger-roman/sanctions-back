@@ -2,6 +2,7 @@ import { createEffect, createEvent, createStore } from "effector";
 import { io, Socket } from "socket.io-client";
 import { nanoid } from "nanoid";
 import { TOKEN_KEY } from "shared/authorization";
+import { getDeviceId } from "./device-management.helpers";
 
 export type SocketResponse<T = "success" | "error"> = {
   requestId?: string;
@@ -19,6 +20,7 @@ class AppSocket {
 
   client: Socket;
   $isConnected = createStore(false);
+  deviceId: string;
 
   connect() {
     this.client = io(
@@ -33,7 +35,9 @@ class AppSocket {
     this.init();
   }
 
-  private init() {
+  private async init() {
+    this.deviceId = await getDeviceId();
+
     this.client.onAny((_, response: SocketResponse) => {
       if (response.requestId && this.pendingRequests[response.requestId]) {
         this.pendingRequests[response.requestId](response);
@@ -69,6 +73,7 @@ class AppSocket {
       ...payload,
       requestId,
       token: localStorage[TOKEN_KEY],
+      deviceId: this.deviceId,
     });
 
     return new Promise((resolve, reject) => {

@@ -1,20 +1,42 @@
 import { prisma } from "../../prisma";
 import { ClientCategory, Profile } from "./types";
 import { Request } from "../types";
+import * as jwt from "jsonwebtoken";
 
 import { UserService } from "./user.service";
+import { searchQuotasService } from "../search-app/search-quotas.service";
 
 class ProfileService {
-  async loadProfile(token): Promise<Profile> {
-    const user = await UserService.getUserByToken(token, {
-      tarrifs: {
-        include: {
-          tarrif: true,
+  async loadProfile(token): Promise<
+    Profile & {
+      isUnlimitedRequests: boolean;
+      isUnlimitedDevices: boolean;
+    }
+  > {
+    const userCreds = jwt.decode(token);
+    const user = await prisma.user.findUnique({
+      where: { id: userCreds.id },
+      include: {
+        tarrifs: {
+          select: {
+            _count: {
+              select: { searchRequest: true, devices: true },
+            },
+            start: true,
+            end: true,
+            tarrif: {
+              select: {
+                identifier: true,
+                allowedRequests: true,
+                allowedDevices: true,
+              },
+            },
+          },
+          orderBy: {
+            end: "asc",
+          },
         },
-        orderBy: {
-          end: "asc",
-        },
-      } as any,
+      },
     });
 
     return {
@@ -30,7 +52,13 @@ class ProfileService {
       isConfirmed: user.isConfirmed,
       companyName: user.companyName,
       lastPasswordChangeTime: user.lastPasswordChangeTime.toISOString(),
-      tarrifs: user.tarrifs,
+      tarrifs: user.tarrifs as any,
+      isUnlimitedRequests: searchQuotasService.isUserUnlimitedRequests(
+        user.tarrifs as any,
+      ),
+      isUnlimitedDevices: searchQuotasService.isUserUnlimitedDevices(
+        user.tarrifs as any,
+      ),
     };
   }
   async changeProfile(profile: Request<Profile>) {

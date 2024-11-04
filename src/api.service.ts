@@ -10,7 +10,7 @@ export class Api<T extends string> {
   async handle(
     action: T,
     socket: Socket,
-    payload: { requestId?: string; token?: string },
+    payload: { requestId?: string; token?: string; deviceId?: string },
   ) {
     try {
       beforeAction(payload.token, socket);

@@ -85,6 +85,7 @@ sample({
     profileApi.changePasswordFx.failData,
     profileApi.changeProfileFx.failData,
     billingApi.createPaymentFx.failData,
+    searchAppApi.searchFx.failData,
   ],
   fn: (error?: string): Notification.PayloadType => ({
     type: "error",

@@ -14,6 +14,8 @@ export type Profile = {
   companyName?: string;
   lastPasswordChangeTime?: string;
   tarrifs: Array<UserTarrif>;
+  isUnlimitedRequests: boolean;
+  isUnlimitedDevices: boolean;
 };
 
 export type ChangePasswordPayload = {
@@ -25,8 +27,11 @@ export type UserTarrif = {
   start: string;
   end: string;
   tarrif: Tarrif;
+  _count: { searchRequest: number; devices: number };
 };
 
 export type Tarrif = {
   identifier: TarrifKind;
+  allowedRequests: number;
+  allowedDevices: number;
 };

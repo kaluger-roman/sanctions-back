@@ -1,6 +1,10 @@
 import { Socket } from "socket.io";
 
-export type Request<T> = T & { requestId?: string; token?: string };
+export type Request<T> = T & {
+  requestId?: string;
+  token?: string;
+  deviceId?: string;
+};
 export type SocketResponse<T> = {
   requestId?: string;
   error?: string;

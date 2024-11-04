@@ -9,83 +9,12 @@ import {
   AccordionDetails,
 } from "@mui/material";
 import { theme } from "shared/theme";
-import { DataChip } from "./data-chip";
 import { navigation } from "shared/navigate";
 import { useUnit } from "effector-react";
 import { profileModel } from "models";
 import { TarrifKind } from "shared/billing";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-
-import {
-  CategoryNames,
-  TarrifCategories,
-  TarrifNames,
-} from "pages/billing/constants";
-import { UserTarrif } from "shared/profile";
-
-const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
-  const currentTarrif = useUnit(profileModel.$currentTarrif);
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 1,
-        width: "100%",
-        overflow: "hidden",
-        pb: 3,
-        pt: 3,
-        borderBottom: `1px solid ${theme.palette.grey[300]}`,
-      }}
-    >
-      <DataChip
-        label={`${
-          currentTarrif === tarrif
-            ? "Текущий"
-            : new Date(tarrif.start).getTime() > new Date().getTime()
-            ? "Предоплаченный"
-            : "Завершенный"
-        } тариф`}
-        value={TarrifNames[tarrif.tarrif.identifier]}
-      />
-      {tarrif.tarrif.identifier !== TarrifKind.free && (
-        <DataChip
-          label="Тип"
-          value={
-            (CategoryNames as any)[
-              TarrifCategories[tarrif.tarrif.identifier]
-            ] || TarrifCategories[tarrif.tarrif.identifier]
-          }
-        />
-      )}
-      <DataChip
-        label="Начало действия"
-        value={
-          tarrif.start &&
-          new Date(tarrif.start).toLocaleDateString("ru-RU", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })
-        }
-        placeholder="Бессрочно"
-      />
-      <DataChip
-        label="Конец действия"
-        value={
-          tarrif.end &&
-          new Date(tarrif.end).toLocaleDateString("ru-RU", {
-            year: "numeric",
-            month: "long",
-            day: "numeric",
-          })
-        }
-        placeholder="Бессрочно"
-      />
-    </Box>
-  );
-};
+import { TarrifItem } from "./tarrif-item";
 
 export const Tarrif = () => {
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));

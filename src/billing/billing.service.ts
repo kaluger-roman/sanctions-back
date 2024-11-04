@@ -8,6 +8,9 @@ import { nanoid } from "nanoid";
 import { ACTIONS } from "../actions";
 import { TarrifCategories, TarrifNames } from "./constants";
 import { ActiveConnections } from "../active-connections";
+import { SearchFilters } from "src/search-app/search-app.types";
+import { Tarrif, UserTarrif } from "@prisma/client";
+import { paymentsService } from "./payments.service";
 
 const billing = new YooCheckout({
   shopId: env.BILLING_SHOP_ID,
@@ -15,6 +18,9 @@ const billing = new YooCheckout({
 });
 
 export class BillingService {
+  constructor() {
+    paymentsService.waitingForPayments(this.updateUserTarrif);
+  }
   async getUserLastTarrif(userId: number) {
     const userLastTarrif = await prisma.userTarrif.findFirst({
       where: {
@@ -24,7 +30,28 @@ export class BillingService {
         },
       },
       orderBy: {
-        end: "desc",
+        end: "asc",
+      },
+      include: {
+        tarrif: true,
+      },
+    });
+
+    return userLastTarrif;
+  }
+  async getUserCurrentTarrif(userId: number) {
+    const userLastTarrif = await prisma.userTarrif.findFirst({
+      where: {
+        userId,
+        end: {
+          gte: new Date(),
+        },
+        start: {
+          lte: new Date(),
+        },
+      },
+      include: {
+        tarrif: true,
       },
     });
 
@@ -41,13 +68,13 @@ export class BillingService {
 
     const userLastTarrif = await this.getUserLastTarrif(user.id);
 
-    const newEndTarrif = new Date(userLastTarrif.end || new Date());
+    const newEndTarrif = new Date(userLastTarrif?.end || new Date());
     newEndTarrif.setMonth(newEndTarrif.getMonth() + tarrif.duration);
     newEndTarrif.setHours(23, 59, 59, 999);
 
-    const newStartTarrif = new Date(userLastTarrif.end || new Date());
-    newEndTarrif.setDate(newEndTarrif.getDate() + 1);
-    newEndTarrif.setHours(0, 0, 0, 0);
+    const newStartTarrif = new Date(userLastTarrif?.end || new Date());
+    newStartTarrif.setDate(newEndTarrif.getDate() + (userLastTarrif ? 1 : 0));
+    newStartTarrif.setHours(0, 0, 0, 0);
 
     await prisma.userTarrif.create({
       data: {
@@ -61,44 +88,18 @@ export class BillingService {
     const userTarrifs = await prisma.userTarrif.findMany({
       where: {
         userId: user.id,
-        end: {
-          gte: new Date(),
-        },
       },
       orderBy: {
-        end: "desc",
+        end: "asc",
+      },
+      include: {
+        tarrif: true,
       },
     });
 
     ActiveConnections[user.id]?.forEach(async (socket) => {
       socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, userTarrifs);
     });
-  }
-  async waitingForPayments() {
-    while (true) {
-      try {
-        const pendingPayments = await prisma.pendingPayment.findMany();
-
-        for await (const payment of pendingPayments) {
-          const paymentInfo = await billing.getPayment(payment.id);
-
-          if (paymentInfo.status === "succeeded") {
-            await this.updateUserTarrif(paymentInfo);
-            await prisma.pendingPayment.delete({
-              where: { id: paymentInfo.id },
-            });
-          } else if (paymentInfo.status === "canceled") {
-            await prisma.pendingPayment.delete({
-              where: { id: paymentInfo.id },
-            });
-          }
-        }
-
-        await new Promise((resolve) => setTimeout(resolve, 5000));
-      } catch (e) {
-        console.log(e);
-      }
-    }
   }
   async userTarrifNoticed({ token }: Request<void>) {
     const user = await UserService.getUserByToken(token);
@@ -115,68 +116,6 @@ export class BillingService {
       },
     });
   }
-  async createPayment({ tariffKind, token }: Request<CreatePaymentPayload>) {
-    const tarrif = await prisma.tarrif.findFirst({
-      where: { identifier: tariffKind },
-    });
-
-    if (!tarrif) throw new Error("Тариф не найден");
-
-    const user = await UserService.getUserByToken(token);
-
-    const pendingPayments = await billing.getPaymentList({
-      status: "pending",
-    });
-
-    const pendingUserPayment = pendingPayments.items.find(
-      ({ metadata }) =>
-        String(metadata.userId) === String(user.id) &&
-        metadata.tarrifId === tarrif.identifier,
-    );
-
-    if (pendingUserPayment) {
-      return {
-        confirmation_url: pendingUserPayment.confirmation.confirmation_url,
-      };
-    }
-
-    const idempotencyId = nanoid();
-
-    const payment = await billing.createPayment(
-      {
-        amount: {
-          value: tarrif.price.toFixed(2),
-          currency: "RUB",
-        },
-        capture: true,
-        description: `Тариф ${TarrifNames[tarrif.identifier]} (${
-          TarrifCategories[tarrif.identifier]
-        }) - ${tarrif.duration} мес.`,
-        confirmation: {
-          type: "redirect",
-          return_url: `${env.FRONT_HOST}/profile/tariff`,
-        },
-        metadata: {
-          userId: user.id,
-          idempotencyId,
-          tarrifId: tarrif.identifier,
-        },
-      },
-      idempotencyId,
-    );
-
-    await prisma.pendingPayment.create({
-      data: {
-        id: payment.id,
-      },
-    });
-
-    return {
-      confirmation_url: payment.confirmation.confirmation_url,
-    };
-  }
 }
 
 export const billingService = new BillingService();
-
-billingService.waitingForPayments();

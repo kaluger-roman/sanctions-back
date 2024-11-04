@@ -7,7 +7,7 @@ export const DataChip = ({
   placeholder = "Не указано",
 }: {
   label?: string;
-  value?: string;
+  value?: string | React.ReactElement;
   placeholder?: string;
 }) => {
   return (

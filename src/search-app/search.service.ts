@@ -1,8 +1,10 @@
-import { groupBy, intersection, mapValues, uniq } from "lodash";
+import { groupBy, isEmpty, mapValues, uniq } from "lodash";
 import { prisma } from "../../prisma";
 import { splitCodeTag } from "./search-app.helpers";
 import { SearchFilters } from "./search-app.types";
 import { Sanction } from "@prisma/client";
+import { Request } from "../types";
+import { searchQuotasService } from "./search-quotas.service";
 
 class SearchService {
   async loadCountries() {
@@ -45,7 +47,9 @@ class SearchService {
     searchTags,
     countries,
     restrictions,
-  }: SearchFilters) {
+    deviceId,
+    token,
+  }: Request<SearchFilters>) {
     const sanctions: Array<
       Sanction & { descriptionTag?: string; codeTag?: string }
     > = [];
@@ -133,6 +137,14 @@ class SearchService {
       ),
       (value) => groupBy(value, (value) => value.tag),
     );
+
+    if (!isEmpty(groupedSanctions)) {
+      await searchQuotasService.registerDevice(deviceId, token);
+      await searchQuotasService.registerSearchRequest(
+        { searchTypes, searchTags, countries, restrictions },
+        token,
+      );
+    }
 
     return groupedSanctions;
   }

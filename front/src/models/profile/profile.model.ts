@@ -135,6 +135,8 @@ sample({
 
 sample({
   clock: [appModel.AppGate.open, authApi.authFx.doneData, ProfileGate.open],
+  source: profileApi.loadCurrentProfileFx.pending,
+  filter: (pending) => !pending,
   target: profileApi.loadCurrentProfileFx,
 });
 

@@ -4,7 +4,7 @@ import {
   billingApi,
   contactUsApi,
   profileApi,
-  sanctionsManagementApi,
+  adminApi,
   searchAppApi,
 } from "api";
 import {
@@ -34,6 +34,8 @@ const $commonPendingRequests = combine(
   profileApi.changeProfileFx.pending,
   billingApi.createPaymentFx.pending,
   billingApi.addRequestsPaymentFx.pending,
+  adminApi.changeTarrifsSettingsFx.pending,
+  adminApi.changeTarrifsSettingsFx.pending,
   socket.$isConnected.map((isConnected) => !isConnected),
   (...requests: Array<boolean>) => requests.some(Boolean),
 ) as unknown as Store<boolean>;
@@ -78,7 +80,7 @@ $authorizationData.reset(LogOut);
 
 sample({
   clock: [
-    sanctionsManagementApi.uploadSanctionsFileFx.failData,
+    adminApi.uploadSanctionsFileFx.failData,
     contactUsApi.submitForm.failData,
     authApi.recoverRequestFx.failData,
     authApi.recoverConfirmFx.failData,
@@ -88,6 +90,8 @@ sample({
     billingApi.createPaymentFx.failData,
     searchAppApi.searchFx.failData,
     billingApi.addRequestsPaymentFx.failData,
+    adminApi.changeTarrifsSettingsFx.failData,
+    adminApi.changeTarrifsSettingsFx.failData,
   ],
   fn: (error?: string): Notification.PayloadType => ({
     type: "error",
@@ -117,3 +121,6 @@ sample({
   fn: () => NaN,
   target: $loadingProgress,
 });
+export function AdminGate(AdminGate: any) {
+  throw new Error("Function not implemented.");
+}

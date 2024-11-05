@@ -1,7 +1,6 @@
 import { searchAppApi } from "api";
 import { createEvent, createStore, sample } from "effector";
 import { createGate } from "effector-react";
-import { appModel } from "models/app";
 import { SearchResult } from "shared/sanctions";
 import { SyncedFilters } from "shared/search";
 import { SearchType } from "shared/search-type";

@@ -18,7 +18,7 @@ import {
 } from "pages";
 import { CompanyClients } from "pages/clients";
 import { useEffect } from "react";
-import { ManageSanctions } from "pages/manage-sanctions";
+import { Admin } from "pages/admin";
 import { RecoverRequest } from "pages/auth/recover-request";
 import { RecoverConfirm, RegistrationConfirm } from "pages/auth";
 
@@ -76,10 +76,7 @@ export const AppNavigation = () => {
               />
               <Route path={Paths.search_app} element={<SearchApp />} />
               <Route path={Paths.contacts} element={<Contacts />} />
-              <Route
-                path={Paths.resetSanctionsDatabase}
-                element={<ManageSanctions />}
-              />
+              <Route path={Paths.admin} element={<Admin />} />
             </Route>
           </Route>
         </Routes>

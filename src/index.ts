@@ -1,10 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { searchApiHandlers, searchApi } from "./search-app";
 import { registerApi } from "./api.service";
-import {
-  sanctionsManagementApi,
-  sanctionsManagementApiHandlers,
-} from "./sanctions-management";
+import { adminApi, adminApiHandlers } from "./admin";
 import { execSync } from "child_process";
 import { createServer } from "http";
 import * as express from "express";
@@ -67,7 +64,7 @@ server.on("connection", async (socket: Socket) => {
   initConnection(socket);
 
   registerApi(searchApiHandlers, searchApi, socket);
-  registerApi(sanctionsManagementApiHandlers, sanctionsManagementApi, socket);
+  registerApi(adminApiHandlers, adminApi, socket);
   registerApi(userApiHandlers, userApi, socket);
   registerApi(contactApiHandlers, contactApi, socket);
   registerApi(billingApiHandlers, billingApi, socket);

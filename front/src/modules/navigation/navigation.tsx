@@ -235,9 +235,7 @@ export const Navigation = () => {
                 {authorizationData.isAdmin && (
                   <Button
                     sx={{ width: "100%" }}
-                    onClick={() =>
-                      navigation.navigate(Paths.resetSanctionsDatabase)
-                    }
+                    onClick={() => navigation.navigate(Paths.admin)}
                   >
                     Админ панель
                   </Button>

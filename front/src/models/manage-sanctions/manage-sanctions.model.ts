@@ -1,4 +1,4 @@
-import { sanctionsManagementApi } from "api";
+import { adminApi } from "api";
 import { createEvent, createStore, sample } from "effector";
 import { Notification } from "@master_kufa/client-tools";
 
@@ -17,13 +17,13 @@ sample({
   source: $selectedFileDB,
   filter: Boolean,
   fn: (buffer) => ({ buffer }),
-  target: sanctionsManagementApi.uploadSanctionsFileFx,
+  target: adminApi.uploadSanctionsFileFx,
 });
 
-$selectedFileDB.reset(sanctionsManagementApi.uploadSanctionsFileFx.done);
+$selectedFileDB.reset(adminApi.uploadSanctionsFileFx.done);
 
 sample({
-  clock: sanctionsManagementApi.uploadSanctionsFileFx.done,
+  clock: adminApi.uploadSanctionsFileFx.done,
   fn: (): Notification.PayloadType => ({
     type: "success",
     message: "Успешно обновлено",

@@ -35,4 +35,5 @@ export type Tarrif = {
   identifier: TarrifKind;
   allowedRequests: number;
   allowedDevices: number;
+  allowedCountries: Array<string>;
 };

@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import { useGate, useUnit } from "effector-react";
 import { intersection, last, sortBy, trim } from "lodash";
-import { searchAppModel } from "models";
+import { profileModel, searchAppModel } from "models";
 import {
   search,
   searchTypeChanged,
@@ -26,6 +26,7 @@ import { SearchType, SearchTypeName } from "shared/search-type";
 import { theme } from "shared/theme";
 import { SearchTable } from "./search-table";
 import { SearchAppMetadata } from "modules/search-app-metadata";
+import PaidIcon from "@mui/icons-material/Paid";
 
 export const SearchApp = () => {
   const searchTags = useUnit(searchAppModel.$searchTags);
@@ -36,6 +37,8 @@ export const SearchApp = () => {
   const selectedCountries = useUnit(searchAppModel.$selectedCountries);
   const availableFilters = useUnit(searchAppModel.$availableFilters);
   const filtersSyncPending = useUnit(searchAppModel.$filtersSyncPending);
+  const currentTarrif = useUnit(profileModel.$currentTarrif);
+  const allowedCountries = currentTarrif?.tarrif.allowedCountries || countries;
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const isAllAvailableSanctionsSelected =
@@ -118,9 +121,9 @@ export const SearchApp = () => {
               onChange={({ target }) => {
                 selectedCountriesChanged(
                   last(target.value) === "all"
-                    ? countries.length === selectedCountries.length
+                    ? allowedCountries.length === selectedCountries.length
                       ? []
-                      : countries
+                      : allowedCountries
                     : (target.value as Array<string>),
                 );
               }}
@@ -132,24 +135,34 @@ export const SearchApp = () => {
                   disabled={filtersSyncPending}
                   indeterminate={
                     selectedCountries.length > 0 &&
-                    countries.length !== selectedCountries.length
+                    allowedCountries.length !== selectedCountries.length
                   }
-                  checked={countries.length === selectedCountries.length}
+                  checked={allowedCountries.length === selectedCountries.length}
                 />
                 <ListItemText primary="Все страны" />
               </MenuItem>
-              {countries.map((country) => (
-                <MenuItem
-                  key={country}
-                  value={country}
-                  disabled={
-                    countries.indexOf(country) === -1 || filtersSyncPending
-                  }
-                >
-                  <Checkbox checked={selectedCountries.indexOf(country) > -1} />
-                  <ListItemText primary={country} />
-                </MenuItem>
-              ))}
+              {sortBy(countries, (x) => !allowedCountries.includes(x)).map(
+                (country) => {
+                  const notAllowed = allowedCountries.indexOf(country) === -1;
+                  return (
+                    <MenuItem
+                      key={country}
+                      value={country}
+                      disabled={notAllowed || filtersSyncPending}
+                    >
+                      <Checkbox
+                        checked={selectedCountries.indexOf(country) > -1}
+                      />
+                      {notAllowed && (
+                        <PaidIcon
+                          sx={{ position: "absolute", left: 6, fontSize: 16 }}
+                        />
+                      )}
+                      <ListItemText primary={country} />
+                    </MenuItem>
+                  );
+                },
+              )}
             </Select>
           </FormControl>
 

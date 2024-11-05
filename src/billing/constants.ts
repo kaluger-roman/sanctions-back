@@ -48,6 +48,7 @@ export const UserTarrifsInclude = {
         identifier: true,
         allowedRequests: true,
         allowedDevices: true,
+        allowedCountries: true,
       },
     },
   },

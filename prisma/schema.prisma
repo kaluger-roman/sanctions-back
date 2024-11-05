@@ -63,9 +63,8 @@ model SearchRequest {
 }
 
 model Device {
-  id           String      @id
-  UserTarrif   UserTarrif? @relation(fields: [userTarrifId], references: [id])
-  userTarrifId Int?
+  id         String       @id
+  UserTarrif UserTarrif[]
 }
 
 model Tarrif {

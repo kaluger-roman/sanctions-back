@@ -161,7 +161,7 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
         }
         placeholder="Бессрочно"
       />
-      {currentTarrif?.tarrif.allowedRequests && (
+      {tarrif?.tarrif.allowedRequests && (
         <QuotaChip
           label={`Квота поисковых запросов ${
             tarrif.additionalRequestsCount ? `(увеличена)` : ""
@@ -193,7 +193,7 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
           ]}
         />
       )}
-      {currentTarrif?.tarrif.allowedDevices && (
+      {tarrif?.tarrif.allowedDevices && (
         <QuotaChip
           label="Квота устройств"
           count={tarrif._count.devices}

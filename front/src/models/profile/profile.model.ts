@@ -134,7 +134,7 @@ sample({
 });
 
 sample({
-  clock: [appModel.AppGate.open, authApi.authFx.doneData],
+  clock: [appModel.AppGate.open, authApi.authFx.doneData, ProfileGate.open],
   target: profileApi.loadCurrentProfileFx,
 });
 

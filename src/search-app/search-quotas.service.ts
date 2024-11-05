@@ -24,8 +24,11 @@ class SearchQuotasService {
     const tarrif = await billingService.getUserCurrentTarrif(userId);
 
     if (
-      (await prisma.device.count({ where: { userTarrifId: tarrif.id } })) >=
-      tarrif.tarrif.allowedDevices
+      (await prisma.device.count({
+        where: {
+          UserTarrif: { some: { id: tarrif.id } },
+        },
+      })) >= tarrif.tarrif.allowedDevices
     ) {
       throw new Error(
         "Превышен лимит устройств для поиска, улучшите ваш тариф",
@@ -34,7 +37,7 @@ class SearchQuotasService {
 
     return prisma.device.upsert({
       where: { id: deviceId },
-      update: {},
+      update: { UserTarrif: { connect: { id: tarrif.id } } },
       create: { id: deviceId, UserTarrif: { connect: { id: tarrif.id } } },
     });
   }

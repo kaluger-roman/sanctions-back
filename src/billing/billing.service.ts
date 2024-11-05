@@ -29,7 +29,7 @@ export class BillingService {
         },
       },
       orderBy: {
-        end: "asc",
+        end: "desc",
       },
       include: {
         tarrif: true,
@@ -135,12 +135,10 @@ export class BillingService {
   async userTarrifNoticed({ token }: Request<void>) {
     const user = await UserService.getUserByToken(token);
 
-    const lastTarrif = await billingService.getUserLastTarrif(user.id);
-
-    await prisma.userTarrif.update({
-      include: { user: true },
+    await prisma.userTarrif.updateMany({
       where: {
-        id: lastTarrif.id,
+        userId: user.id,
+        isUserNoticed: false,
       },
       data: {
         isUserNoticed: true,

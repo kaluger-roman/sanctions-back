@@ -27,15 +27,6 @@ export const afterAction = async (token: string, socket: Socket) => {
   });
 
   if (tarrifs.some((x) => x.isUserNoticed === false)) {
-    await prisma.userTarrif.updateMany({
-      where: {
-        userId: user.id,
-        isUserNoticed: false,
-      },
-      data: {
-        isUserNoticed: true,
-      },
-    });
     ActiveConnections[user.id]?.forEach(async (socket) => {
       socket.emit(ACTIONS.BILLING_TARRIF_USER_NOTICED, {
         isUserNoticed: false,

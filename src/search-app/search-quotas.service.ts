@@ -22,8 +22,14 @@ class SearchQuotasService {
   async registerDevice(deviceId: string, token: string) {
     const { id: userId } = await UserService.getUserByToken(token);
     const tarrif = await billingService.getUserCurrentTarrif(userId);
+    const tarrifs = await prisma.userTarrif.findMany({
+      where: { userId },
+      include: { tarrif: true },
+    });
+    const isUserUnlimitedDevices = this.isUserUnlimitedDevices(tarrifs);
 
     if (
+      !isUserUnlimitedDevices &&
       (await prisma.device.count({
         where: {
           UserTarrif: { some: { id: tarrif.id } },

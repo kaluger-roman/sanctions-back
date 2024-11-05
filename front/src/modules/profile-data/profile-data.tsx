@@ -107,7 +107,6 @@ export const ProfileData = () => {
         onChange={(value) =>
           profileModel.changeProfileField({ field: "secondName", value })
         }
-        validate={required}
         label="Отчество"
         value={profile.secondName}
         placeholder="Не указано"

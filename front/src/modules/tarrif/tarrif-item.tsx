@@ -66,7 +66,7 @@ const QuotaChip = ({
               )}
             </Typography>
           )}
-          {limit && !isUnlimited && count >= limit && (
+          {!!limit && !isUnlimited && count >= limit && (
             <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
               {additionalPayments?.map((payment) => (
                 <Chip
@@ -161,42 +161,46 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
         }
         placeholder="Бессрочно"
       />
-      <QuotaChip
-        label={`Квота поисковых запросов ${
-          tarrif.additionalRequestsCount ? `(увеличена)` : ""
-        }`}
-        count={tarrif._count.searchRequest}
-        limit={tarrif.tarrif.allowedRequests + tarrif.additionalRequestsCount}
-        isUnlimited={!!isUnlimitedRequests}
-        onAdditionalPayment={(kind) =>
-          billingModel.createAddRequestsPayment(
-            kind as AdditionalRequestsPaymentKind,
-          )
-        }
-        additionalPayments={[
-          {
-            label: "+100",
-            value: AdditionalRequestsPaymentKind.additional100,
-            price: 2000,
-          },
-          {
-            label: "+200",
-            value: AdditionalRequestsPaymentKind.additional200,
-            price: 4000,
-          },
-          {
-            label: "+300",
-            value: AdditionalRequestsPaymentKind.additional300,
-            price: 6000,
-          },
-        ]}
-      />
-      <QuotaChip
-        label="Квота устройств"
-        count={tarrif._count.devices}
-        limit={tarrif.tarrif.allowedDevices}
-        isUnlimited={!!isUnlimitedDevices}
-      />
+      {currentTarrif?.tarrif.allowedRequests && (
+        <QuotaChip
+          label={`Квота поисковых запросов ${
+            tarrif.additionalRequestsCount ? `(увеличена)` : ""
+          }`}
+          count={tarrif._count.searchRequest}
+          limit={tarrif.tarrif.allowedRequests + tarrif.additionalRequestsCount}
+          isUnlimited={!!isUnlimitedRequests}
+          onAdditionalPayment={(kind) =>
+            billingModel.createAddRequestsPayment(
+              kind as AdditionalRequestsPaymentKind,
+            )
+          }
+          additionalPayments={[
+            {
+              label: "+100",
+              value: AdditionalRequestsPaymentKind.additional100,
+              price: 2000,
+            },
+            {
+              label: "+200",
+              value: AdditionalRequestsPaymentKind.additional200,
+              price: 4000,
+            },
+            {
+              label: "+300",
+              value: AdditionalRequestsPaymentKind.additional300,
+              price: 6000,
+            },
+          ]}
+        />
+      )}
+      {currentTarrif?.tarrif.allowedDevices && (
+        <QuotaChip
+          label="Квота устройств"
+          count={tarrif._count.devices}
+          limit={tarrif.tarrif.allowedDevices}
+          isUnlimited={!!isUnlimitedDevices}
+        />
+      )}
     </Box>
   );
 };

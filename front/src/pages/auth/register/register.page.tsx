@@ -179,7 +179,7 @@ export const Register = () => {
             helperText={passwordConfirmTextError}
           />
           <FormControlLabel
-            key={String(isPoliciesAccepted)}
+            key={String(clientCategory)}
             control={
               <Checkbox
                 required

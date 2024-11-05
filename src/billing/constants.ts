@@ -1,4 +1,4 @@
-import { TarrifKind } from "./types";
+import { AdditionalRequestsPaymentKind, TarrifKind } from "./types";
 
 export const TarrifNames = {
   [TarrifKind.free]: "Бесплатный",
@@ -19,3 +19,39 @@ export const TarrifCategories = {
   [TarrifKind.jurUpper]: "Юр. лицо",
   [TarrifKind.jurPro]: "Юр. лицо",
 };
+
+export const AdditionalPayments = {
+  [AdditionalRequestsPaymentKind.additional100]: {
+    price: 2000,
+    amount: 100,
+  },
+  [AdditionalRequestsPaymentKind.additional200]: {
+    price: 4000,
+    amount: 200,
+  },
+  [AdditionalRequestsPaymentKind.additional300]: {
+    price: 6000,
+    amount: 300,
+  },
+};
+
+export const UserTarrifsInclude = {
+  select: {
+    _count: {
+      select: { searchRequest: true, devices: true },
+    },
+    start: true,
+    end: true,
+    additionalRequestsCount: true,
+    tarrif: {
+      select: {
+        identifier: true,
+        allowedRequests: true,
+        allowedDevices: true,
+      },
+    },
+  },
+  orderBy: {
+    end: "asc",
+  },
+} as const;

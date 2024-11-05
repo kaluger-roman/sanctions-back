@@ -1,9 +1,9 @@
-import { Box, Typography, Tooltip } from "@mui/material";
+import { Box, Typography, Tooltip, Chip } from "@mui/material";
 import { theme } from "shared/theme";
 import { DataChip } from "./data-chip";
 import { useUnit } from "effector-react";
-import { profileModel } from "models";
-import { TarrifKind } from "shared/billing";
+import { billingModel, profileModel } from "models";
+import { AdditionalRequestsPaymentKind, TarrifKind } from "shared/billing";
 import InfoIcon from "@mui/icons-material/Info";
 
 import {
@@ -18,17 +18,25 @@ const QuotaChip = ({
   count,
   limit,
   isUnlimited,
+  additionalPayments,
+  onAdditionalPayment,
 }: {
   label: string;
   count: number;
   limit: number | null;
   isUnlimited: boolean;
+  onAdditionalPayment?: (value: unknown) => void;
+  additionalPayments?: Array<{
+    label: string;
+    value: unknown;
+    price: number;
+  }>;
 }) => {
   return (
     <DataChip
       label={label}
       value={
-        <Box sx={{ display: "flex", gap: 1 }}>
+        <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           {!!limit && (
             <Typography
               variant="caption"
@@ -57,6 +65,33 @@ const QuotaChip = ({
                 </Tooltip>
               )}
             </Typography>
+          )}
+          {limit && !isUnlimited && count >= limit && (
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+              {additionalPayments?.map((payment) => (
+                <Chip
+                  onClick={() => onAdditionalPayment?.(payment.value)}
+                  sx={{
+                    height: 16,
+                    minWidth: 110,
+                    background: theme.palette.primary.main,
+
+                    "&:hover": {
+                      cursor: "pointer",
+                      background: theme.palette.primary.dark,
+                    },
+                  }}
+                  label={
+                    <Typography
+                      color={theme.palette.common.white}
+                      variant="caption"
+                    >
+                      {payment.label} ({payment.price} ₽)
+                    </Typography>
+                  }
+                />
+              ))}
+            </Box>
           )}
         </Box>
       }
@@ -127,10 +162,34 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
         placeholder="Бессрочно"
       />
       <QuotaChip
-        label="Квота поисковых запросов"
+        label={`Квота поисковых запросов ${
+          tarrif.additionalRequestsCount ? `(увеличена)` : ""
+        }`}
         count={tarrif._count.searchRequest}
-        limit={tarrif.tarrif.allowedRequests}
+        limit={tarrif.tarrif.allowedRequests + tarrif.additionalRequestsCount}
         isUnlimited={!!isUnlimitedRequests}
+        onAdditionalPayment={(kind) =>
+          billingModel.createAddRequestsPayment(
+            kind as AdditionalRequestsPaymentKind,
+          )
+        }
+        additionalPayments={[
+          {
+            label: "+100",
+            value: AdditionalRequestsPaymentKind.additional100,
+            price: 2000,
+          },
+          {
+            label: "+200",
+            value: AdditionalRequestsPaymentKind.additional200,
+            price: 4000,
+          },
+          {
+            label: "+300",
+            value: AdditionalRequestsPaymentKind.additional300,
+            price: 6000,
+          },
+        ]}
       />
       <QuotaChip
         label="Квота устройств"

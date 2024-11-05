@@ -41,11 +41,18 @@ class SearchQuotasService {
   async registerSearchRequest(payload: SearchFilters, token: string) {
     const { id: userId } = await UserService.getUserByToken(token);
     const tarrif = await billingService.getUserCurrentTarrif(userId);
+    const tarrifs = await prisma.userTarrif.findMany({
+      where: { userId },
+      include: { tarrif: true },
+    });
+    const isUserUnlimitedRequests = this.isUserUnlimitedRequests(tarrifs);
 
     if (
+      !isUserUnlimitedRequests &&
       (await prisma.searchRequest.count({
         where: { userTarrifId: tarrif.id },
-      })) >= tarrif.tarrif.allowedRequests
+      })) >=
+        tarrif.tarrif.allowedRequests + tarrif.additionalRequestsCount
     ) {
       throw new Error("Превышен лимит запросов для поиска, улучшите ваш тариф");
     }

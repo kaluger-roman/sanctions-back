@@ -5,6 +5,7 @@ import * as jwt from "jsonwebtoken";
 
 import { UserService } from "./user.service";
 import { searchQuotasService } from "../search-app/search-quotas.service";
+import { UserTarrifsInclude } from "../billing/constants";
 
 class ProfileService {
   async loadProfile(token): Promise<
@@ -17,25 +18,7 @@ class ProfileService {
     const user = await prisma.user.findUnique({
       where: { id: userCreds.id },
       include: {
-        tarrifs: {
-          select: {
-            _count: {
-              select: { searchRequest: true, devices: true },
-            },
-            start: true,
-            end: true,
-            tarrif: {
-              select: {
-                identifier: true,
-                allowedRequests: true,
-                allowedDevices: true,
-              },
-            },
-          },
-          orderBy: {
-            end: "asc",
-          },
-        },
+        tarrifs: UserTarrifsInclude,
       },
     });
 

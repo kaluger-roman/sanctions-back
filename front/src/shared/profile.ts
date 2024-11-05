@@ -27,6 +27,7 @@ export type UserTarrif = {
   start: string;
   end: string;
   tarrif: Tarrif;
+  additionalRequestsCount: number;
   _count: { searchRequest: number; devices: number };
 };
 

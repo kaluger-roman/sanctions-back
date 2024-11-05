@@ -1,15 +1,11 @@
-import { CreatePaymentPayload, TarrifKind } from "./types";
 import { Request } from "src/types";
 import { UserService } from "../user/user.service";
 import { Payment, YooCheckout } from "@a2seven/yoo-checkout";
 import { env } from "process";
 import { prisma } from "../../prisma";
-import { nanoid } from "nanoid";
 import { ACTIONS } from "../actions";
-import { TarrifCategories, TarrifNames } from "./constants";
+import { AdditionalPayments, UserTarrifsInclude } from "./constants";
 import { ActiveConnections } from "../active-connections";
-import { SearchFilters } from "src/search-app/search-app.types";
-import { Tarrif, UserTarrif } from "@prisma/client";
 import { paymentsService } from "./payments.service";
 
 const billing = new YooCheckout({
@@ -19,7 +15,10 @@ const billing = new YooCheckout({
 
 export class BillingService {
   constructor() {
-    paymentsService.waitingForPayments(this.updateUserTarrif);
+    paymentsService.waitingForPayments(
+      this.updateUserTarrif.bind(this),
+      this.updateSearchRequests.bind(this),
+    );
   }
   async getUserLastTarrif(userId: number) {
     const userLastTarrif = await prisma.userTarrif.findFirst({
@@ -92,9 +91,41 @@ export class BillingService {
       orderBy: {
         end: "asc",
       },
-      include: {
-        tarrif: true,
+      ...UserTarrifsInclude,
+    });
+
+    ActiveConnections[user.id]?.forEach(async (socket) => {
+      socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, userTarrifs);
+    });
+  }
+  async updateSearchRequests(paymentInfo: Payment) {
+    const user = await prisma.user.findFirst({
+      where: { id: Number(paymentInfo.metadata.userId) },
+    });
+
+    const userCurrentTarrif = await this.getUserCurrentTarrif(user.id);
+
+    await prisma.userTarrif.update({
+      where: {
+        id: userCurrentTarrif.id,
       },
+      data: {
+        isUserNoticed: false,
+        additionalRequestsCount:
+          userCurrentTarrif?.additionalRequestsCount +
+          (AdditionalPayments[paymentInfo.metadata.additionalRequestsKind]
+            ?.amount || 0),
+      },
+    });
+
+    const userTarrifs = await prisma.userTarrif.findMany({
+      where: {
+        userId: user.id,
+      },
+      orderBy: {
+        end: "asc",
+      },
+      ...UserTarrifsInclude,
     });
 
     ActiveConnections[user.id]?.forEach(async (socket) => {

@@ -2,13 +2,16 @@ import { ACTIONS } from "../actions";
 
 import { Api } from "../api.service";
 import { Request } from "src/types";
-import { CreatePaymentPayload } from "./types";
+import { AddRequestsPaymentPayload, CreatePaymentPayload } from "./types";
 import { billingService } from "./billing.service";
 import { paymentsService } from "./payments.service";
 
 export const billingApiHandlers = {
   [ACTIONS.BILLING_CREATE_PAYMENT]: (payload: Request<CreatePaymentPayload>) =>
     paymentsService.createPayment(payload),
+  [ACTIONS.BILLING_ADD_REQUESTS_PAYMENT]: (
+    payload: Request<AddRequestsPaymentPayload>,
+  ) => paymentsService.createAdditionalRequestsPayment(payload),
   [ACTIONS.BILLING_TARRIF_USER_NOTICED]: (payload: Request<void>) =>
     billingService.userTarrifNoticed(payload),
 };

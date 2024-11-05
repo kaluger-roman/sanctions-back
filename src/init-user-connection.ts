@@ -7,6 +7,7 @@ import {
 import { billingService } from "./billing/billing.service";
 import { ACTIONS } from "./actions";
 import { TarrifKind } from "./billing/types";
+import { prisma } from "../prisma/prisma";
 
 export const beforeAction = async (token: string, socket: Socket) => {
   if (!token) return;
@@ -21,13 +22,20 @@ export const afterAction = async (token: string, socket: Socket) => {
 
   if (!user) return;
 
-  const lastTarrif = await billingService.getUserLastTarrif(user.id);
+  const tarrifs = await prisma.userTarrif.findMany({
+    where: { userId: user.id },
+  });
 
-  if (
-    lastTarrif &&
-    lastTarrif.tarrif.identifier !== TarrifKind.free &&
-    !lastTarrif.isUserNoticed
-  ) {
+  if (tarrifs.some((x) => x.isUserNoticed === false)) {
+    await prisma.userTarrif.updateMany({
+      where: {
+        userId: user.id,
+        isUserNoticed: false,
+      },
+      data: {
+        isUserNoticed: true,
+      },
+    });
     ActiveConnections[user.id]?.forEach(async (socket) => {
       socket.emit(ACTIONS.BILLING_TARRIF_USER_NOTICED, {
         isUserNoticed: false,

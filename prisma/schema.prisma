@@ -39,16 +39,17 @@ model User {
 }
 
 model UserTarrif {
-  id            Int             @id @default(autoincrement())
-  user          User            @relation(fields: [userId], references: [id])
-  tarrif        Tarrif          @relation(fields: [tarrifId], references: [id])
-  start         DateTime?
-  end           DateTime?
-  userId        Int
-  tarrifId      Int
-  isUserNoticed Boolean         @default(false)
-  devices       Device[]
-  searchRequest SearchRequest[]
+  id                      Int             @id @default(autoincrement())
+  user                    User            @relation(fields: [userId], references: [id])
+  tarrif                  Tarrif          @relation(fields: [tarrifId], references: [id])
+  start                   DateTime?
+  end                     DateTime?
+  userId                  Int
+  tarrifId                Int
+  isUserNoticed           Boolean         @default(false)
+  devices                 Device[]
+  searchRequest           SearchRequest[]
+  additionalRequestsCount Int             @default(0)
 }
 
 model SearchRequest {

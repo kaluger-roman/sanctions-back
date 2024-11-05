@@ -1,11 +1,12 @@
-import { CreatePaymentPayload } from "./types";
+import { AddRequestsPaymentPayload, CreatePaymentPayload } from "./types";
 import { Request } from "src/types";
 import { UserService } from "../user/user.service";
 import { Payment, YooCheckout } from "@a2seven/yoo-checkout";
 import { env } from "process";
 import { prisma } from "../../prisma";
 import { nanoid } from "nanoid";
-import { TarrifCategories, TarrifNames } from "./constants";
+import { AdditionalPayments, TarrifCategories, TarrifNames } from "./constants";
+import { searchQuotasService } from "../search-app/search-quotas.service";
 
 const billing = new YooCheckout({
   shopId: env.BILLING_SHOP_ID,
@@ -13,7 +14,10 @@ const billing = new YooCheckout({
 });
 
 export class PaymentsService {
-  async waitingForPayments(updateUserTarrif: (payment: Payment) => void) {
+  async waitingForPayments(
+    updateUserTarrif: (payment: Payment) => void,
+    addSearchRequests: (payment: Payment) => void,
+  ) {
     while (true) {
       try {
         const pendingPayments = await prisma.pendingPayment.findMany();
@@ -22,7 +26,14 @@ export class PaymentsService {
           const paymentInfo = await billing.getPayment(payment.id);
 
           if (paymentInfo.status === "succeeded") {
-            await updateUserTarrif(paymentInfo);
+            if (paymentInfo.metadata.tarrifId) {
+              await updateUserTarrif(paymentInfo);
+            }
+
+            if (paymentInfo.metadata.additionalRequestsKind) {
+              await addSearchRequests(paymentInfo);
+            }
+
             await prisma.pendingPayment.delete({
               where: { id: paymentInfo.id },
             });
@@ -75,7 +86,7 @@ export class PaymentsService {
         capture: true,
         description: `Тариф ${TarrifNames[tarrif.identifier]} (${
           TarrifCategories[tarrif.identifier]
-        }) - ${tarrif.duration} мес.`,
+        }) - ${tarrif.duration} мес. id: ${user.id}`,
         confirmation: {
           type: "redirect",
           return_url: `${env.FRONT_HOST}/profile/tariff`,
@@ -98,6 +109,52 @@ export class PaymentsService {
     return {
       confirmation_url: payment.confirmation.confirmation_url,
     };
+  }
+
+  async createAdditionalRequestsPayment({
+    kind,
+    token,
+  }: Request<AddRequestsPaymentPayload>) {
+    const user = await UserService.getUserByToken(token);
+    const tariffs = await prisma.userTarrif.findMany({
+      where: { userId: user.id },
+      include: { tarrif: true },
+    });
+    const isUserUnlimitedRequests =
+      searchQuotasService.isUserUnlimitedRequests(tariffs);
+
+    if (isUserUnlimitedRequests) {
+      throw new Error("У вас уже неограниченное количество запросов.");
+    }
+
+    const idempotencyId = nanoid();
+
+    const { price, amount } = AdditionalPayments[kind];
+
+    const payment = await billing.createPayment(
+      {
+        amount: {
+          value: price.toFixed(2),
+          currency: "RUB",
+        },
+        capture: true,
+        description: `Доп. лимиты +${amount} запросов. id: ${user.id}`,
+        confirmation: {
+          type: "redirect",
+          return_url: `${env.FRONT_HOST}/profile/tariff`,
+        },
+        metadata: {
+          userId: user.id,
+          idempotencyId,
+          additionalRequestsKind: kind,
+        },
+      },
+      idempotencyId,
+    );
+
+    await prisma.pendingPayment.create({ data: { id: payment.id } });
+
+    return { confirmation_url: payment.confirmation.confirmation_url };
   }
 }
 

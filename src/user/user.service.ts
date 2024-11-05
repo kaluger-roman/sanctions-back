@@ -77,6 +77,7 @@ export class UserService {
       data: {
         userId: user.id,
         tarrifId: freeTariff.id,
+        isUserNoticed: true,
       },
     });
 

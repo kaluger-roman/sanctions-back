@@ -1,7 +1,12 @@
 import { billingApi } from "api";
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { appModel } from "models/app";
-import { CreatePaymentPayload, TarrifKind } from "shared/billing";
+import {
+  AdditionalRequestsPaymentKind,
+  AddRequestsPaymentPayload,
+  CreatePaymentPayload,
+  TarrifKind,
+} from "shared/billing";
 import { Notification } from "@master_kufa/client-tools";
 import { createGate } from "effector-react";
 import { connectSocketFx, socket } from "api/app.api";
@@ -10,6 +15,8 @@ import { profileModel } from "models/profile";
 import { TARRIF_UPDATED_SHOWED_KEY } from "./billing.constants";
 
 export const createPayment = createEvent<TarrifKind>();
+export const createAddRequestsPayment =
+  createEvent<AdditionalRequestsPaymentKind>();
 export const tarrifUpdatedNoticeChanged = createEvent<boolean>();
 export const tarrifSoonExpiredNoticeChanged = createEvent<boolean>();
 
@@ -128,10 +135,28 @@ sample({
 });
 
 sample({
-  clock: billingApi.createPaymentFx.doneData,
+  clock: [
+    billingApi.createPaymentFx.doneData,
+    billingApi.addRequestsPaymentFx.doneData,
+  ],
   target: createEffect<{ confirmation_url: string }, void>(
     ({ confirmation_url }) => {
       window.open(confirmation_url, "_blank");
     },
   ),
+});
+
+sample({
+  clock: createAddRequestsPayment,
+  fn: (kind) => ({ kind } satisfies AddRequestsPaymentPayload),
+  target: billingApi.addRequestsPaymentFx,
+});
+
+sample({
+  clock: billingApi.addRequestsPaymentFx.doneData,
+  fn: (): Notification.PayloadType => ({
+    type: "success",
+    message: "Платеж создан, вскоре после оплаты лимиты обновятся!",
+  }),
+  target: Notification.add,
 });

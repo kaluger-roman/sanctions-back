@@ -36,8 +36,6 @@ class AppSocket {
   }
 
   private async init() {
-    this.deviceId = await getDeviceId();
-
     this.client.onAny((_, response: SocketResponse) => {
       if (response.requestId && this.pendingRequests[response.requestId]) {
         this.pendingRequests[response.requestId](response);
@@ -58,6 +56,8 @@ class AppSocket {
         }
       }
     });
+
+    this.deviceId = await getDeviceId();
   }
 
   emitWithAnswer<T, V>(actions: string, payload?: T): Promise<V> {

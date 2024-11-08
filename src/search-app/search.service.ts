@@ -138,7 +138,7 @@ class SearchService {
       (value) => groupBy(value, (value) => value.tag),
     );
 
-    if (!isEmpty(groupedSanctions)) {
+    if (!isEmpty(groupedSanctions) && token) {
       await searchQuotasService.registerDevice(deviceId, token);
       await searchQuotasService.registerSearchRequest(
         { searchTypes, searchTags, countries, restrictions },

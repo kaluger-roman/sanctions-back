@@ -141,7 +141,9 @@ sample({
   ],
   target: createEffect<{ confirmation_url: string }, void>(
     ({ confirmation_url }) => {
-      window.open(confirmation_url, "_blank");
+      const isOpened = window.open(confirmation_url, "_blank");
+
+      if (!isOpened) window.location.href = confirmation_url;
     },
   ),
 });

@@ -91,6 +91,7 @@ export class PaymentsService {
           type: "redirect",
           return_url: `${env.FRONT_HOST}/profile/tariff`,
         },
+        save_payment_method: false,
         metadata: {
           userId: user.id,
           idempotencyId,

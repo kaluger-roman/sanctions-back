@@ -38,6 +38,8 @@ export class BillingService {
 
     return userLastTarrif;
   }
+
+  // can be null if free tarrif
   async getUserCurrentTarrif(userId: number) {
     const userLastTarrif = await prisma.userTarrif.findFirst({
       where: {

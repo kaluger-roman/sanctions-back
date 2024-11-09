@@ -28,6 +28,8 @@ class SearchQuotasService {
     });
     const isUserUnlimitedDevices = this.isUserUnlimitedDevices(tarrifs);
 
+    if(!tarrif) return
+    
     if (
       !isUserUnlimitedDevices &&
       (await prisma.device.count({
@@ -55,6 +57,8 @@ class SearchQuotasService {
       include: { tarrif: true },
     });
     const isUserUnlimitedRequests = this.isUserUnlimitedRequests(tarrifs);
+
+    if(!tarrif) return
 
     if (
       !isUserUnlimitedRequests &&

@@ -1,39 +1,19 @@
-import {
-  Box,
-  Link,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Box, Paper, Table, TableBody } from "@mui/material";
 import { useUnit } from "effector-react";
-import { isEmpty, keys } from "lodash";
 import { searchAppModel } from "models";
-import React from "react";
 import { theme } from "shared/theme";
+import { TableHeader } from "./components/table-head";
+import { EmptySearch } from "./components/empty-search";
+import { CategoryRows } from "./components/category-rows";
+import { isSearchEmpty } from "./search-table.helpers";
 
 export const SearchTable = () => {
   const searchResult = useUnit(searchAppModel.$searchResult);
-  const isSearchHappened = useUnit(searchAppModel.$isSearchHappened);
-  const countries = useUnit(searchAppModel.$countries);
-  const searchTags = useUnit(searchAppModel.$searchTags);
 
   return (
     <Box sx={{ position: "relative", width: "100%", overflowX: "auto" }}>
-      {isSearchHappened &&
-        isEmpty(searchResult) &&
-        (searchTags.length ? (
-          <Typography variant="body1">Поиск не дал результатов</Typography>
-        ) : (
-          <Typography variant="body1">
-            Введите хотя бы один поисковый код / описание
-          </Typography>
-        ))}
-
-      {!isEmpty(searchResult) && (
+      <EmptySearch />
+      {!isSearchEmpty(searchResult) && (
         <Table
           component={Paper}
           sx={{
@@ -44,70 +24,18 @@ export const SearchTable = () => {
             },
           }}
         >
-          <TableHead>
-            <TableRow>
-              <TableCell>Поисковый Тег</TableCell>
-              <TableCell>Санкционный код</TableCell>
-              <TableCell>Источник ограничения</TableCell>
-              <TableCell>Тип ограничений</TableCell>
-              <TableCell>Описание</TableCell>
-            </TableRow>
-          </TableHead>
+          <TableHeader />
           <TableBody>
-            {keys(searchResult).map((country) => (
-              <React.Fragment key={country}>
-                <TableRow>
-                  <TableCell
-                    colSpan={5}
-                    sx={{
-                      background: theme.palette.grey[200],
-                      verticalAlign: "top",
-                    }}
-                  >
-                    <Typography
-                      textAlign="center"
-                      variant="h6"
-                      fontWeight="bold"
-                    >
-                      {countries.find((item) => country === item)}
-                    </Typography>
-                  </TableCell>
-                </TableRow>
-                {keys(searchResult[country]).map((tag) => (
-                  <React.Fragment key={tag}>
-                    <TableRow>
-                      <TableCell
-                        rowSpan={searchResult[country][tag].length + 1}
-                        sx={{
-                          background: theme.palette.grey[100],
-                          verticalAlign: "top",
-                          fontWeight: "bold",
-                        }}
-                      >
-                        {tag}
-                      </TableCell>
-                    </TableRow>
+            <CategoryRows data={searchResult.code} label="Совпадение по коду" />
+            <CategoryRows
+              data={searchResult.description}
+              label="Совпадение по описанию"
+            />
 
-                    {searchResult[country][tag].map((item) => (
-                      <TableRow key={tag + country + item.id}>
-                        <TableCell sx={{ verticalAlign: "top" }}>
-                          {item.code}
-                        </TableCell>
-                        <TableCell sx={{ verticalAlign: "top" }}>
-                          <Link href="#">{item.sourceDocument}</Link>
-                        </TableCell>
-                        <TableCell sx={{ verticalAlign: "top" }}>
-                          {item.restriction}
-                        </TableCell>
-                        <TableCell sx={{ verticalAlign: "top" }}>
-                          {item.description}
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </React.Fragment>
-                ))}
-              </React.Fragment>
-            ))}
+            <CategoryRows
+              data={searchResult.codeAddition}
+              label="Возможное дополнение кода"
+            />
           </TableBody>
         </Table>
       )}

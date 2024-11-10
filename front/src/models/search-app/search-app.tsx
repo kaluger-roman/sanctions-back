@@ -11,8 +11,13 @@ export const $searchTags = createStore<Array<string>>([]);
 export const $searchType = createStore<Array<SearchType>>([
   "code",
   "description",
+  "codeAddition",
 ]);
-export const $searchResult = createStore<SearchResult>({});
+export const $searchResult = createStore<SearchResult>({
+  code: {},
+  description: {},
+  codeAddition: {},
+});
 export const $availableFilters = createStore<SyncedFilters>({
   restrictions: [],
 });

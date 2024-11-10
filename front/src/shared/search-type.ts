@@ -1,6 +1,7 @@
-export type SearchType = "code" | "description";
+export type SearchType = "code" | "description" | "codeAddition";
 
 export const SearchTypeName: Record<SearchType, string> = {
-  code: "По коду",
-  description: "По описанию",
+  code: "Совпадение по коду",
+  description: "Совпадение по описанию",
+  codeAddition: "Возможное дополнение кода",
 };

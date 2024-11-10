@@ -5,4 +5,4 @@ export type SearchFilters = {
   searchTags: Array<string>;
 };
 
-export type SearchType = "code" | "description";
+export type SearchType = "code" | "description" | "codeAddition";

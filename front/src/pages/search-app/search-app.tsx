@@ -224,7 +224,7 @@ export const SearchApp = () => {
             </Select>
           </FormControl>
 
-          <FormControl fullWidth>
+          <FormControl required fullWidth>
             <InputLabel>Тип поиска</InputLabel>
             <Select
               multiple
@@ -246,6 +246,10 @@ export const SearchApp = () => {
               <MenuItem value="description">
                 <Checkbox checked={searchType.includes("description")} />
                 <ListItemText primary={SearchTypeName.description} />
+              </MenuItem>
+              <MenuItem value="codeAddition">
+                <Checkbox checked={searchType.includes("codeAddition")} />
+                <ListItemText primary={SearchTypeName.codeAddition} />
               </MenuItem>
             </Select>
           </FormControl>

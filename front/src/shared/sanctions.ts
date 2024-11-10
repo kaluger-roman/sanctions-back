@@ -1,5 +1,5 @@
 export type Sanction = {
-  id: number;
+  id: number | "uplimit";
   sourceCountry: string;
   sourceDocument: string;
   restriction: string;
@@ -7,12 +7,17 @@ export type Sanction = {
   description: string;
 };
 
-export type SearchResult = Record<
+export type CountrySearchMatch = Record<
   string,
-  Record<
-    string,
-    (Sanction & {
-      tag: string;
-    })[]
-  >
+  (Sanction & {
+    tag: string;
+  })[]
 >;
+
+export type CategorySearchMath = Record<string, CountrySearchMatch>;
+
+export type SearchResult = {
+  code: CategorySearchMath;
+  description: CategorySearchMath;
+  codeAddition: CategorySearchMath;
+};

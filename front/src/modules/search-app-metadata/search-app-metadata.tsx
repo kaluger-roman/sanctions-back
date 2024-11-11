@@ -13,6 +13,7 @@ import EmailIcon from "@mui/icons-material/Email";
 import { theme } from "shared/theme";
 import Instruction from "./instruction.pdf";
 import { navigation } from "shared/navigate";
+import { News } from "./news";
 
 const ACTUAL_DATES: Array<{
   country: string;
@@ -58,6 +59,7 @@ export const SearchAppMetadata = () => (
         ))}
       </List>
     </Box>
+    <News />
     <Box
       sx={{ borderRadius: 3, background: theme.palette.secondary.light, p: 2 }}
     >

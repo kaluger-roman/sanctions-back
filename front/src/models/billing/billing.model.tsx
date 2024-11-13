@@ -13,6 +13,10 @@ import { connectSocketFx, socket } from "api/app.api";
 import { ACTIONS } from "api/actions";
 import { profileModel } from "models/profile";
 import { TARRIF_UPDATED_SHOWED_KEY } from "./billing.constants";
+import { Link, Typography } from "@mui/material";
+import { Paths } from "shared/paths";
+import { navigation } from "shared/navigate";
+import { theme } from "shared/theme";
 
 export const createPayment = createEvent<TarrifKind>();
 export const createAddRequestsPayment =
@@ -81,7 +85,30 @@ sample({
 sample({
   clock: createPayment,
   source: appModel.$authorizationData,
-  filter: (authorizationData) => Boolean(authorizationData),
+  filter: (authorizationData) => !authorizationData?.isConfirmed,
+  fn: (): Notification.PayloadType => ({
+    type: "error",
+    message: (
+      <Typography variant="body2">
+        {" "}
+        Для покупки тарифа{" "}
+        <Link
+          sx={{ cursor: "pointer", color: theme.palette.error.main }}
+          onClick={() => navigation.navigate(Paths.profileMy)}
+        >
+          подтвердите почту{" "}
+        </Link>{" "}
+      </Typography>
+    ) as any,
+  }),
+  target: Notification.add,
+});
+
+sample({
+  clock: createPayment,
+  source: appModel.$authorizationData,
+  filter: (authorizationData) =>
+    Boolean(authorizationData && authorizationData.isConfirmed),
   fn: (_, tariffKind) => ({ tariffKind } satisfies CreatePaymentPayload),
   target: billingApi.createPaymentFx,
 });

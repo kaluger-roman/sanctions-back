@@ -84,8 +84,8 @@ sample({
 
 sample({
   clock: createPayment,
-  source: appModel.$authorizationData,
-  filter: (authorizationData) => !authorizationData?.isConfirmed,
+  source: profileModel.$profile,
+  filter: (profile) => !profile?.isConfirmed,
   fn: (): Notification.PayloadType => ({
     type: "error",
     message: (
@@ -106,9 +106,8 @@ sample({
 
 sample({
   clock: createPayment,
-  source: appModel.$authorizationData,
-  filter: (authorizationData) =>
-    Boolean(authorizationData && authorizationData.isConfirmed),
+  source: profileModel.$profile,
+  filter: (profile) => Boolean(profile && profile.isConfirmed),
   fn: (_, tariffKind) => ({ tariffKind } satisfies CreatePaymentPayload),
   target: billingApi.createPaymentFx,
 });

@@ -2,8 +2,18 @@ import { Box, Typography, Link, Button, Alert } from "@mui/material";
 import { useState } from "react";
 import { AlertStyles } from "./styles";
 
+const COOCKIE_AGREEMENT_FLAG = "COOCKIE_AGREEMENT_FLAG";
+
 export const CoockieNotice = () => {
-  const [cookies, setCookies] = useState(false);
+  const [cookies, setCookies] = useState(
+    localStorage.getItem(COOCKIE_AGREEMENT_FLAG) === "true",
+  );
+
+  const acceptCookies = () => {
+    localStorage.setItem(COOCKIE_AGREEMENT_FLAG, "true");
+
+    setCookies(true);
+  };
 
   if (cookies) return null;
 
@@ -17,9 +27,9 @@ export const CoockieNotice = () => {
         <Button
           sx={{ minWidth: "100px" }}
           variant="outlined"
-          onClick={() => setCookies(true)}
+          onClick={acceptCookies}
         >
-          <Typography variant="body1" onClick={() => setCookies(true)}>
+          <Typography variant="body1" onClick={acceptCookies}>
             Согласен
           </Typography>
         </Button>

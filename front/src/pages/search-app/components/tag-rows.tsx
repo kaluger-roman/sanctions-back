@@ -22,13 +22,17 @@ export const TagRows = ({ data }: { data: CountrySearchMatch }) => (
           </TableCell>
         </TableRow>
 
-        {data[tag].map((item) =>
+        {data[tag].map((item, inx) =>
           item.id === "uplimit" ? (
             <TableCell colSpan={4} sx={{ color: theme.palette.grey[500] }}>
               Возможных дополнений более 10, конкретизируйте ваш код ТНВЭД
             </TableCell>
           ) : (
-            <DataRow key={tag + item.id} {...item} />
+            <DataRow
+              key={tag + item.id}
+              {...item}
+              isLast={inx === data[tag].length - 1}
+            />
           ),
         )}
       </React.Fragment>

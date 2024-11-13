@@ -22,6 +22,12 @@ export const SearchTable = () => {
               fontSize: "18px",
               background: theme.palette.grey[300],
             },
+            td: {
+              border: "none",
+            },
+            "tr:not(:last-child),th": {
+              borderBottom: `1px solid ${theme.palette.grey[900]}`,
+            },
           }}
         >
           <TableHeader />

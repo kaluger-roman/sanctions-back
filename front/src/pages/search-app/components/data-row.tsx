@@ -1,13 +1,21 @@
 import { TableRow, TableCell, Link } from "@mui/material";
 import { Sanction } from "shared/sanctions";
+import { theme } from "shared/theme";
 
 export const DataRow = ({
   code,
   sourceDocument,
   restriction,
   description,
-}: Sanction) => (
-  <TableRow>
+  isLast,
+}: Sanction & { isLast: boolean }) => (
+  <TableRow
+    sx={{
+      borderBottomColor: isLast
+        ? "inherit"
+        : `${theme.palette.grey[300]} !important`,
+    }}
+  >
     <TableCell sx={{ verticalAlign: "top" }}>{code}</TableCell>
     <TableCell sx={{ verticalAlign: "top" }}>
       <Link href="#">{sourceDocument}</Link>

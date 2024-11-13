@@ -1,10 +1,18 @@
-import { Box, Typography, Tooltip, Chip } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Tooltip,
+  Menu,
+  MenuItem,
+  Button,
+} from "@mui/material";
 import { theme } from "shared/theme";
 import { DataChip } from "./data-chip";
 import { useUnit } from "effector-react";
 import { billingModel, profileModel } from "models";
 import { AdditionalRequestsPaymentKind, TarrifKind } from "shared/billing";
 import InfoIcon from "@mui/icons-material/Info";
+import AddIcon from "@mui/icons-material/Add";
 
 import {
   CategoryNames,
@@ -12,6 +20,7 @@ import {
   TarrifNames,
 } from "pages/billing/constants";
 import { UserTarrif } from "shared/profile";
+import { useState } from "react";
 
 const QuotaChip = ({
   label,
@@ -29,9 +38,12 @@ const QuotaChip = ({
   additionalPayments?: Array<{
     label: string;
     value: unknown;
-    price: number;
   }>;
 }) => {
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClose = () => setAnchorEl(null);
+
   return (
     <DataChip
       label={label}
@@ -66,32 +78,40 @@ const QuotaChip = ({
               )}
             </Typography>
           )}
-          {!!limit && !isUnlimited && count >= limit && (
-            <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              {additionalPayments?.map((payment) => (
-                <Chip
-                  onClick={() => onAdditionalPayment?.(payment.value)}
-                  sx={{
-                    height: 16,
-                    minWidth: 110,
-                    background: theme.palette.primary.main,
-
-                    "&:hover": {
-                      cursor: "pointer",
-                      background: theme.palette.primary.dark,
-                    },
-                  }}
-                  label={
-                    <Typography
-                      color={theme.palette.common.white}
-                      variant="caption"
-                    >
-                      {payment.label} ({payment.price} ₽)
-                    </Typography>
-                  }
-                />
-              ))}
-            </Box>
+          {!isUnlimited && additionalPayments?.length && (
+            <>
+              <Button
+                variant="outlined"
+                startIcon={<AddIcon sx={{ fontSize: "10px" }} />}
+                onClick={(e) => setAnchorEl(e.currentTarget as any)}
+                sx={{
+                  fontSize: "10px",
+                  ".MuiButton-startIcon": { mr: 0 },
+                  pt: 0,
+                  pb: 0,
+                  pr: 1,
+                  pl: 1,
+                }}
+              >
+                Докупить
+              </Button>
+              <Menu
+                sx={{ mt: 0.5 }}
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                onClick={handleClose}
+              >
+                {additionalPayments?.map((payment) => (
+                  <MenuItem
+                    sx={{ fontSize: "14px" }}
+                    onClick={() => onAdditionalPayment?.(payment.value)}
+                  >
+                    {payment.label}
+                  </MenuItem>
+                ))}
+              </Menu>
+            </>
           )}
         </Box>
       }
@@ -176,19 +196,16 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
           }
           additionalPayments={[
             {
-              label: "+100",
+              label: "+100 (2000руб)",
               value: AdditionalRequestsPaymentKind.additional100,
-              price: 2000,
             },
             {
-              label: "+200",
+              label: "+200 (4000руб)",
               value: AdditionalRequestsPaymentKind.additional200,
-              price: 4000,
             },
             {
-              label: "+300",
+              label: "+300 (6000руб)",
               value: AdditionalRequestsPaymentKind.additional300,
-              price: 6000,
             },
           ]}
         />

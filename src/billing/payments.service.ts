@@ -139,6 +139,7 @@ export class PaymentsService {
           currency: "RUB",
         },
         capture: true,
+        save_payment_method: false,
         description: `Доп. лимиты +${amount} запросов. id: ${user.id}`,
         confirmation: {
           type: "redirect",

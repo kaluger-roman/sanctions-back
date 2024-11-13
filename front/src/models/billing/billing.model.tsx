@@ -17,6 +17,7 @@ import { Link, Typography } from "@mui/material";
 import { Paths } from "shared/paths";
 import { navigation } from "shared/navigate";
 import { theme } from "shared/theme";
+import { CategoryNames, TarrifCategories } from "pages/billing/constants";
 
 export const createPayment = createEvent<TarrifKind>();
 export const createAddRequestsPayment =
@@ -107,7 +108,26 @@ sample({
 sample({
   clock: createPayment,
   source: profileModel.$profile,
-  filter: (profile) => Boolean(profile && profile.isConfirmed),
+  filter: (profile, tariffKind) =>
+    profile?.category !== TarrifCategories[tariffKind],
+  fn: (profile): Notification.PayloadType => ({
+    type: "error",
+    message: `Вам доступны только тарифы категории "${
+      CategoryNames[profile!.category]
+    }"`,
+  }),
+  target: Notification.add,
+});
+
+sample({
+  clock: createPayment,
+  source: profileModel.$profile,
+  filter: (profile, tariffKind) =>
+    Boolean(
+      profile &&
+        profile.isConfirmed &&
+        profile.category === TarrifCategories[tariffKind],
+    ),
   fn: (_, tariffKind) => ({ tariffKind } satisfies CreatePaymentPayload),
   target: billingApi.createPaymentFx,
 });

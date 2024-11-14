@@ -86,7 +86,7 @@ sample({
 sample({
   clock: createPayment,
   source: profileModel.$profile,
-  filter: (profile) => !profile?.isConfirmed,
+  filter: (profile) => !!(profile && !profile?.isConfirmed),
   fn: (): Notification.PayloadType => ({
     type: "error",
     message: (

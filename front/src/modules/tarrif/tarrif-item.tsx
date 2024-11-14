@@ -181,43 +181,39 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
         }
         placeholder="Бессрочно"
       />
-      {tarrif?.tarrif.allowedRequests && (
-        <QuotaChip
-          label={`Квота поисковых запросов ${
-            tarrif.additionalRequestsCount ? `(увеличена)` : ""
-          }`}
-          count={tarrif._count.searchRequest}
-          limit={tarrif.tarrif.allowedRequests + tarrif.additionalRequestsCount}
-          isUnlimited={!!isUnlimitedRequests}
-          onAdditionalPayment={(kind) =>
-            billingModel.createAddRequestsPayment(
-              kind as AdditionalRequestsPaymentKind,
-            )
-          }
-          additionalPayments={[
-            {
-              label: "+100 (2000руб)",
-              value: AdditionalRequestsPaymentKind.additional100,
-            },
-            {
-              label: "+200 (4000руб)",
-              value: AdditionalRequestsPaymentKind.additional200,
-            },
-            {
-              label: "+300 (6000руб)",
-              value: AdditionalRequestsPaymentKind.additional300,
-            },
-          ]}
-        />
-      )}
-      {tarrif?.tarrif.allowedDevices && (
-        <QuotaChip
-          label="Квота устройств"
-          count={tarrif._count.devices}
-          limit={tarrif.tarrif.allowedDevices}
-          isUnlimited={!!isUnlimitedDevices}
-        />
-      )}
+      <QuotaChip
+        label={`Квота поисковых запросов ${
+          tarrif.additionalRequestsCount ? `(увеличена)` : ""
+        }`}
+        count={tarrif._count.searchRequest}
+        limit={tarrif.tarrif.allowedRequests + tarrif.additionalRequestsCount}
+        isUnlimited={!!isUnlimitedRequests}
+        onAdditionalPayment={(kind) =>
+          billingModel.createAddRequestsPayment(
+            kind as AdditionalRequestsPaymentKind,
+          )
+        }
+        additionalPayments={[
+          {
+            label: "+100 (2000руб)",
+            value: AdditionalRequestsPaymentKind.additional100,
+          },
+          {
+            label: "+200 (4000руб)",
+            value: AdditionalRequestsPaymentKind.additional200,
+          },
+          {
+            label: "+300 (6000руб)",
+            value: AdditionalRequestsPaymentKind.additional300,
+          },
+        ]}
+      />
+      <QuotaChip
+        label="Квота устройств"
+        count={tarrif._count.devices}
+        limit={tarrif.tarrif.allowedDevices}
+        isUnlimited={!!isUnlimitedDevices}
+      />
     </Box>
   );
 };

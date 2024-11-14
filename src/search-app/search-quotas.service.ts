@@ -28,18 +28,21 @@ class SearchQuotasService {
     });
     const isUserUnlimitedDevices = this.isUserUnlimitedDevices(tarrifs);
 
-    if(!tarrif) return
-    
+    if (!tarrif) return;
+
+    const registeredDevices = await prisma.device.findMany({
+      where: {
+        UserTarrif: { some: { id: tarrif.id } },
+      },
+    });
+
     if (
       !isUserUnlimitedDevices &&
-      (await prisma.device.count({
-        where: {
-          UserTarrif: { some: { id: tarrif.id } },
-        },
-      })) >= tarrif.tarrif.allowedDevices
+      registeredDevices.length >= tarrif.tarrif.allowedDevices &&
+      !registeredDevices.some((device) => device.id === deviceId)
     ) {
       throw new Error(
-        "Превышен лимит устройств для поиска, улучшите ваш тариф",
+        "Превышен лимит устройств для поиска, улучшите ваш тариф или используйте предыдущие устройства",
       );
     }
 
@@ -58,7 +61,7 @@ class SearchQuotasService {
     });
     const isUserUnlimitedRequests = this.isUserUnlimitedRequests(tarrifs);
 
-    if(!tarrif) return
+    if (!tarrif) return;
 
     if (
       !isUserUnlimitedRequests &&

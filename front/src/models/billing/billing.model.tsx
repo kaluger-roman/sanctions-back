@@ -109,7 +109,9 @@ sample({
   clock: createPayment,
   source: profileModel.$profile,
   filter: (profile, tariffKind) =>
-    profile?.category !== TarrifCategories[tariffKind],
+    !!(
+      profile?.isConfirmed && profile?.category !== TarrifCategories[tariffKind]
+    ),
   fn: (profile): Notification.PayloadType => ({
     type: "error",
     message: `Вам доступны только тарифы категории "${

@@ -187,7 +187,9 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
         }`}
         count={tarrif._count.searchRequest}
         limit={tarrif.tarrif.allowedRequests + tarrif.additionalRequestsCount}
-        isUnlimited={!!isUnlimitedRequests}
+        isUnlimited={
+          !!isUnlimitedRequests || tarrif.tarrif.identifier === TarrifKind.free
+        }
         onAdditionalPayment={(kind) =>
           billingModel.createAddRequestsPayment(
             kind as AdditionalRequestsPaymentKind,
@@ -212,7 +214,9 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
         label="Квота устройств"
         count={tarrif._count.devices}
         limit={tarrif.tarrif.allowedDevices}
-        isUnlimited={!!isUnlimitedDevices}
+        isUnlimited={
+          !!isUnlimitedDevices || tarrif.tarrif.identifier === TarrifKind.free
+        }
       />
     </Box>
   );

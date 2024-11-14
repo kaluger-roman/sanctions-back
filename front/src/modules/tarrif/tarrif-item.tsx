@@ -147,7 +147,7 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
         } тариф`}
         value={TarrifNames[tarrif.tarrif.identifier]}
       />
-      {tarrif.tarrif.identifier !== TarrifKind.free && (
+      {
         <DataChip
           label="Тип"
           value={
@@ -156,7 +156,7 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
             ] || TarrifCategories[tarrif.tarrif.identifier]
           }
         />
-      )}
+      }
       <DataChip
         label="Начало действия"
         value={

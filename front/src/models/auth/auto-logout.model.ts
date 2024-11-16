@@ -1,7 +1,9 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
+import { attachLogger } from "effector-logger";
 import { appModel } from "models/app";
 import { $authorizationData, LogOut } from "models/app/app.model";
 import { interval, reset } from "patronum";
+attachLogger();
 
 export const $isAutoLogoutConfirmShowed = createStore(false);
 export const $logoutConfirmLeftTime = createStore<number>(30);
@@ -53,17 +55,11 @@ sample({
 });
 
 sample({
-  clock: userActionDone,
+  clock: [userActionDone, $isAutoLogoutConfirmShowed],
   source: [$authorizationData, $isAutoLogoutConfirmShowed] as const,
   filter: ([data, isAutoLogoutConfirmShowed]) =>
     Boolean(data && !isAutoLogoutConfirmShowed),
   target: [stopLogoutTimer, startLogoutTimer],
-});
-
-sample({
-  clock: autoLogoutConfirmShowed,
-  filter: (x) => !x,
-  target: startLogoutTimer,
 });
 
 sample({

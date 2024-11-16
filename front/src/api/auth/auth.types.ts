@@ -1,4 +1,8 @@
-export type AuthPayload = { email: string; password: string };
+export type AuthPayload = {
+  email: string;
+  password: string;
+  forceLogin?: boolean;
+};
 export type RegisterPayload = {
   email: string;
   password: string;

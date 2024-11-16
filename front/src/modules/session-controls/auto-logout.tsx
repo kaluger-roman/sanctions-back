@@ -21,7 +21,7 @@ export const AutoLogout = () => {
           <Box sx={{ display: "flex", gap: 3, flexDirection: "column" }}>
             <Typography variant="h5">Выход</Typography>
             <Typography variant="body1">
-              Вы слишком долго бездействовали (1 час), выход из аккаунта будет
+              Вы слишком долго бездействовали, выход из аккаунта будет
               осуществлен автоматически через {logoutConfirmLeftTime} секунд.
             </Typography>
             <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>

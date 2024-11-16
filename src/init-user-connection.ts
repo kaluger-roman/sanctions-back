@@ -4,9 +4,7 @@ import {
   ActiveConnections,
   addActiveUserConnection,
 } from "./active-connections";
-import { billingService } from "./billing/billing.service";
 import { ACTIONS } from "./actions";
-import { TarrifKind } from "./billing/types";
 import { prisma } from "../prisma/prisma";
 
 export const beforeAction = async (token: string, socket: Socket) => {

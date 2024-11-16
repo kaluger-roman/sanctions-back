@@ -1,6 +1,7 @@
 import { userService } from "./user.service";
 import {
   ChangePasswordPayload,
+  LastActivityPayload,
   Profile,
   RecoverConfirmPayload,
   RecoverTokenRequestPayload,
@@ -11,13 +12,17 @@ import { ACTIONS } from "../actions";
 import { Api } from "../api.service";
 import { Request } from "../types";
 import { profileService } from "./profile.service";
+import { sessionsService } from "./sessions.service";
 
 export const userApiHandlers = {
   [ACTIONS.AUTH]: (payload: Request<RegisterPayload>) =>
-    userService.auth(payload),
+    sessionsService.auth(payload),
   [ACTIONS.REGISTER]: (payload: Request<RegisterPayload>) =>
     userService.create(payload),
-  [ACTIONS.VERIFY]: (payload: Request<void>) => payload.token,
+  [ACTIONS.VERIFY]: async (payload: Request<object>) => {
+    await sessionsService.verifySession(payload);
+    return payload.token;
+  },
   [ACTIONS.RECOVER_PASSWORD_REQUEST]: (
     payload: Request<RecoverTokenRequestPayload>,
   ) => userService.recoverTokenRequest(payload),
@@ -33,6 +38,10 @@ export const userApiHandlers = {
     userService.changePassword(payload),
   [ACTIONS.CHANGE_PROFILE]: (payload: Request<Profile>) =>
     profileService.changeProfile(payload),
+  [ACTIONS.LAST_ACTIVITY_TIME]: (payload: Request<LastActivityPayload>) =>
+    sessionsService.recordLastActivity(payload),
+  [ACTIONS.LOGOUT]: (payload: Request<void>, socket) =>
+    sessionsService.logout(payload, socket),
 };
 
 export const userApi = new Api(userApiHandlers);

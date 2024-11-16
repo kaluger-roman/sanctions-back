@@ -4,7 +4,7 @@ import { AppNavigation } from "./app.navigation";
 import { ThemeProvider } from "@emotion/react";
 import { theme } from "shared/theme";
 import { CssBaseline } from "@mui/material";
-import { AutoLogout, Loader, PermanentNotifications } from "modules";
+import { SessionControls, Loader, PermanentNotifications } from "modules";
 
 export const App = () => {
   return (
@@ -19,7 +19,7 @@ export const App = () => {
         <AppNavigation />
       </BrowserRouter>
       <PermanentNotifications />
-      <AutoLogout />
+      <SessionControls />
     </ThemeProvider>
   );
 };

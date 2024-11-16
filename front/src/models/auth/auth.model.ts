@@ -4,10 +4,13 @@ import { createGate } from "effector-react";
 import { Notification } from "@master_kufa/client-tools";
 import { navigation } from "shared/navigate";
 import { Paths } from "shared/paths";
+import { AuthSystemError } from "./types";
 
 export const emailTextChanged = createEvent<string>();
 export const passwordTextChanged = createEvent<string>();
-export const authClicked = createEvent();
+export const authClicked = createEvent<{
+  forceLogin?: boolean;
+}>();
 
 export const $emailText = restore(emailTextChanged, "");
 export const $passwordText = restore(passwordTextChanged, "");
@@ -25,7 +28,7 @@ export const PageGate = createGate();
 sample({
   clock: authClicked,
   source: [$emailText, $passwordText],
-  fn: ([email, password]) => ({ password, email }),
+  fn: ([email, password], { forceLogin }) => ({ password, email, forceLogin }),
   target: authApi.authFx,
 });
 
@@ -36,6 +39,11 @@ sample({
 
 sample({
   clock: authApi.authFx.failData,
+  filter: (message) =>
+    ![
+      AuthSystemError.SESSION_ALREADY_EXISTS,
+      AuthSystemError.SESSION_EXPIRED,
+    ].includes(message as any),
   fn: (message: string): Notification.PayloadType => ({
     type: "error",
     message,

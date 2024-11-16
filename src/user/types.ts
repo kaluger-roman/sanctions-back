@@ -1,6 +1,10 @@
 import { UserTarrif } from "@prisma/client";
 
-export type AuthPayload = { email: string; password: string };
+export type AuthPayload = {
+  email: string;
+  password: string;
+  forceLogin?: boolean;
+};
 export type RegisterPayload = {
   email: string;
   password: string;
@@ -48,3 +52,12 @@ export type ChangePasswordPayload = {
   oldPassword: string;
   newPassword: string;
 };
+
+export type LastActivityPayload = {
+  timestamp: number;
+};
+
+export enum FORCE_LOGOUT_REASON {
+  INACTIVITY = "INACTIVITY",
+  NEW_SESSION = "NEW_SESSION",
+}

@@ -1,6 +1,6 @@
 import { PrismaClient } from "@prisma/client";
-import { userService } from "../src/user";
 import { TarrifKind } from "../src/billing/types";
+import { buildPasswordHash } from "../src/user/helpers";
 
 const prisma = new PrismaClient();
 
@@ -55,32 +55,40 @@ const baseTariffs = [
 ];
 
 async function main() {
-  await prisma.tarrif.createMany({ data: baseTariffs });
+  if (!(await prisma.tarrif.count())) {
+    await prisma.tarrif.createMany({ data: baseTariffs });
+  }
 
-  const admin = await prisma.user.upsert({
-    where: { email: process.env.ADMIN_USER },
-    update: {},
-    create: {
-      email: process.env.ADMIN_USER,
-      passwordHash: userService.buildPasswordHash(process.env.ADMIN_PASSWORD),
-      isAdmin: true,
-      name: "Admin",
-      surname: "Admin",
-      phone: "123456789",
-      category: "private",
-    },
-  });
+  if (!(await prisma.user.count())) {
+    const admin = await prisma.user.upsert({
+      where: { email: process.env.ADMIN_USER },
+      update: {},
+      create: {
+        email: process.env.ADMIN_USER,
+        passwordHash: buildPasswordHash(process.env.ADMIN_PASSWORD),
+        isAdmin: true,
+        name: "Admin",
+        surname: "Admin",
+        phone: "123456789",
+        category: "private",
+      },
+    });
 
-  const freeTariff = await prisma.tarrif.findFirst({
-    where: { identifier: TarrifKind.free },
-  });
+    const freeTariff = await prisma.tarrif.findFirst({
+      where: { identifier: TarrifKind.free },
+    });
 
-  await prisma.userTarrif.create({
-    data: {
-      userId: admin.id,
-      tarrifId: freeTariff.id,
-    },
-  });
+    await prisma.userTarrif.create({
+      data: {
+        userId: admin.id,
+        tarrifId: freeTariff.id,
+      },
+    });
+  }
+
+  if (!(await prisma.preferences.count())) {
+    await prisma.preferences.create({});
+  }
 }
 main()
   .then(async () => {

@@ -1,19 +1,17 @@
 import {
-  AuthPayload,
   ChangePasswordPayload,
   RecoverConfirmPayload,
   RecoverTokenRequestPayload,
   RegisterPayload,
   RegistrationConfirmPayload,
 } from "./types";
-import { createHash } from "crypto";
 import * as jwt from "jsonwebtoken";
-import { SocketErrors } from "@master_kufa/server-tools";
 import { prisma } from "../../prisma";
 import { nanoid } from "nanoid";
 import { transporter } from "../shared/email-transporter";
 import { Request } from "../types";
 import { TarrifKind } from "src/billing/types";
+import { buildPasswordHash } from "./helpers";
 
 export class UserService {
   static async getUserByToken(
@@ -27,9 +25,6 @@ export class UserService {
     });
 
     return user;
-  }
-  buildPasswordHash(password: string) {
-    return createHash("sha256").update(password).digest("hex");
   }
   async recordUser(email?: string) {
     const user = await prisma.user.findUnique({
@@ -56,7 +51,7 @@ export class UserService {
     const user = await prisma.user.create({
       data: {
         email: payload.email,
-        passwordHash: this.buildPasswordHash(payload.password),
+        passwordHash: buildPasswordHash(payload.password),
         name: payload.name,
         surname: payload.surname,
         secondName: payload.secondName,
@@ -120,37 +115,6 @@ export class UserService {
     });
 
     return "success";
-  }
-
-  async auth(payload: AuthPayload) {
-    const user = await prisma.user.findUnique({
-      where: { email: payload.email },
-    });
-
-    if (!user) throw new Error("Пользователь не существует");
-
-    if (this.buildPasswordHash(payload.password) !== user.passwordHash)
-      throw new Error("Неверный логин или пароль");
-
-    return jwt.sign(
-      {
-        email: user.email,
-        id: user.id,
-        isAdmin: user.isAdmin,
-        isConfirmed: user.isConfirmed,
-      },
-      process.env.JWT_SECRET,
-    );
-  }
-
-  verify(token: string) {
-    try {
-      jwt.verify(token, process.env.JWT_SECRET);
-
-      return jwt.decode(token);
-    } catch (e) {
-      throw new Error(SocketErrors.UNAUTHORIZED);
-    }
   }
 
   async recoverTokenRequest({ email }: RecoverTokenRequestPayload) {
@@ -217,7 +181,7 @@ export class UserService {
     await prisma.user.updateMany({
       where: { recoverPasswordToken: payload.recoverPasswordToken },
       data: {
-        passwordHash: this.buildPasswordHash(payload.password),
+        passwordHash: buildPasswordHash(payload.password),
         recoverPasswordToken: null,
         recoverPasswordRequestTime: null,
       },
@@ -236,14 +200,14 @@ export class UserService {
       throw new Error("Пользователь не найден");
     }
 
-    if (this.buildPasswordHash(oldPassword) !== user.passwordHash) {
+    if (buildPasswordHash(oldPassword) !== user.passwordHash) {
       throw new Error("Старый пароль был введен неверно");
     }
 
     await prisma.user.update({
       where: { id: user.id },
       data: {
-        passwordHash: this.buildPasswordHash(newPassword),
+        passwordHash: buildPasswordHash(newPassword),
         lastPasswordChangeTime: new Date(),
       },
     });

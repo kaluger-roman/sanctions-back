@@ -3,39 +3,27 @@ import { appModel } from "models/app";
 import { $authorizationData, LogOut } from "models/app/app.model";
 import { reset } from "patronum";
 import { webWorkerInterval } from "./helpers";
-import { LOGOUT_TIMER } from "./constants";
-import { TOKEN_KEY } from "shared/authorization";
+import { socket } from "api/app.api";
+import { ACTIONS } from "api/actions";
+import { authApi } from "api";
+import { AuthSystemError, FORCE_LOGOUT_REASON } from "./types";
 
 export const $isAutoLogoutConfirmShowed = createStore(false);
+export const $isForceLogoutConfirmShowed =
+  createStore<FORCE_LOGOUT_REASON | null>(null);
+export const $isSessionAlreadyExistsConfirmShowed = createStore(false);
 export const $logoutConfirmLeftTime = createStore<number>(30);
 
 export const autoLogoutConfirmShowed = createEvent<boolean>();
-export const startLogoutTimer = createEvent();
-export const stopLogoutTimer = createEvent();
+export const sessionAlreadyExistsConfirmShowed = createEvent<boolean>();
+export const forceLogoutShowed = createEvent<FORCE_LOGOUT_REASON | null>();
 export const startLogoutConfirmationTimer = createEvent();
 export const stopLogoutConfirmationTimer = createEvent();
 export const userActionDone = createEvent();
+export const logoutAsked = createEvent();
 
 const userActionCheckFx = createEffect(() => {
   document.addEventListener("click", () => userActionDone());
-});
-
-sample({
-  clock: appModel.AppGate.open,
-  filter: () => {
-    const logoutTimerStartedAt = localStorage.logoutTimerStartedAt;
-
-    if (!logoutTimerStartedAt || !localStorage[TOKEN_KEY]) return false;
-
-    return Date.now() - Number(logoutTimerStartedAt) > LOGOUT_TIMER;
-  },
-  target: [appModel.LogOut, autoLogoutConfirmShowed.prepend(() => true)],
-});
-
-export const logoutAsked = webWorkerInterval({
-  start: startLogoutTimer,
-  stop: stopLogoutTimer,
-  interval: LOGOUT_TIMER,
 });
 
 export const logoutConfirmed = webWorkerInterval({
@@ -51,41 +39,14 @@ export const logoutConfirmTimer = webWorkerInterval({
 });
 
 sample({
-  clock: startLogoutTimer,
-  target: createEffect(() => {
-    localStorage.logoutTimerStartedAt = Date.now();
-  }),
-});
-
-sample({
   clock: appModel.AppGate.open,
   target: userActionCheckFx,
 });
 
 sample({
   clock: $authorizationData,
-  filter: Boolean,
-  target: startLogoutTimer,
-});
-
-sample({
-  clock: $authorizationData,
   filter: (data) => !data,
-  target: [stopLogoutConfirmationTimer, stopLogoutTimer],
-});
-
-sample({
-  clock: [userActionDone, $isAutoLogoutConfirmShowed],
-  source: [$authorizationData, $isAutoLogoutConfirmShowed] as const,
-  filter: ([data, isAutoLogoutConfirmShowed]) =>
-    Boolean(data && !isAutoLogoutConfirmShowed),
-  target: [stopLogoutTimer, startLogoutTimer],
-});
-
-sample({
-  clock: logoutAsked,
-  fn: () => true,
-  target: autoLogoutConfirmShowed,
+  target: stopLogoutConfirmationTimer,
 });
 
 sample({
@@ -94,16 +55,28 @@ sample({
 });
 
 sample({
+  clock: sessionAlreadyExistsConfirmShowed,
+  target: $isSessionAlreadyExistsConfirmShowed,
+});
+
+sample({
+  clock: forceLogoutShowed,
+  target: $isForceLogoutConfirmShowed,
+});
+
+sample({
   clock: autoLogoutConfirmShowed,
   filter: Boolean,
-  target: [startLogoutConfirmationTimer, stopLogoutTimer],
+  target: [startLogoutConfirmationTimer],
 });
 
 sample({
   clock: $isAutoLogoutConfirmShowed,
   filter: (x) => !x,
+  fn: () => ({ timestamp: Date.now() }),
   target: [
     stopLogoutConfirmationTimer,
+    authApi.lastActivityTimeFx,
     reset({ target: $logoutConfirmLeftTime }),
   ],
 });
@@ -118,4 +91,45 @@ sample({
   source: $logoutConfirmLeftTime,
   fn: (logoutConfirmLeftTime) => logoutConfirmLeftTime - 1,
   target: $logoutConfirmLeftTime,
+});
+
+sample({
+  clock: socket.$isConnected,
+  filter: (isConnected) => isConnected,
+  target: createEffect(() => {
+    socket.client.on(ACTIONS.INACTIVITY_LOGOUT, () => logoutAsked());
+    socket.client.on(ACTIONS.FORCE_LOGOUT, ({ reason }) => {
+      forceLogoutShowed(reason);
+      appModel.LogOut();
+    });
+  }),
+});
+
+sample({
+  clock: logoutAsked,
+  fn: () => true,
+  target: autoLogoutConfirmShowed,
+});
+
+sample({
+  clock: userActionDone,
+  source: [$authorizationData, $isAutoLogoutConfirmShowed] as const,
+  filter: ([data, isAutoLogoutConfirmShowed]) =>
+    Boolean(data && !isAutoLogoutConfirmShowed),
+  fn: () => ({ timestamp: Date.now() }),
+  target: authApi.lastActivityTimeFx,
+});
+
+sample({
+  clock: authApi.authFx.failData,
+  filter: (message) => message === AuthSystemError.SESSION_ALREADY_EXISTS,
+  fn: () => true,
+  target: sessionAlreadyExistsConfirmShowed,
+});
+
+sample({
+  clock: authApi.verifyFx.failData,
+  filter: (message) => message === AuthSystemError.SESSION_EXPIRED,
+  fn: () => true,
+  target: $isAutoLogoutConfirmShowed,
 });

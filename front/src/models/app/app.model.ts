@@ -59,7 +59,7 @@ sample({
 });
 
 sample({
-  clock: [authApi.verifyFx.failData, LogOut],
+  clock: [authApi.verifyFx.failData, authApi.logoutFx.done],
   target: createEffect(() => {
     localStorage[TOKEN_KEY] = "";
   }),
@@ -78,13 +78,18 @@ sample({
   target: $authorizationData,
 });
 
-$authorizationData.reset(LogOut);
+$authorizationData.reset(authApi.logoutFx.done);
 
 sample({
-  clock: LogOut,
+  clock: authApi.logoutFx.done,
   target: createEffect(() => {
     navigation.navigate(Paths.root);
   }),
+});
+
+sample({
+  clock: LogOut,
+  target: authApi.logoutFx,
 });
 
 sample({

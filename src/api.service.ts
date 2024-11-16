@@ -3,20 +3,18 @@ import { ApiHandlers, SocketResponse } from "./types";
 import { userService } from "./user";
 import { ACTIONS, UNAUTHORIZED_ACTIONS } from "./actions";
 import { beforeAction, afterAction } from "./init-user-connection";
+import { sessionsService } from "./user/sessions.service";
+import { Request } from "./types";
 
 export class Api<T extends string> {
   constructor(private handlers: ApiHandlers<T>) {}
 
-  async handle(
-    action: T,
-    socket: Socket,
-    payload: { requestId?: string; token?: string; deviceId?: string },
-  ) {
+  async handle(action: T, socket: Socket, payload: Request<any>) {
     try {
       beforeAction(payload.token, socket);
 
       if (!UNAUTHORIZED_ACTIONS.includes(action as ACTIONS)) {
-        const decoded = userService.verify(payload.token);
+        const decoded = await sessionsService.verifyToken(payload);
         if (decoded) {
           await userService.recordUser(decoded.email);
         } else {

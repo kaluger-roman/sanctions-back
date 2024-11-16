@@ -37,7 +37,7 @@ class AppSocket {
 
   private async init() {
     this.client.onAny((_, response: SocketResponse) => {
-      if (response.requestId && this.pendingRequests[response.requestId]) {
+      if (response?.requestId && this.pendingRequests[response.requestId]) {
         this.pendingRequests[response.requestId](response);
         Reflect.deleteProperty(this.pendingRequests, response.requestId);
       }

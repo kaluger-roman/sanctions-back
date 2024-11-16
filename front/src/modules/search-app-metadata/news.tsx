@@ -60,7 +60,7 @@ export const News = () => (
         },
       ].map((item) => (
         <>
-          <Box sx={{ display: "flex" }}>
+          <Box key={item.text} sx={{ display: "flex" }}>
             <ArticleIcon sx={{ mr: 1 }} />
             <Typography variant="body1" fontWeight="bold">
               {item.date}

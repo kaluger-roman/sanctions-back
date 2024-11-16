@@ -1,9 +1,8 @@
 import { createEffect, createEvent, createStore, sample } from "effector";
-import { attachLogger } from "effector-logger";
 import { appModel } from "models/app";
 import { $authorizationData, LogOut } from "models/app/app.model";
-import { interval, reset } from "patronum";
-attachLogger();
+import { reset } from "patronum";
+import { webWorkerInterval } from "./helpers";
 
 export const $isAutoLogoutConfirmShowed = createStore(false);
 export const $logoutConfirmLeftTime = createStore<number>(30);
@@ -19,22 +18,22 @@ const userActionCheckFx = createEffect(() => {
   document.addEventListener("click", () => userActionDone());
 });
 
-export const logoutAsked = interval({
+export const logoutAsked = webWorkerInterval({
   start: startLogoutTimer,
   stop: stopLogoutTimer,
-  timeout: 1000 * 60 * 60,
+  interval: localStorage.logoutTimer || 1000 * 60 * 60,
 });
 
-export const logoutConfirmed = interval({
+export const logoutConfirmed = webWorkerInterval({
   start: startLogoutConfirmationTimer,
   stop: stopLogoutConfirmationTimer,
-  timeout: 30000,
+  interval: 30000,
 });
 
-export const logoutConfirmTimer = interval({
+export const logoutConfirmTimer = webWorkerInterval({
   start: startLogoutConfirmationTimer,
   stop: stopLogoutConfirmationTimer,
-  timeout: 1000,
+  interval: 1000,
 });
 
 sample({
@@ -63,7 +62,7 @@ sample({
 });
 
 sample({
-  clock: logoutAsked.tick,
+  clock: logoutAsked,
   fn: () => true,
   target: autoLogoutConfirmShowed,
 });
@@ -89,12 +88,12 @@ sample({
 });
 
 sample({
-  clock: logoutConfirmed.tick,
+  clock: logoutConfirmed,
   target: LogOut,
 });
 
 sample({
-  clock: logoutConfirmTimer.tick,
+  clock: logoutConfirmTimer,
   source: $logoutConfirmLeftTime,
   fn: (logoutConfirmLeftTime) => logoutConfirmLeftTime - 1,
   target: $logoutConfirmLeftTime,

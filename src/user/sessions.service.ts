@@ -97,6 +97,18 @@ export class SessionsService {
       throw new Error("SESSION_EXPIRED");
     }
 
+    const otherActiveSessions = await prisma.userSession.findFirst({
+      where: {
+        userId,
+        deviceId: { not: payload.deviceId },
+        destroyedAt: null,
+      },
+    });
+
+    if (otherActiveSessions) {
+      throw new Error("SESSION_ALREADY_EXISTS");
+    }
+
     await prisma.$transaction(async () => {
       const activeUserSession = await prisma.userSession.findFirst({
         where: { userId, destroyedAt: null, deviceId: payload.deviceId },

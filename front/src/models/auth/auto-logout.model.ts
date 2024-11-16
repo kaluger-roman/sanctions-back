@@ -133,3 +133,10 @@ sample({
   fn: () => true,
   target: $isAutoLogoutConfirmShowed,
 });
+
+sample({
+  clock: authApi.verifyFx.failData,
+  filter: (message) => message === AuthSystemError.SESSION_ALREADY_EXISTS,
+  fn: () => FORCE_LOGOUT_REASON.NEW_SESSION,
+  target: $isForceLogoutConfirmShowed,
+});

@@ -11,6 +11,7 @@ export const AutoLogout = () => {
 
   return (
     <Modal
+      disableAutoFocus
       sx={{ display: "flex", alignItems: "center", justifyContent: "center" }}
       open={isAutoLogoutConfirmShowed}
       onClose={() => autoLogoutModel.autoLogoutConfirmShowed(false)}

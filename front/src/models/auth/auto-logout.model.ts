@@ -3,6 +3,8 @@ import { appModel } from "models/app";
 import { $authorizationData, LogOut } from "models/app/app.model";
 import { reset } from "patronum";
 import { webWorkerInterval } from "./helpers";
+import { LOGOUT_TIMER } from "./constants";
+import { TOKEN_KEY } from "shared/authorization";
 
 export const $isAutoLogoutConfirmShowed = createStore(false);
 export const $logoutConfirmLeftTime = createStore<number>(30);
@@ -18,10 +20,22 @@ const userActionCheckFx = createEffect(() => {
   document.addEventListener("click", () => userActionDone());
 });
 
+sample({
+  clock: appModel.AppGate.open,
+  filter: () => {
+    const logoutTimerStartedAt = localStorage.logoutTimerStartedAt;
+
+    if (!logoutTimerStartedAt || !localStorage[TOKEN_KEY]) return false;
+
+    return Date.now() - Number(logoutTimerStartedAt) > LOGOUT_TIMER;
+  },
+  target: [appModel.LogOut, autoLogoutConfirmShowed.prepend(() => true)],
+});
+
 export const logoutAsked = webWorkerInterval({
   start: startLogoutTimer,
   stop: stopLogoutTimer,
-  interval: localStorage.logoutTimer || 1000 * 60 * 60,
+  interval: LOGOUT_TIMER,
 });
 
 export const logoutConfirmed = webWorkerInterval({
@@ -34,6 +48,13 @@ export const logoutConfirmTimer = webWorkerInterval({
   start: startLogoutConfirmationTimer,
   stop: stopLogoutConfirmationTimer,
   interval: 1000,
+});
+
+sample({
+  clock: startLogoutTimer,
+  target: createEffect(() => {
+    localStorage.logoutTimerStartedAt = Date.now();
+  }),
 });
 
 sample({

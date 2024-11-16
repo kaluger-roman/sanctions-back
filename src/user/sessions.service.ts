@@ -174,8 +174,6 @@ export class SessionsService {
       },
     });
 
-    console.log("Checking for inactive sessions", userSessions);
-
     for (const session of userSessions) {
       ActiveConnections[session.userId]?.forEach((socket) => {
         socket.emit(ACTIONS.INACTIVITY_LOGOUT);
@@ -188,12 +186,6 @@ export class SessionsService {
           const isStillInactive =
             updatedSession.lastActivityTime.getTime() <=
             Date.now() - preferences.autoLogoutTime;
-
-          console.log(
-            "Checking for still inactive sessions",
-            updatedSession,
-            isStillInactive,
-          );
 
           if (isStillInactive) {
             await prisma.userSession.update({

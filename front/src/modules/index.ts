@@ -6,3 +6,4 @@ export { BillingCard } from "./billing-card";
 export { ProfileData } from "./profile-data";
 export { Tarrif } from "./tarrif";
 export { PermanentNotifications } from "./notifications";
+export { AutoLogout } from "./auto-logout";

@@ -20,6 +20,8 @@ import { createGate } from "effector-react";
 import { socket } from "api/app.api";
 import { TOKEN_KEY, User } from "shared/authorization";
 import { jwtDecode } from "jwt-decode";
+import { navigation } from "shared/navigate";
+import { Paths } from "shared/paths";
 
 export const $isLoading = createStore<boolean>(true);
 export const $loadingProgress = createStore<number>(NaN);
@@ -77,6 +79,13 @@ sample({
 });
 
 $authorizationData.reset(LogOut);
+
+sample({
+  clock: LogOut,
+  target: createEffect(() => {
+    navigation.navigate(Paths.root);
+  }),
+});
 
 sample({
   clock: [

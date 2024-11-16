@@ -244,7 +244,6 @@ export const Navigation = () => {
                   sx={{ width: "100%" }}
                   onClick={() => {
                     LogOut();
-                    navigation.navigate(Paths.root);
                   }}
                 >
                   Выйти

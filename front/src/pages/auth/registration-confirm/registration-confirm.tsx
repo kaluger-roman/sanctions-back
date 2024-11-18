@@ -35,7 +35,7 @@ export const RegistrationConfirm = () => {
         ml: "auto",
       }}
     >
-      <Typography variant="h4">
+      <Typography textAlign="center" variant="h4">
         {isSuccess ? "Учетная запись подтверждена!!!" : "Ошибка!"}
       </Typography>
 

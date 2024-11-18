@@ -38,6 +38,7 @@ const $commonPendingRequests = combine(
   billingApi.addRequestsPaymentFx.pending,
   adminApi.changeTarrifsSettingsFx.pending,
   adminApi.changeTarrifsSettingsFx.pending,
+  profileApi.retryConfirmEmailFx.pending,
   socket.$isConnected.map((isConnected) => !isConnected),
   (...requests: Array<boolean>) => requests.some(Boolean),
 ) as unknown as Store<boolean>;

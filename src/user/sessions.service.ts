@@ -41,7 +41,7 @@ export class SessionsService {
         data: { destroyedAt: new Date() },
       });
 
-      ActiveConnections[user.id].forEach((socket) =>
+      ActiveConnections[user.id]?.forEach((socket) =>
         socket.emit(ACTIONS.FORCE_LOGOUT, {
           reason: FORCE_LOGOUT_REASON.NEW_SESSION,
         }),

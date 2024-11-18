@@ -17,6 +17,7 @@ export type RegisterPayload = {
   clientCategory: ClientCategory;
 };
 
+export type RetryConfirmEmailPayload = { userId: number };
 export type RecoverTokenRequestPayload = { email: string };
 export type RecoverConfirmPayload = {
   password: string;

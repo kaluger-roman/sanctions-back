@@ -7,6 +7,7 @@ import {
   RecoverTokenRequestPayload,
   RegisterPayload,
   RegistrationConfirmPayload,
+  RetryConfirmEmailPayload,
 } from "./types";
 import { ACTIONS } from "../actions";
 import { Api } from "../api.service";
@@ -26,6 +27,8 @@ export const userApiHandlers = {
   [ACTIONS.RECOVER_PASSWORD_REQUEST]: (
     payload: Request<RecoverTokenRequestPayload>,
   ) => userService.recoverTokenRequest(payload),
+  [ACTIONS.RETRY_EMAIL_CONFIRM]: (payload: Request<RetryConfirmEmailPayload>) =>
+    userService.confirmEmail(payload),
   [ACTIONS.RECOVER_PASSWORD_CONFIRM]: (
     payload: Request<RecoverConfirmPayload>,
   ) => userService.recoverPasswordConfirm(payload),

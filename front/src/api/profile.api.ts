@@ -21,3 +21,14 @@ export const changePasswordFx = createEffect<
 export const changeProfileFx = createEffect<Profile, void, string>((data) =>
   socket.emitWithAnswer<Profile, void>(ACTIONS.CHANGE_PROFILE, data),
 );
+
+export const retryConfirmEmailFx = createEffect<
+  { userId: number },
+  void,
+  string
+>((payload) =>
+  socket.emitWithAnswer<{ userId: number }, void>(
+    ACTIONS.RETRY_EMAIL_CONFIRM,
+    payload,
+  ),
+);

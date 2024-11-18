@@ -38,6 +38,29 @@ export class UserService {
 
     return user;
   }
+  async confirmEmail({ userId }: { userId: number }) {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    await new Promise((resolve, reject) => {
+      transporter.sendMail(
+        {
+          to: user.email,
+          subject: "Регистрация на сайте GoodSanctionCheck",
+          text: `Вы зарегистрировались на сайте GoodSanctionCheck. Для подтверждения почты перейдите по ссылке: https://goodsanctioncheck.com/registration_confirm/${user.registrationConfirmToken}`,
+          textEncoding: "base64",
+        },
+        (err, info) => {
+          if (err) return reject(err);
+
+          resolve(info);
+        },
+      );
+    });
+
+    return "success";
+  }
   async create(payload: RegisterPayload) {
     const existedUser = await prisma.user.findUnique({
       where: { email: payload.email },
@@ -76,21 +99,7 @@ export class UserService {
       },
     });
 
-    await new Promise((resolve, reject) => {
-      transporter.sendMail(
-        {
-          to: payload.email,
-          subject: "Регистрация на сайте GoodSanctionCheck",
-          text: `Вы зарегистрировались на сайте GoodSanctionCheck. Для подтверждения перейдите по ссылке: https://goodsanctioncheck.com/registration_confirm/${registrationConfirmToken}`,
-          textEncoding: "base64",
-        },
-        (err, info) => {
-          if (err) return reject(err);
-
-          resolve(info);
-        },
-      );
-    });
+    await this.confirmEmail({ userId: user.id });
 
     return payload.email;
   }

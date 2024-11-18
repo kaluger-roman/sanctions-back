@@ -39,8 +39,28 @@ export const ProfileData = () => {
         </Alert>
       ) : (
         <Alert sx={{ mt: 1, mb: 2 }} severity="warning">
-          Почта не подтверждена. Пожалуйста, перейдите по ссылке в письме. До
-          подтверждения часть функционала может быть ограниччена.
+          <Box
+            sx={{
+              display: "flex",
+              gap: 2,
+              flexDirection: "column",
+              alignItems: "flex-start",
+            }}
+          >
+            <Typography variant="body2">
+              Почта не подтверждена. Пожалуйста, перейдите по ссылке в письме.
+              До подтверждения часть функционала может быть ограниччена.
+            </Typography>
+
+            <Button
+              onClick={() => profileModel.retryConfirmEmailClicked()}
+              size="small"
+              sx={{ minWidth: 160 }}
+              variant="contained"
+            >
+              Выслать повторно
+            </Button>
+          </Box>
         </Alert>
       )}
       <DataChip

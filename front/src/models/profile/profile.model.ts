@@ -44,12 +44,31 @@ export const removeEditErrorKey = createEvent<string>();
 
 export const savePasswordClicked = createEvent();
 export const saveProfileClicked = createEvent();
+export const retryConfirmEmailClicked = createEvent();
 
 sample({
   clock: toggleChangePassword,
   source: $isChangePasswordActive,
   fn: (isChangePasswordActive) => !isChangePasswordActive,
   target: $isChangePasswordActive,
+});
+
+sample({
+  clock: retryConfirmEmailClicked,
+  source: $profile,
+  filter: (profile): profile is Profile => !!profile,
+  fn: (profile) => ({ userId: profile!.id }),
+  target: profileApi.retryConfirmEmailFx,
+});
+
+sample({
+  clock: profileApi.retryConfirmEmailFx.doneData,
+  source: $profile,
+  fn: (): Notification.PayloadType => ({
+    type: "success",
+    message: "Письмо с подтверждением отправлено повторно",
+  }),
+  target: Notification.add,
 });
 
 sample({

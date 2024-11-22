@@ -49,7 +49,8 @@ export const SearchAppMetadata = () => (
       </Typography>
     </Box>
     <Box sx={{ pt: 4, pb: 4 }}>
-      <Typography variant="h6">Списки актуальны на следующие даты:</Typography>
+      <Typography variant="h6">Списки актуальны на текущий день!</Typography>
+      <Typography variant="body1">Дата обновления:</Typography>
       <List sx={{ display: "flex", flexWrap: "wrap" }}>
         {ACTUAL_DATES.map((item) => (
           <ListItem sx={{ gap: 2, width: "min-content", mr: 8 }}>

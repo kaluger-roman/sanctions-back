@@ -1,10 +1,11 @@
 export type Sanction = {
-  id: number | "uplimit";
+  id: number | "uplimit_code_addition" | "uplimit_description";
   sourceCountry: string;
   sourceDocument: string;
   restriction: string;
   code: string;
   description: string;
+  matchedWords: Array<string>;
 };
 
 export type CountrySearchMatch = Record<

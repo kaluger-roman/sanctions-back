@@ -23,6 +23,7 @@
     "nodemailer": "^6.9.13",
     "socket.io": "^4.6.2",
     "socket.io-client": "^4.7.1",
+    "trigram-similarity": "^1.0.7",
     "ts-node": "^10.9.1",
     "xlsx": "^0.18.5"
   },

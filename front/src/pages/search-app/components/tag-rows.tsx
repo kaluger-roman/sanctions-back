@@ -23,9 +23,15 @@ export const TagRows = ({ data }: { data: CountrySearchMatch }) => (
         </TableRow>
 
         {data[tag].map((item, inx) =>
-          item.id === "uplimit" ? (
+          ["uplimit_code_addition", "uplimit_description"].includes(
+            item.id as any,
+          ) ? (
             <TableCell colSpan={4} sx={{ color: theme.palette.grey[500] }}>
-              Возможных дополнений более 10, конкретизируйте ваш код ТНВЭД
+              {item.id === "uplimit_code_addition"
+                ? "Возможных дополнений более 10 (показаны первые 10), конкретизируйте ваш код ТНВЭД"
+                : item.id === "uplimit_description"
+                ? "Совпадений по описанию более 50 (показаны первые 50), конкретизируйте поисковый запрос"
+                : ""}
             </TableCell>
           ) : (
             <DataRow

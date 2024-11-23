@@ -1,6 +1,7 @@
 import { mapValues, uniq } from "lodash";
 import { prisma } from "../../prisma/prisma";
 import { Sanction } from "@prisma/client";
+import * as trigramSimilarity from "trigram-similarity";
 
 const keyPoints = [2, 4, 6, 8, 10, 12];
 
@@ -63,6 +64,8 @@ export const searchByDescription = async (
   const res: Array<Sanction> = [];
 
   for await (const descriptionTag of searchTags) {
+    const tagArr = descriptionTag.split(" ");
+
     res.push(
       ...(
         await prisma.$queryRawUnsafe<any>(`
@@ -85,10 +88,20 @@ export const searchByDescription = async (
           : ""
       } 
       group by id, description)
-      select id, "sourceCountry", "sourceDocument", "restriction", code, description from all_rows WHERE match_count=${
-        descriptionTag.split(" ").length
-      } order by "code" asc;`)
-      ).map((x) => ({ ...x, descriptionTag })),
+      select id, "sourceCountry", "sourceDocument", "restriction",score, code, description
+      from all_rows WHERE match_count=${tagArr.length} 
+      order by score desc, "code" asc;`)
+      ).map((x) => ({
+        ...x,
+        descriptionTag,
+        matchedWords: x.description
+          .split(/\s+/g)
+          .filter((descWord: string) =>
+            tagArr.some(
+              (tagWord) => trigramSimilarity(tagWord, descWord) > 0.5,
+            ),
+          ),
+      })),
     );
   }
 
@@ -146,7 +159,25 @@ export const postLimitCodeAddition = (
     mapValues(x, (y) =>
       y
         .slice(0, takeLimit + 1)
-        .map((z, inx) => (inx === takeLimit ? { id: "uplimit" } : z)),
+        .map((z, inx) =>
+          inx === takeLimit ? { id: "uplimit_code_addition" } : z,
+        ),
+    ),
+  );
+};
+
+export const postLimitDescription = (
+  data: Record<string, Record<string, Array<Sanction>>>,
+) => {
+  const takeLimit = 50;
+
+  return mapValues(data, (x) =>
+    mapValues(x, (y) =>
+      y
+        .slice(0, takeLimit + 1)
+        .map((z, inx) =>
+          inx === takeLimit ? { id: "uplimit_description" } : z,
+        ),
     ),
   );
 };

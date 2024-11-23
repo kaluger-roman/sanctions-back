@@ -2,6 +2,7 @@ import { groupBy, isEmpty, mapValues, uniq } from "lodash";
 import { prisma } from "../../prisma";
 import {
   postLimitCodeAddition,
+  postLimitDescription,
   searchByCode,
   searchByCodeAddition,
   searchByDescription,
@@ -134,7 +135,9 @@ class SearchService {
 
     const groupedSanctions = {
       code: groupByCountryAndTag(codeMatches),
-      description: groupByCountryAndTag(descriptionMatches),
+      description: postLimitDescription(
+        groupByCountryAndTag(descriptionMatches),
+      ),
       codeAddition: postLimitCodeAddition(
         groupByCountryAndTag(codeAdditionMatches),
       ),

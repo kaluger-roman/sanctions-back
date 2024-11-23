@@ -24,7 +24,7 @@ import { AuthContainer, FormContainer, FormFields } from "../styles";
 import { navigation } from "../../../shared/navigate";
 import { Paths } from "../../../shared/paths";
 import { ClientCategory } from "shared/billing";
-import policies from "../../../modules/footer/Politika_konfidentsialnosti.docx";
+import policies from "../../../modules/footer/Politika_obrabotki_personalnykh_dannykh.docx";
 
 export const Register = () => {
   const clientCategory = useUnit(registerModel.$clientCategory);
@@ -182,20 +182,20 @@ export const Register = () => {
             key={String(clientCategory)}
             control={
               <Checkbox
-                required
                 value={isPoliciesAccepted}
                 onChange={() => registerModel.toggleAcceptPolicies()}
               />
             }
             label={
-              <Typography variant="body1">
+              <Typography variant="body2">
                 Я согласен с{" "}
                 <Link
                   href={policies}
-                  download="Политика конфиденциальности.docx"
+                  download="Политика обработки персональных данных.docx"
                 >
-                  Политикой конфиденциальности
-                </Link>
+                  Политикой обработки персональных данных
+                </Link>{" "}
+                *
               </Typography>
             }
           />

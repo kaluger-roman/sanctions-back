@@ -6,11 +6,13 @@ import { ReactComponent as VK } from "shared/icons/vk.svg";
 import { ReactComponent as TG } from "shared/icons/telegram.svg";
 import PermIdentityIcon from "@mui/icons-material/PermIdentity";
 import BookmarkIcon from "@mui/icons-material/Bookmark";
-import policies from "./Politika_konfidentsialnosti.docx";
+import policies from "./Politika_obrabotki_personalnykh_dannykh.docx";
+import policies1 from "./Soglasie_na_obrabotku_PD.docx";
 import oferta from "./Publichnaya_oferta.docx";
 import { theme } from "shared/theme";
 import LockIcon from "@mui/icons-material/Lock";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import HandshakeIcon from "@mui/icons-material/Handshake";
 
 export const Footer = () => {
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
@@ -49,9 +51,23 @@ export const Footer = () => {
             [BookmarkIcon, "ОГРНИП: 324774600705838"],
             [
               LockIcon,
-              <Link href={policies} download="Политика конфиденциальности.docx">
+              <Link
+                href={policies}
+                download="Политика обработки персональных данных.docx"
+              >
                 <Typography variant="caption">
-                  Политика конфиденциальности
+                  Политика обработки персональных данных
+                </Typography>
+              </Link>,
+            ],
+            [
+              HandshakeIcon,
+              <Link
+                href={policies1}
+                download="Согласие на обработку персональных данных.docx"
+              >
+                <Typography variant="caption">
+                  Согласие на обработку персональных данных
                 </Typography>
               </Link>,
             ],

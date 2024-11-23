@@ -12,8 +12,11 @@ export const $message = createStore("");
 export const $phoneError = createStore("");
 export const $emailError = createStore("");
 
+export const $isPoliciesAccepted = createStore<boolean>(false);
+
 export const PageGate = createGate();
 
+export const toggleAcceptPolicies = createEvent();
 export const changeOrganizationName = createEvent<string>();
 export const changeName = createEvent<string>();
 export const changeEmail = createEvent<string>();
@@ -28,6 +31,13 @@ export const isPhoneNumberEmpty = $phoneNumber.map(
 export const isMessageEmpty = $message.map((message) => !message);
 
 export const submit = createEvent();
+
+sample({
+  clock: toggleAcceptPolicies,
+  source: $isPoliciesAccepted,
+  fn: (isPoliciesAccepted) => !isPoliciesAccepted,
+  target: $isPoliciesAccepted,
+});
 
 sample({
   clock: changeOrganizationName,
@@ -107,5 +117,7 @@ $name.reset(PageGate.close, contactUsApi.submitForm.done);
 $email.reset(PageGate.close, contactUsApi.submitForm.done);
 $phoneNumber.reset(PageGate.close, contactUsApi.submitForm.done);
 $message.reset(PageGate.close, contactUsApi.submitForm.done);
+$isPoliciesAccepted.reset(PageGate.close, contactUsApi.submitForm.done);
 $phoneError.reset(PageGate.close);
 $emailError.reset(PageGate.close);
+$isPoliciesAccepted.reset(PageGate.close);

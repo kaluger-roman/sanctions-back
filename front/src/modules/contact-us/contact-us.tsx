@@ -1,6 +1,9 @@
 import {
   Box,
   Button,
+  Checkbox,
+  FormControlLabel,
+  Link,
   TextField,
   TextFieldProps,
   Typography,
@@ -19,6 +22,7 @@ import {
   submit,
 } from "models/contact-us/contact-us.model";
 import { theme } from "shared/theme";
+import policies from "../../modules/footer/Politika_obrabotki_personalnykh_dannykh.docx";
 
 const Input = (props: TextFieldProps & { isMd?: boolean }) => (
   <TextField
@@ -43,6 +47,7 @@ export const ContactUs = () => {
   const phoneError = useStore(contactUsModel.$phoneError);
   const isEmailEmpty = useStore(contactUsModel.isEmailEmpty);
   const isNameEmpty = useStore(contactUsModel.isNameEmpty);
+  const isPoliciesAccepted = useStore(contactUsModel.$isPoliciesAccepted);
   const isPhoneNumberEmpty = useStore(contactUsModel.isPhoneNumberEmpty);
   const isMessageEmpty = useStore(contactUsModel.isMessageEmpty);
   const pending = useUnit(contactUsApi.submitForm.pending);
@@ -120,6 +125,26 @@ export const ContactUs = () => {
           onChange={({ target }) => changeMessage(target.value)}
           sx={{ width: "100%", maxWidth: "100%", flexBasis: "100%" }}
         />
+        <FormControlLabel
+          control={
+            <Checkbox
+              value={isPoliciesAccepted}
+              onChange={() => contactUsModel.toggleAcceptPolicies()}
+            />
+          }
+          label={
+            <Typography variant="body2">
+              Я согласен с{" "}
+              <Link
+                href={policies}
+                download="Политика обработки персональных данных.docx"
+              >
+                Политикой обработки персональных данных
+              </Link>{" "}
+              *
+            </Typography>
+          }
+        />
       </Box>
       <Box sx={{ display: "flex", justifyContent: "flex-end" }}>
         <Button
@@ -128,7 +153,8 @@ export const ContactUs = () => {
             isNameEmpty ||
             isPhoneNumberEmpty ||
             isMessageEmpty ||
-            pending
+            pending ||
+            !isPoliciesAccepted
           }
           sx={{ mt: 2, ":disabled": { background: theme.palette.grey[600] } }}
           size="large"

@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.6d4c2c8c.css",
-    "main.js": "/static/js/main.8d864d2c.js",
+    "main.js": "/static/js/main.f056cd02.js",
     "static/media/city.jpg": "/static/media/city.bc193eabcd9ae0b996ab.jpg",
     "static/media/back-image.jpg": "/static/media/back-image.553032c068726347e91f.jpg",
     "static/media/globalisation.jpeg": "/static/media/globalisation.4d0d843cc31443e82b61.jpeg",
@@ -9,17 +9,18 @@
     "static/media/sanctions.jpg": "/static/media/sanctions.d341ec269511195937cb.jpg",
     "static/media/office.jpg": "/static/media/office.fdd81b3d3ea4eaa47d1a.jpg",
     "static/media/instruction.pdf": "/static/media/instruction.f4f663a628e1287d45ff.pdf",
-    "static/media/Politika_konfidentsialnosti.docx": "/static/media/Politika_konfidentsialnosti.e425b0f7c85e836026e1.docx",
-    "static/media/Publichnaya_oferta.docx": "/static/media/Publichnaya_oferta.140840a5f722140a4b5f.docx",
+    "static/media/Publichnaya_oferta.docx": "/static/media/Publichnaya_oferta.fa578611a22d4ea2e6fc.docx",
+    "static/media/Politika_obrabotki_personalnykh_dannykh.docx": "/static/media/Politika_obrabotki_personalnykh_dannykh.ec7d2a7cec9af9258a13.docx",
+    "static/media/Soglasie_na_obrabotku_PD.docx": "/static/media/Soglasie_na_obrabotku_PD.ce9ea5a119b5f1d8fee4.docx",
     "static/media/vk.svg": "/static/media/vk.08caa67dc8c8f9c918bc75cc2c5385f3.svg",
     "static/media/telegram.svg": "/static/media/telegram.b76bfc6eb1711697aade6f0f9ff006cb.svg",
     "index.html": "/index.html",
     "static/media/web-worker-timer.js": "/static/media/web-worker-timer.56cbb4b7331c0df00f17.js",
     "main.6d4c2c8c.css.map": "/static/css/main.6d4c2c8c.css.map",
-    "main.8d864d2c.js.map": "/static/js/main.8d864d2c.js.map"
+    "main.f056cd02.js.map": "/static/js/main.f056cd02.js.map"
   },
   "entrypoints": [
     "static/css/main.6d4c2c8c.css",
-    "static/js/main.8d864d2c.js"
+    "static/js/main.f056cd02.js"
   ]
 }

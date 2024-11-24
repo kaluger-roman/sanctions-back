@@ -126,11 +126,10 @@ export const ContactUs = () => {
           sx={{ width: "100%", maxWidth: "100%", flexBasis: "100%" }}
         />
         <FormControlLabel
+          checked={isPoliciesAccepted}
+          value={isPoliciesAccepted}
           control={
-            <Checkbox
-              value={isPoliciesAccepted}
-              onChange={() => contactUsModel.toggleAcceptPolicies()}
-            />
+            <Checkbox onChange={() => contactUsModel.toggleAcceptPolicies()} />
           }
           label={
             <Typography variant="body2">

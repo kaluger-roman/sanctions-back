@@ -120,4 +120,3 @@ $message.reset(PageGate.close, contactUsApi.submitForm.done);
 $isPoliciesAccepted.reset(PageGate.close, contactUsApi.submitForm.done);
 $phoneError.reset(PageGate.close);
 $emailError.reset(PageGate.close);
-$isPoliciesAccepted.reset(PageGate.close);

@@ -21,7 +21,10 @@ export const DataRow = ({
     if (!(CSS as any).highlights || !text || !matchedWords) return;
 
     for (let word of matchedWords) {
-      const regex = new RegExp(word, "g");
+      const regex = new RegExp(
+        word.replaceAll(/(^[^0-9a-zA-Zа-яА-Я]+)|([^0-9a-zA-Zа-яА-Я]+$)/g, ""),
+        "g",
+      );
       const matches = Array.from(description.matchAll(regex));
 
       for (let match of matches) {

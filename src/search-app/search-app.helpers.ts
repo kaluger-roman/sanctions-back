@@ -98,7 +98,7 @@ export const searchByDescription = async (
           .split(/\s+/g)
           .filter((descWord: string) =>
             tagArr.some(
-              (tagWord) => trigramSimilarity(tagWord, descWord) > 0.5,
+              (tagWord) => trigramSimilarity(descWord, tagWord) > 0.2,
             ),
           ),
       })),

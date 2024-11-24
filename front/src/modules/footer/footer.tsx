@@ -16,8 +16,8 @@ import HandshakeIcon from "@mui/icons-material/Handshake";
 
 export const Footer = () => {
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
-  const isMd = useMediaQuery(theme.breakpoints.down("md"));
-  const isLg = useMediaQuery(theme.breakpoints.down("lg"));
+  const isMd = useMediaQuery(theme.breakpoints.down(1040));
+  const isLg = useMediaQuery(theme.breakpoints.down(1340));
   return (
     <Box
       sx={{
@@ -40,7 +40,7 @@ export const Footer = () => {
           alignItems: "flex-start",
           flexWrap: "wrap",
 
-          height: isSm ? 540 : isMd ? 300 : isLg ? 170 : 110,
+          height: isSm ? 620 : isMd ? 300 : isLg ? 230 : 110,
         }}
       >
         {(
@@ -98,7 +98,9 @@ export const Footer = () => {
         <Box
           sx={{
             display: "flex",
-            height: "24px",
+            height: "40px",
+            pt: "8px",
+            pb: "8px",
             gap: 1,
             width: "100%",
             alignItems: "center",

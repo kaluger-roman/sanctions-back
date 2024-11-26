@@ -3,8 +3,11 @@ import { useEffect, useRef } from "react";
 import { Sanction } from "shared/sanctions";
 import { theme } from "shared/theme";
 
-const colorHighlight = new (window as any).Highlight();
-(CSS as any).highlights.set(`higlight`, colorHighlight);
+const colorHighlight = (window as any).Highlight
+  ? new (window as any).Highlight()
+  : null;
+
+if (colorHighlight) (CSS as any).highlights.set(`higlight`, colorHighlight);
 
 export const DataRow = ({
   code,

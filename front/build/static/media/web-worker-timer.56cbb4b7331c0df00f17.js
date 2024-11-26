@@ -1,1 +1,0 @@
-var timerId;onmessage=function(t){var e=t.data,r=e.action,a=e.interval;if("start"===r&&a){if(timerId)return;timerId=setInterval((function(){postMessage("tick")}),a)}"stop"===r&&(clearInterval(timerId),timerId=null)};

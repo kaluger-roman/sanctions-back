@@ -1,6 +1,7 @@
 import {
   Box,
   Button,
+  Link,
   List,
   ListItem,
   ListItemIcon,
@@ -14,6 +15,7 @@ import { theme } from "shared/theme";
 import Instruction from "./instruction.pdf";
 import { navigation } from "shared/navigate";
 import { News } from "./news";
+import { Paths } from "shared/paths";
 
 const ACTUAL_DATES: Array<{
   country: string;
@@ -38,14 +40,30 @@ export const SearchAppMetadata = () => (
       }}
     >
       <Typography variant="body1">
-        Уважаемые пользователи! Данный сервис живет за счет энтузиазма
-        создателей, целью которых было объединить санкционные ограничения
-        государств в отношении товаров, обеспечив пользователей унифицированной
-        поисковой базой данных. Принимая во внимание намерения по дальнейшему
-        значительному расширению проекта, планируется изменение условий
-        использования сайта: в скором времени доступ будет разделен на базовый и
-        расширенный (на платной основе). Благодарим за понимание и надеемся на
-        дальнейшее сотрудничество!
+        Уважаемые Пользователи!
+        <br /> <br /> Данный сервис по-прежнему предоставляет полный доступ ко
+        всем функциям бесплатно! Однако просим Вас{" "}
+        <Link
+          sx={{ cursor: "pointer" }}
+          onClick={() => navigation.navigate(Paths.register)}
+        >
+          <b>зарегистрироваться</b>
+        </Link>{" "}
+        на сайте (окно в правом верхнем углу), чтобы мы не потеряли друг друга и
+        всегда оставались на связи. При наличии любых вопросов можете смело
+        обращаться по{" "}
+        <Link
+          sx={{ cursor: "pointer" }}
+          onClick={() => navigation.navigate(Paths.contacts)}
+        >
+          форме на сайте
+        </Link>
+        , по почте (<Link>goodsanctionsearch@gmail.com</Link>) или напрямую
+        написать в Telegram (
+        <Link href="https://t.me/GoodSanctionSearch">
+          https://t.me/GoodSanctionSearch
+        </Link>
+        ).
       </Typography>
     </Box>
     <Box sx={{ pt: 4, pb: 4 }}>

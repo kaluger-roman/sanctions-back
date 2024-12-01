@@ -8,7 +8,7 @@ import {
   ListItemText,
   Typography,
 } from "@mui/material";
-import { US, EU, GB, AU, KR } from "country-flag-icons/react/3x2";
+import { US, EU, GB, AU, KR, CN } from "country-flag-icons/react/3x2";
 import DownloadIcon from "@mui/icons-material/Download";
 import EmailIcon from "@mui/icons-material/Email";
 import { theme } from "shared/theme";
@@ -27,6 +27,7 @@ const ACTUAL_DATES: Array<{
   { country: "США", date: "18.06.2024", flag: <US /> },
   { country: "Южная Корея", date: "09.09.2024", flag: <KR /> },
   { country: "Австралия", date: "08.04.2024", flag: <AU /> },
+  { country: "Китай", date: "01.12.2024", flag: <CN /> },
 ];
 
 export const SearchAppMetadata = () => (

@@ -61,6 +61,7 @@ export const DataRow = ({
         ref={highlightRef}
         sx={{
           verticalAlign: "top",
+          whiteSpace: "pre-wrap",
           "::highlight(higlight)": {
             background: theme.palette.primary.light,
           },

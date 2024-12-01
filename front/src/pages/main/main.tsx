@@ -18,7 +18,6 @@ import { theme } from "shared/theme";
 import ThumbUpIcon from "@mui/icons-material/ThumbUp";
 import { useNavigate } from "react-router";
 import { Paths } from "shared/paths";
-import { HightlightPluses } from "components";
 import { adjustAppHeight } from "@master_kufa/client-tools";
 
 const ServicesCard = ({

@@ -113,7 +113,7 @@ export class PaymentsService {
               description,
               quantity: "1",
               amount,
-              vat_code: 4,
+              vat_code: 1,
             },
           ],
         },

@@ -25,7 +25,7 @@ export const DataRow = ({
 
     for (let word of matchedWords) {
       const regex = new RegExp(
-        word.replaceAll(/(^[^0-9a-zA-Zа-яА-Я]+)|([^0-9a-zA-Zа-яА-Я]+$)/g, ""),
+        word.replaceAll(/[#-.]|[[-^]|[?|{}]/g, "\\$&"),
         "g",
       );
       const matches = Array.from(description.matchAll(regex));

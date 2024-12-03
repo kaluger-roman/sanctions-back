@@ -8,11 +8,6 @@ import { AdditionalPayments, UserTarrifsInclude } from "./constants";
 import { ActiveConnections } from "../active-connections";
 import { paymentsService } from "./payments.service";
 
-const billing = new YooCheckout({
-  shopId: env.BILLING_SHOP_ID,
-  secretKey: env.BILLING_SECRET_KEY,
-});
-
 export class BillingService {
   constructor() {
     paymentsService.waitingForPayments(

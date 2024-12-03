@@ -80,7 +80,7 @@ export class PaymentsService {
     const payment = await billing.createPayment(
       {
         amount: {
-          value: tarrif.price.toFixed(2),
+          value: user.isAdmin ? "10.00" : tarrif.price.toFixed(2),
           currency: "RUB",
         },
         capture: true,

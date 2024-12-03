@@ -110,7 +110,13 @@ export const Footer = () => {
             Соцсети:{" "}
           </Typography>
           <VK height="100%" cursor="pointer" />
-          <TG height="100%" cursor="pointer" />
+          <TG
+            onClick={() =>
+              window.open("https://t.me/GoodSanctionSearch", "_blank")
+            }
+            height="100%"
+            cursor="pointer"
+          />
         </Box>
       </Box>
     </Box>

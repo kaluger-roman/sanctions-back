@@ -97,7 +97,7 @@ export class BillingService {
     });
 
     ActiveConnections[user.id]?.forEach(async (socket) => {
-      socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, userTarrifs);
+      socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, { tarrifs: userTarrifs });
     });
   }
   async updateSearchRequests(paymentInfo: Payment) {
@@ -131,7 +131,7 @@ export class BillingService {
     });
 
     ActiveConnections[user.id]?.forEach(async (socket) => {
-      socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, userTarrifs);
+      socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, { tarrifs: userTarrifs });
     });
   }
   async userTarrifNoticed({ token }: Request<void>) {

@@ -48,20 +48,23 @@ class AppSocket {
     this.client.on("disconnect", () => socketConnected(false));
     this.$isConnected.on(socketConnected, (_, payload) => payload);
 
-    this.$isConnected.watch((isConnected) => {
-      if (isConnected) {
-        for (const [actions, fn] of Object.entries(this.postponedRequests)) {
-          fn();
-          Reflect.deleteProperty(this.postponedRequests, actions);
-        }
+    const execPostponed = () => {
+      for (const [actions, fn] of Object.entries(this.postponedRequests)) {
+        fn();
+        Reflect.deleteProperty(this.postponedRequests, actions);
       }
-    });
+    };
 
     this.deviceId = await getDeviceId();
+    if (this.$isConnected.getState()) execPostponed();
+    else
+      this.$isConnected.watch((isConnected) => {
+        if (isConnected) execPostponed();
+      });
   }
 
   emitWithAnswer<T, V>(actions: string, payload?: T): Promise<V> {
-    if (!this.$isConnected.getState()) {
+    if (!this.$isConnected.getState() || !this.deviceId) {
       return new Promise((resolve) => {
         this.postponedRequests[actions] = () =>
           resolve(this.emitWithAnswer(actions, payload));

@@ -5,6 +5,7 @@ import {
   Menu,
   MenuItem,
   Button,
+  IconButton,
 } from "@mui/material";
 import { theme } from "shared/theme";
 import { DataChip } from "./data-chip";
@@ -21,6 +22,7 @@ import {
 } from "pages/billing/constants";
 import { UserTarrif } from "shared/profile";
 import { useState } from "react";
+import { REQUESTS_NOTICE } from "./constants";
 
 const QuotaChip = ({
   label,
@@ -29,8 +31,9 @@ const QuotaChip = ({
   isUnlimited,
   additionalPayments,
   onAdditionalPayment,
+  additionalInfo,
 }: {
-  label: string;
+  label: string | React.ReactElement;
   count: number;
   limit: number | null;
   isUnlimited: boolean;
@@ -39,6 +42,7 @@ const QuotaChip = ({
     label: string;
     value: unknown;
   }>;
+  additionalInfo?: React.ReactElement;
 }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -58,6 +62,7 @@ const QuotaChip = ({
               }}
             >
               {count}/{limit}
+              {additionalInfo}
             </Typography>
           )}
           {isUnlimited && (
@@ -182,9 +187,19 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
         placeholder="Бессрочно"
       />
       <QuotaChip
-        label={`Квота поисковых запросов ${
-          tarrif.additionalRequestsCount ? `(увеличена)` : ""
-        }`}
+        label={
+          <>
+            Квота поисковых запросов{" "}
+            {tarrif.additionalRequestsCount ? `(увеличена)` : ""}
+          </>
+        }
+        additionalInfo={
+          <Tooltip title={REQUESTS_NOTICE}>
+            <IconButton size="small" sx={{ p: "2px", ml: "2px" }}>
+              <InfoIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+          </Tooltip>
+        }
         count={tarrif._count.searchRequest}
         limit={tarrif.tarrif.allowedRequests + tarrif.additionalRequestsCount}
         isUnlimited={
@@ -210,10 +225,18 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
           },
         ]}
       />
+
       <QuotaChip
         label="Квота устройств"
         count={tarrif._count.devices}
         limit={tarrif.tarrif.allowedDevices}
+        additionalInfo={
+          <Tooltip title="Обновляется раз в 3 дня">
+            <IconButton size="small" sx={{ p: "2px", ml: "2px" }}>
+              <InfoIcon sx={{ fontSize: 20 }} />
+            </IconButton>
+          </Tooltip>
+        }
         isUnlimited={
           !!isUnlimitedDevices || tarrif.tarrif.identifier === TarrifKind.free
         }

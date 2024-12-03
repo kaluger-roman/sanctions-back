@@ -143,9 +143,12 @@ sample({
     };
 
     socket.client.on(ACTIONS.BILLING_TARRIF_UPDATED, (payload) => {
-      profileModel.changeProfileField({ field: "tarrifs", value: payload });
+      profileModel.changeProfileField({
+        field: "tarrifs",
+        value: payload.tarrifs,
+      });
 
-      showBillingNotice();
+      if (!payload.isQuiet) showBillingNotice();
     });
 
     socket.client.on(

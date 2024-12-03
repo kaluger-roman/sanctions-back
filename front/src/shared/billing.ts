@@ -6,7 +6,7 @@ export enum ClientCategory {
 export type TarrifCard = {
   durationTitle: string;
   description: string;
-  features: Array<string>;
+  features: Array<string | React.ReactElement>;
   price: number;
   kind: TarrifKind;
 };

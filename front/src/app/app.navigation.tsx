@@ -39,7 +39,7 @@ export const AppNavigation = () => {
         <Navigation />
         <Routes>
           <Route path="/">
-            <Route element={<Navigate replace to={Paths.main} />} index />
+            <Route element={<Navigate replace to={Paths.search_app} />} index />
             <Route path={Paths.root}>
               <Route index path={Paths.auth} element={<Auth />} />
               <Route path={Paths.register} element={<Register />} />

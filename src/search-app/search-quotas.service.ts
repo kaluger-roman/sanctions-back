@@ -3,8 +3,65 @@ import { billingService } from "../billing/billing.service";
 import { UserService } from "../user/user.service";
 import { SearchFilters } from "./search-app.types";
 import { prisma } from "../../prisma";
+import { ActiveConnections } from "../active-connections";
+import { ACTIONS } from "../actions";
+import { UserTarrifsInclude } from "../billing/constants";
+
+const DEVICE_QUOTA_CHECK_TIME = 3 * 60 * 1000;
 
 class SearchQuotasService {
+  constructor() {
+    setInterval(() => this.resetDeviceQuota(), DEVICE_QUOTA_CHECK_TIME);
+  }
+  async resetDeviceQuota() {
+    const users = await prisma.user.findMany();
+
+    for (const user of users) {
+      const tarrif = await billingService.getUserCurrentTarrif(user.id);
+      const resetPeriod = user.isAdmin
+        ? 5 * 60 * 1000
+        : 3 * 24 * 60 * 60 * 1000;
+
+      if (!tarrif) continue;
+
+      const tarrifPending = Date.now() - tarrif.start.getTime();
+      const isNeedReset =
+        tarrifPending > resetPeriod &&
+        tarrifPending % resetPeriod < DEVICE_QUOTA_CHECK_TIME;
+
+      if (!isNeedReset) continue;
+
+      const registeredDevices = await prisma.device.findMany({
+        where: {
+          UserTarrif: { some: { id: tarrif.id } },
+        },
+      });
+
+      for (const device of registeredDevices) {
+        await prisma.device.update({
+          where: { id: device.id },
+          data: { UserTarrif: { disconnect: [{ id: tarrif.id }] } },
+        });
+      }
+
+      const userTarrifs = await prisma.userTarrif.findMany({
+        where: {
+          userId: user.id,
+        },
+        orderBy: {
+          end: "asc",
+        },
+        ...UserTarrifsInclude,
+      });
+
+      ActiveConnections[user.id]?.forEach(async (socket) => {
+        socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, {
+          tarrifs: userTarrifs,
+          isQuiet: true,
+        });
+      });
+    }
+  }
   isUserUnlimitedRequests(userTarrifs: Array<UserTarrif & { tarrif: Tarrif }>) {
     return userTarrifs.some(
       (tarrif) =>

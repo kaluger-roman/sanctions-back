@@ -166,7 +166,13 @@ export const Navigation = () => {
         {!isSm && (
           <>
             <VK height="28px" cursor="pointer" />
-            <TG height="28px" cursor="pointer" />
+            <TG
+              onClick={() =>
+                window.open("https://t.me/GoodSanctionSearch", "_blank")
+              }
+              height="28px"
+              cursor="pointer"
+            />
           </>
         )}
 
@@ -296,7 +302,13 @@ export const Navigation = () => {
                 </Typography>
 
                 <VK height="28px" cursor="pointer" />
-                <TG height="28px" cursor="pointer" />
+                <TG
+                  onClick={() =>
+                    window.open("https://t.me/GoodSanctionSearch", "_blank")
+                  }
+                  height="28px"
+                  cursor="pointer"
+                />
               </Box>
             </Box>
           </Drawer>

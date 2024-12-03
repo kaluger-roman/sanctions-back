@@ -16,7 +16,7 @@ import { TarrifNames } from "pages/billing/constants";
 export const BillingCard = ({ item }: { item: TarrifCard }) => (
   <Card
     sx={{
-      maxWidth: "400px",
+      maxWidth: "406px",
       minWidth: "300px",
       display: "flex",
       flexDirection: "column",
@@ -47,7 +47,7 @@ export const BillingCard = ({ item }: { item: TarrifCard }) => (
         <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
           {item.features.map((feature) => (
             <Typography
-              key={feature}
+              key={feature.toString()}
               sx={{
                 display: "flex",
                 alignItems: "center",

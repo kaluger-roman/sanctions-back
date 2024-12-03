@@ -150,17 +150,19 @@ export class PaymentsService {
 
     const idempotencyId = nanoid();
 
-    const { price, amount } = AdditionalPayments[kind];
+    const { price, amount: amountVal } = AdditionalPayments[kind];
+    const description = `Доп. лимиты +${amountVal} запросов. id: ${user.id}`;
+    const amount = {
+      value: price.toFixed(2),
+      currency: "RUB",
+    };
 
     const payment = await billing.createPayment(
       {
-        amount: {
-          value: price.toFixed(2),
-          currency: "RUB",
-        },
+        amount,
         capture: true,
         save_payment_method: false,
-        description: `Доп. лимиты +${amount} запросов. id: ${user.id}`,
+        description,
         confirmation: {
           type: "redirect",
           return_url: `${env.FRONT_HOST}/profile/tariff`,
@@ -169,6 +171,22 @@ export class PaymentsService {
           userId: user.id,
           idempotencyId,
           additionalRequestsKind: kind,
+        },
+        receipt: {
+          customer: {
+            email: user.email,
+            phone: user.phone,
+          },
+          items: [
+            {
+              payment_mode: "full_payment",
+              payment_subject: "service",
+              description,
+              quantity: "1",
+              amount,
+              vat_code: 1,
+            },
+          ],
         },
       },
       idempotencyId,

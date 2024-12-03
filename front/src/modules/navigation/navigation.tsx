@@ -177,7 +177,10 @@ export const Navigation = () => {
         )}
 
         <>
-          <Tooltip title={authorizationData ? "Профиль" : "Вход"}>
+          <Tooltip
+            enterTouchDelay={0}
+            title={authorizationData ? "Профиль" : "Вход"}
+          >
             <IconButton
               ref={accountRef}
               sx={{ height: 36, width: 36 }}

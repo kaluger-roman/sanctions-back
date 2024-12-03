@@ -77,7 +77,10 @@ const QuotaChip = ({
             >
               Безлимит
               {!!limit && (
-                <Tooltip title="В списке неистекших оплаченных тарифов есть безлимитный">
+                <Tooltip
+                  enterTouchDelay={0}
+                  title="В списке неистекших оплаченных тарифов есть безлимитный"
+                >
                   <InfoIcon fontSize="inherit" />
                 </Tooltip>
               )}
@@ -194,7 +197,7 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
           </>
         }
         additionalInfo={
-          <Tooltip title={REQUESTS_NOTICE}>
+          <Tooltip enterTouchDelay={0} title={REQUESTS_NOTICE}>
             <IconButton size="small" sx={{ p: "2px", ml: "2px" }}>
               <InfoIcon sx={{ fontSize: 20 }} />
             </IconButton>
@@ -231,7 +234,7 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
         count={tarrif._count.devices}
         limit={tarrif.tarrif.allowedDevices}
         additionalInfo={
-          <Tooltip title="Обновляется раз в 3 дня">
+          <Tooltip enterTouchDelay={0} title="Обновляется раз в 3 дня">
             <IconButton size="small" sx={{ p: "2px", ml: "2px" }}>
               <InfoIcon sx={{ fontSize: 20 }} />
             </IconButton>

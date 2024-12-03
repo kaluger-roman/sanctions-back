@@ -4,7 +4,7 @@ import { DEVICE_INFO, REQUESTS_INFO } from "./constants";
 import InfoIcon from "@mui/icons-material/Info";
 
 export const RequestInfoTooltip = () => (
-  <Tooltip title={REQUESTS_INFO}>
+  <Tooltip enterTouchDelay={0} title={REQUESTS_INFO}>
     <IconButton size="small" sx={{ p: "2px" }}>
       <InfoIcon sx={{ fontSize: 20 }} />
     </IconButton>
@@ -12,7 +12,7 @@ export const RequestInfoTooltip = () => (
 );
 
 export const DeviceInfoTooltip = () => (
-  <Tooltip title={DEVICE_INFO}>
+  <Tooltip enterTouchDelay={0} title={DEVICE_INFO}>
     <IconButton size="small" sx={{ p: "2px" }}>
       <InfoIcon sx={{ fontSize: 20 }} />
     </IconButton>

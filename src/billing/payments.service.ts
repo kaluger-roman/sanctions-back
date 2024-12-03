@@ -77,16 +77,20 @@ export class PaymentsService {
 
     const idempotencyId = nanoid();
 
+    const description = `Тариф ${TarrifNames[tarrif.identifier]} (${
+      TarrifCategories[tarrif.identifier]
+    }) - ${tarrif.duration} мес. id: ${user.id}`;
+
+    const amount = {
+      value: user.isAdmin ? "10.00" : tarrif.price.toFixed(2),
+      currency: "RUB",
+    };
+
     const payment = await billing.createPayment(
       {
-        amount: {
-          value: user.isAdmin ? "10.00" : tarrif.price.toFixed(2),
-          currency: "RUB",
-        },
+        amount,
         capture: true,
-        description: `Тариф ${TarrifNames[tarrif.identifier]} (${
-          TarrifCategories[tarrif.identifier]
-        }) - ${tarrif.duration} мес. id: ${user.id}`,
+        description,
         confirmation: {
           type: "redirect",
           return_url: `${env.FRONT_HOST}/profile/tariff`,
@@ -96,6 +100,22 @@ export class PaymentsService {
           userId: user.id,
           idempotencyId,
           tarrifId: tarrif.identifier,
+        },
+        receipt: {
+          customer: {
+            email: user.email,
+            phone: user.phone,
+          },
+          items: [
+            {
+              payment_mode: "full_payment",
+              payment_subject: "service",
+              description,
+              quantity: "1",
+              amount,
+              vat_code: 4,
+            },
+          ],
         },
       },
       idempotencyId,

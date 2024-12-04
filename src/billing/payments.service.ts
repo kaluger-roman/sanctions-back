@@ -104,7 +104,6 @@ export class PaymentsService {
         receipt: {
           customer: {
             email: user.email,
-            phone: user.phone,
           },
           items: [
             {
@@ -175,7 +174,6 @@ export class PaymentsService {
         receipt: {
           customer: {
             email: user.email,
-            phone: user.phone,
           },
           items: [
             {

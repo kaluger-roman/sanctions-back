@@ -182,7 +182,7 @@ export const SearchApp = () => {
                 },
               )}
             </Select>
-            {isFree && (
+            {isFree && allowedCountries.length !== countries.length && (
               <Tooltip
                 enterTouchDelay={0}
                 title="Часть списков доступна только в платных тарифах"

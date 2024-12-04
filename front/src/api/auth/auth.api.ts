@@ -55,12 +55,15 @@ export const registrationConfirmFx = createEffect<
   ),
 );
 
-export const lastActivityTimeFx = createEffect<{ timestamp: number }, string>(
-  (payload) =>
-    socket.emitWithAnswer<{ timestamp: number }, string>(
-      ACTIONS.LAST_ACTIVITY_TIME,
-      payload,
-    ),
+export const lastActivityTimeFx = createEffect<
+  { timestamp: number },
+  string,
+  string
+>((payload) =>
+  socket.emitWithAnswer<{ timestamp: number }, string>(
+    ACTIONS.LAST_ACTIVITY_TIME,
+    payload,
+  ),
 );
 
 export const logoutFx = createEffect<void, string>((payload) =>

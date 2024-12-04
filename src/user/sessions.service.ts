@@ -175,30 +175,37 @@ export class SessionsService {
     });
 
     for (const session of userSessions) {
-      ActiveConnections[session.userId]?.forEach((socket) => {
-        socket.emit(ACTIONS.INACTIVITY_LOGOUT);
+      if (ActiveConnections[session.userId]?.length) {
+        ActiveConnections[session.userId]?.forEach((socket) => {
+          socket.emit(ACTIONS.INACTIVITY_LOGOUT);
 
-        setTimeout(async () => {
-          const updatedSession = await prisma.userSession.findFirst({
-            where: { id: session.id },
-          });
-
-          const isStillInactive =
-            updatedSession.lastActivityTime.getTime() <=
-            Date.now() - preferences.autoLogoutTime;
-
-          if (isStillInactive) {
-            await prisma.userSession.update({
+          setTimeout(async () => {
+            const updatedSession = await prisma.userSession.findFirst({
               where: { id: session.id },
-              data: { destroyedAt: new Date() },
             });
 
-            socket.emit(ACTIONS.FORCE_LOGOUT, {
-              reason: FORCE_LOGOUT_REASON.INACTIVITY,
-            });
-          }
-        }, 60000);
-      });
+            const isStillInactive =
+              updatedSession.lastActivityTime.getTime() <=
+              Date.now() - preferences.autoLogoutTime;
+
+            if (isStillInactive) {
+              await prisma.userSession.update({
+                where: { id: session.id },
+                data: { destroyedAt: new Date() },
+              });
+
+              socket.emit(ACTIONS.FORCE_LOGOUT, {
+                reason: FORCE_LOGOUT_REASON.INACTIVITY,
+              });
+            }
+          }, 60000);
+        });
+      } else {
+        await prisma.userSession.update({
+          where: { id: session.id },
+          data: { destroyedAt: new Date() },
+        });
+      }
     }
   }
 }

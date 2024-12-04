@@ -147,6 +147,18 @@ export class SessionsService {
   async recordLastActivity(payload: Request<LastActivityPayload>) {
     const user = await UserService.getUserByToken(payload.token);
 
+    const activeSession = await prisma.userSession.findFirst({
+      where: {
+        userId: user.id,
+        deviceId: payload.deviceId,
+        destroyedAt: null,
+      },
+    });
+
+    if (!activeSession) {
+      throw new Error("SESSION_EXPIRED");
+    }
+
     await prisma.userSession.updateMany({
       where: { userId: user.id, destroyedAt: null, deviceId: payload.deviceId },
       data: {

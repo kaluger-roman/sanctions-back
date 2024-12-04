@@ -8,6 +8,7 @@ import {
   MenuItem,
   OutlinedInput,
   Select,
+  Tooltip,
   useMediaQuery,
 } from "@mui/material";
 import { useGate, useUnit } from "effector-react";
@@ -27,18 +28,23 @@ import { theme } from "shared/theme";
 import { SearchTable } from "./search-table";
 import { SearchAppMetadata } from "modules/search-app-metadata";
 import PaidIcon from "@mui/icons-material/Paid";
+import LockIcon from "@mui/icons-material/Lock";
+import { TarrifKind } from "shared/billing";
 
 export const SearchApp = () => {
   const searchTags = useUnit(searchAppModel.$searchTags);
   const searchType = useUnit(searchAppModel.$searchType);
   const countries = useUnit(searchAppModel.$countries);
+  const allowedCountries = useUnit(searchAppModel.$allowedCountries);
   const restrictions = useUnit(searchAppModel.$restrictions);
   const selectedRestrictions = useUnit(searchAppModel.$selectedRestrictions);
   const selectedCountries = useUnit(searchAppModel.$selectedCountries);
   const availableFilters = useUnit(searchAppModel.$availableFilters);
   const filtersSyncPending = useUnit(searchAppModel.$filtersSyncPending);
   const currentTarrif = useUnit(profileModel.$currentTarrif);
-  const allowedCountries = currentTarrif?.tarrif.allowedCountries || countries;
+
+  const isFree =
+    !currentTarrif || currentTarrif?.tarrif.identifier === TarrifKind.free;
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
 
   const isAllAvailableSanctionsSelected =
@@ -112,9 +118,21 @@ export const SearchApp = () => {
             flexDirection: isSm ? "column" : "row",
           }}
         >
-          <FormControl fullWidth>
+          <FormControl
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 1,
+            }}
+            fullWidth
+          >
             <InputLabel>Cтрана</InputLabel>
             <Select
+              sx={{
+                flexGrow: 1,
+                maxWidth: isFree ? "calc(100% - 40px)" : "100%",
+              }}
               onClose={() => syncFilters()}
               multiple
               value={selectedCountries}
@@ -164,6 +182,16 @@ export const SearchApp = () => {
                 },
               )}
             </Select>
+            {isFree && (
+              <Tooltip
+                enterTouchDelay={0}
+                title="Часть списков доступна только в платных тарифах"
+              >
+                <LockIcon
+                  sx={{ color: theme.palette.grey[800], fontSize: 28 }}
+                />
+              </Tooltip>
+            )}
           </FormControl>
 
           <FormControl fullWidth>

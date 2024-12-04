@@ -11,15 +11,41 @@ import { SearchFilters } from "./search-app.types";
 import { Sanction } from "@prisma/client";
 import { Request } from "../types";
 import { searchQuotasService } from "./search-quotas.service";
+import { TarrifKind } from "../billing/types";
+import { UserService } from "../user/user.service";
+import { billingService } from "../billing/billing.service";
 
 class SearchService {
-  async loadCountries() {
+  async loadCountries({ token }: Request<void>) {
+    const user = token ? await UserService.getUserByToken(token) : null;
+    const userTarrif = user
+      ? await billingService.getUserCurrentTarrif(user.id)
+      : null;
+
     const countries = await prisma.sanction.findMany({
       select: { sourceCountry: true },
       distinct: ["sourceCountry"],
     });
 
-    return countries.map(({ sourceCountry }) => sourceCountry);
+    const allowedCountries =
+      userTarrif && userTarrif.tarrif.identifier !== TarrifKind.free
+        ? (
+            await prisma.tarrif.findFirst({
+              where: { identifier: TarrifKind.jurPro },
+              select: { allowedCountries: true },
+            })
+          )?.allowedCountries || []
+        : (
+            await prisma.tarrif.findFirst({
+              where: { identifier: TarrifKind.free },
+              select: { allowedCountries: true },
+            })
+          )?.allowedCountries || [];
+
+    return {
+      countries: countries.map(({ sourceCountry }) => sourceCountry),
+      allowedCountries: uniq(allowedCountries),
+    };
   }
   async loadRestrictions() {
     const restrictions = await prisma.sanction.findMany({

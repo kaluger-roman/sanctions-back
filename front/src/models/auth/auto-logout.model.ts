@@ -136,7 +136,9 @@ sample({
 
 sample({
   clock: authApi.lastActivityTimeFx.failData,
-  filter: (message) => message === AuthSystemError.SESSION_EXPIRED,
+  source: $authorizationData,
+  filter: (authorizationData, message) =>
+    !!authorizationData && message === AuthSystemError.SESSION_EXPIRED,
   fn: () => FORCE_LOGOUT_REASON.INACTIVITY,
   target: [$isForceLogoutConfirmShowed, appModel.LogOut],
 });

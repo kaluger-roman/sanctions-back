@@ -10,3 +10,8 @@ export type SearchFilters = {
 export type SyncedFilters = {
   restrictions: Array<string>;
 };
+
+export type CountriesResult = {
+  countries: Array<string>;
+  allowedCountries: Array<string>;
+};

@@ -1,11 +1,14 @@
 import { searchAppApi } from "api";
 import { createEvent, createStore, sample } from "effector";
 import { createGate } from "effector-react";
+import { $profile } from "models/profile/profile.model";
+import { spread } from "patronum";
 import { SearchResult } from "shared/sanctions";
 import { SyncedFilters } from "shared/search";
 import { SearchType } from "shared/search-type";
 
 export const $countries = createStore<Array<string>>([]);
+export const $allowedCountries = createStore<Array<string>>([]);
 export const $restrictions = createStore<Array<string>>([]);
 export const $searchTags = createStore<Array<string>>([]);
 export const $searchType = createStore<Array<SearchType>>([
@@ -39,12 +42,12 @@ export const $filtersSyncPending = searchAppApi.checkFiltersFx.pending;
 export const SearchAppGate = createGate();
 
 sample({
-  clock: SearchAppGate.open,
+  clock: [SearchAppGate.open, $profile.map((x) => x?.id)],
   target: searchAppApi.loadCountriesFx,
 });
 
 sample({
-  clock: SearchAppGate.open,
+  clock: [SearchAppGate.open, $profile.map((x) => x?.id)],
   target: searchAppApi.loadRestrictionsFx,
 });
 
@@ -70,7 +73,23 @@ sample({
 
 sample({
   clock: searchAppApi.loadCountriesFx.doneData,
-  target: $countries,
+  fn: ({ countries, allowedCountries }) => ({
+    countries,
+    allowedCountries,
+    selectedCountries: allowedCountries,
+  }),
+  target: spread({
+    targets: {
+      countries: $countries,
+      allowedCountries: $allowedCountries,
+      selectedCountries: $selectedCountries,
+    },
+  }),
+});
+
+sample({
+  clock: $selectedCountries,
+  target: syncFilters,
 });
 
 sample({

@@ -13,7 +13,9 @@ export const EmptySearch = () => {
       {isSearchHappened &&
         isSearchEmpty(searchResult) &&
         (searchTags.length ? (
-          <Typography variant="body1">Поиск не дал результатов</Typography>
+          <Typography variant="body1">
+            Совпадений с базой не обнаружено, товар несанкционный
+          </Typography>
         ) : (
           <Typography variant="body1">
             Введите хотя бы один поисковый код / описание

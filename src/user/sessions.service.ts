@@ -77,7 +77,19 @@ export class SessionsService {
 
     const preferences = await prisma.preferences.findFirst();
 
-    const expiredSession = await prisma.userSession.findFirst({
+    const activeSession = await prisma.userSession.findFirst({
+      where: {
+        userId,
+        deviceId: payload.deviceId,
+        destroyedAt: null,
+      },
+    });
+
+    if (!activeSession) {
+      throw new Error("SESSION_EXPIRED");
+    }
+
+    const forceExpiredSession = await prisma.userSession.findFirst({
       where: {
         userId,
         deviceId: payload.deviceId,
@@ -88,9 +100,9 @@ export class SessionsService {
       },
     });
 
-    if (expiredSession) {
+    if (forceExpiredSession) {
       await prisma.userSession.update({
-        where: { id: expiredSession.id },
+        where: { id: forceExpiredSession.id },
         data: { destroyedAt: new Date() },
       });
 

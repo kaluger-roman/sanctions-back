@@ -131,7 +131,10 @@ export const SearchApp = () => {
             <Select
               sx={{
                 flexGrow: 1,
-                maxWidth: isFree ? "calc(100% - 40px)" : "100%",
+                maxWidth:
+                  isFree && allowedCountries.length !== countries.length
+                    ? "calc(100% - 40px)"
+                    : "100%",
               }}
               onClose={() => syncFilters()}
               multiple

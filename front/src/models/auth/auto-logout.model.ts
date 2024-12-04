@@ -137,8 +137,8 @@ sample({
 sample({
   clock: authApi.lastActivityTimeFx.failData,
   filter: (message) => message === AuthSystemError.SESSION_EXPIRED,
-  fn: () => true,
-  target: $isAutoLogoutConfirmShowed,
+  fn: () => FORCE_LOGOUT_REASON.INACTIVITY,
+  target: [$isForceLogoutConfirmShowed, appModel.LogOut],
 });
 
 sample({

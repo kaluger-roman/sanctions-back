@@ -12,7 +12,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useGate, useUnit } from "effector-react";
-import { eq, intersection, last, sortBy, trim } from "lodash";
+import { intersection, last, sortBy, trim } from "lodash";
 import { profileModel, searchAppModel } from "models";
 import {
   search,
@@ -182,7 +182,7 @@ export const SearchApp = () => {
                 },
               )}
             </Select>
-            {isFree && !eq(allowedCountries, countries) && (
+            {isFree && (
               <Tooltip
                 enterTouchDelay={0}
                 title="Часть списков доступна только в платных тарифах"

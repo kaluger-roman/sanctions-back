@@ -14,7 +14,9 @@ export const $currentTarrif = $profile.map(
       (x) =>
         new Date(x.start).getTime() < new Date().getTime() &&
         new Date(x.end).getTime() > new Date().getTime(),
-    ) || profile?.tarrifs.find((x) => x.tarrif.identifier === TarrifKind.free),
+    ) ||
+    profile?.tarrifs.find((x) => x.tarrif.identifier === TarrifKind.free) ||
+    null,
 );
 
 export const $oldPassword = createStore("");

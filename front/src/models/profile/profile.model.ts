@@ -172,6 +172,8 @@ sample({
   target: $initialProfile,
 });
 
+$profile.reset(appModel.LogOut);
+
 sample({
   clock: addEditErrorKey,
   source: $editErrorKeys,

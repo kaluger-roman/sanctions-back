@@ -42,12 +42,12 @@ export const $filtersSyncPending = searchAppApi.checkFiltersFx.pending;
 export const SearchAppGate = createGate();
 
 sample({
-  clock: [SearchAppGate.open, $profile.map((x) => x?.id)],
+  clock: [SearchAppGate.open, $profile.map((x) => x?.id || null)],
   target: searchAppApi.loadCountriesFx,
 });
 
 sample({
-  clock: [SearchAppGate.open, $profile.map((x) => x?.id)],
+  clock: [SearchAppGate.open, $profile.map((x) => x?.id || null)],
   target: searchAppApi.loadRestrictionsFx,
 });
 

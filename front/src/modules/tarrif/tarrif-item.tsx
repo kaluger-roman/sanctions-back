@@ -170,9 +170,11 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
         value={
           tarrif.start &&
           new Date(tarrif.start).toLocaleDateString("ru-RU", {
+            timeZone: "UTC",
             year: "numeric",
             month: "long",
             day: "numeric",
+            timeZoneName: "short",
           })
         }
         placeholder="Бессрочно"
@@ -182,9 +184,11 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
         value={
           tarrif.end &&
           new Date(tarrif.end).toLocaleDateString("ru-RU", {
+            timeZone: "UTC",
             year: "numeric",
             month: "long",
             day: "numeric",
+            timeZoneName: "short",
           })
         }
         placeholder="Бессрочно"

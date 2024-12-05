@@ -6,7 +6,7 @@ export const REQUESTS_INFO =
 export const DEVICE_INFO =
   "Cчитается количество уникальных устройств, с которых заходил пользователь. Также пользователь не может одновременно находиться в 1 учетной записи одновременно с 2 устройств. При заходе с устройства будет всплывать предупреждение, что будет произведен выход с одного устройства и вход с другого";
 
-export const TarrifNames = {
+export const TarrifNames: Record<string, string> = {
   [TarrifKind.free]: "Бесплатный",
   [TarrifKind.physBasic]: "Базовый",
   [TarrifKind.physUpper]: "Продвинутый",
@@ -14,9 +14,10 @@ export const TarrifNames = {
   [TarrifKind.jurBasic]: "Базовый",
   [TarrifKind.jurUpper]: "Продвинутый",
   [TarrifKind.jurPro]: "Про",
+  [TarrifKind.demoPro]: "Демо Про",
 };
 
-export const TarrifCategories = {
+export const TarrifCategories: Record<string, string> = {
   [TarrifKind.free]: "Бесплатный",
   [TarrifKind.physBasic]: ClientCategory.private,
   [TarrifKind.physUpper]: ClientCategory.private,

@@ -27,6 +27,7 @@ export enum TarrifKind {
   jurBasic = "jurBasic",
   jurUpper = "jurUpper",
   jurPro = "jurPro",
+  demoPro = "demoPro",
 }
 
 export enum AdditionalRequestsPaymentKind {

@@ -4,7 +4,14 @@ import { buildPasswordHash } from "../src/user/helpers";
 
 const prisma = new PrismaClient();
 
-const countries = ["Южная Корея", "ЕС", "Австралия", "Великобритания", "США"];
+const countries = [
+  "Южная Корея",
+  "ЕС",
+  "Австралия",
+  "Великобритания",
+  "США",
+  "Китай",
+];
 const baseTariffs = [
   {
     id: 1,

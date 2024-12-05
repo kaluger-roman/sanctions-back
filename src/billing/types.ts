@@ -10,6 +10,7 @@ export const enum TarrifKind {
   jurBasic = "jurBasic",
   jurUpper = "jurUpper",
   jurPro = "jurPro",
+  demoPro = "demoPro",
 }
 
 export type AddRequestsPaymentPayload = {

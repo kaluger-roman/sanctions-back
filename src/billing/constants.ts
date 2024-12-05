@@ -8,6 +8,7 @@ export const TarrifNames = {
   [TarrifKind.jurBasic]: "Базовый",
   [TarrifKind.jurUpper]: "Продвинутый",
   [TarrifKind.jurPro]: "Про",
+  [TarrifKind.demoPro]: "Демо Про",
 };
 
 export const TarrifCategories = {

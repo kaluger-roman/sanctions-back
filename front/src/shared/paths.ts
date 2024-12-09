@@ -8,6 +8,7 @@ export enum Paths {
   profile = "/profile",
   auth = "/auth",
   register = "/register",
+  references = "/references",
   registrationConfirm = "/registration_confirm/:token",
   recoverPasswordRequest = "/recover_password_request",
   recoverPasswordConfirm = "/recover_password_confirm/:token",

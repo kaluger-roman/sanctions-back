@@ -13,6 +13,7 @@ import {
   Contacts,
   Main,
   Profile,
+  References,
   Register,
   SearchApp,
 } from "pages";
@@ -75,6 +76,7 @@ export const AppNavigation = () => {
                 element={<CompanyClients />}
               />
               <Route path={Paths.search_app} element={<SearchApp />} />
+              <Route path={Paths.references} element={<References />} />
               <Route path={Paths.contacts} element={<Contacts />} />
               <Route path={Paths.admin} element={<Admin />} />
             </Route>

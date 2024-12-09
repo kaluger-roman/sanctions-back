@@ -112,8 +112,8 @@ const Links = NAME_MAPPING.map((link) => <Link key={link.name} {...link} />);
 export const Navigation = () => {
   const [isMenuOpened, setIsMenuOpened] = useState(false);
   const [isAccountOpened, setIsAccountOpened] = useState(false);
-  const isMd = useMediaQuery(theme.breakpoints.down("lg"));
-  const isLg = useMediaQuery(theme.breakpoints.up("lg"));
+  const isMd = useMediaQuery(theme.breakpoints.down(1404));
+  const isLg = useMediaQuery(theme.breakpoints.up(1404));
   const isSm = useMediaQuery(theme.breakpoints.down("sm"));
   const authorizationData = useUnit(appModel.$authorizationData);
   const currentTarrif = useUnit(profileModel.$currentTarrif);

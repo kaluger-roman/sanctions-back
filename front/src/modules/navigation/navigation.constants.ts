@@ -14,5 +14,9 @@ export const NAME_MAPPING: Array<LinkOption> = [
     name: "Контакты",
     path: Paths.contacts,
   },
+  {
+    name: "Полезные ссылки и файлы",
+    path: Paths.references,
+  },
   { name: "Поисковое приложение", path: Paths.search_app },
 ];

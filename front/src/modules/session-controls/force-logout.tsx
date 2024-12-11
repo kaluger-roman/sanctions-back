@@ -7,6 +7,7 @@ export const ForceLogout = () => {
   const isForceLogoutConfirmShowed = useUnit(
     autoLogoutModel.$isForceLogoutConfirmShowed,
   );
+  const sessionExistsLimit = useUnit(autoLogoutModel.$sessionExistsLimit);
 
   return (
     <Modal
@@ -25,7 +26,7 @@ export const ForceLogout = () => {
           </Typography>
           <Typography variant="body1">
             {isForceLogoutConfirmShowed === FORCE_LOGOUT_REASON.NEW_SESSION &&
-              "Был осуществлен вход с другого устройства. Ваша сессия завершена."}
+              `Был осуществлен вход с другого устройства. Превышено количество разрешенных активных сессий (${sessionExistsLimit}). Ваша сессия завершена.`}
             {isForceLogoutConfirmShowed === FORCE_LOGOUT_REASON.INACTIVITY &&
               "Ваша сессия была завершена из-за длительного бездействия, войдите в аккаунт повторно"}
           </Typography>

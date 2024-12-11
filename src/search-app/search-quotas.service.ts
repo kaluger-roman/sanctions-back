@@ -54,7 +54,7 @@ class SearchQuotasService {
         ...UserTarrifsInclude,
       });
 
-      ActiveConnections[user.id]?.forEach(async (socket) => {
+      ActiveConnections[user.id]?.forEach(async ({ socket }) => {
         socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, {
           tarrifs: userTarrifs,
           isQuiet: true,

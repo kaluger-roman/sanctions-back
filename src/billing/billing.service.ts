@@ -1,7 +1,6 @@
 import { Request } from "src/types";
 import { UserService } from "../user/user.service";
-import { Payment, YooCheckout } from "@a2seven/yoo-checkout";
-import { env } from "process";
+import { Payment } from "@a2seven/yoo-checkout";
 import { prisma } from "../../prisma";
 import { ACTIONS } from "../actions";
 import { AdditionalPayments, UserTarrifsInclude } from "./constants";
@@ -91,7 +90,7 @@ export class BillingService {
       ...UserTarrifsInclude,
     });
 
-    ActiveConnections[user.id]?.forEach(async (socket) => {
+    ActiveConnections[user.id]?.forEach(async ({ socket }) => {
       socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, { tarrifs: userTarrifs });
     });
   }
@@ -125,7 +124,7 @@ export class BillingService {
       ...UserTarrifsInclude,
     });
 
-    ActiveConnections[user.id]?.forEach(async (socket) => {
+    ActiveConnections[user.id]?.forEach(async ({ socket }) => {
       socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, { tarrifs: userTarrifs });
     });
   }

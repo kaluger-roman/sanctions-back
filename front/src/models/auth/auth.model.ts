@@ -40,10 +40,8 @@ sample({
 sample({
   clock: authApi.authFx.failData,
   filter: (message) =>
-    ![
-      AuthSystemError.SESSION_ALREADY_EXISTS,
-      AuthSystemError.SESSION_EXPIRED,
-    ].includes(message as any),
+    ![AuthSystemError.SESSION_EXPIRED].includes(message as any) &&
+    !message.startsWith(AuthSystemError.SESSION_ALREADY_EXISTS),
   fn: (message: string): Notification.PayloadType => ({
     type: "error",
     message,

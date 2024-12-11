@@ -10,12 +10,27 @@ import {
 import { ACTIONS } from "../actions";
 import { buildPasswordHash } from "./helpers";
 import { UserService } from "./user.service";
-import { Preferences } from "@prisma/client";
+import { Preferences, User } from "@prisma/client";
 import { Socket } from "socket.io";
+import { first } from "lodash";
 
 export class SessionsService {
   constructor() {
     this.autoLogoutWatch();
+  }
+  async currentSessions(user: User) {
+    const preferences = await prisma.preferences.findFirst();
+    const allowedMomentumSessions =
+      user.momentumOnlineDevicesPerUser ||
+      preferences.momentumOnlineDevicesPerUser ||
+      1;
+
+    const activeUserSessions = await prisma.userSession.findMany({
+      where: { userId: user.id, destroyedAt: null },
+      orderBy: { createdAt: "asc" },
+    });
+
+    return { allowedMomentumSessions, activeUserSessions };
   }
   async auth(payload: Request<AuthPayload>) {
     const user = await prisma.user.findUnique({
@@ -27,25 +42,37 @@ export class SessionsService {
     if (buildPasswordHash(payload.password) !== user.passwordHash)
       throw new Error("Неверный логин или пароль");
 
-    const activeUserSession = await prisma.userSession.findFirst({
-      where: { userId: user.id, destroyedAt: null },
-    });
+    const { activeUserSessions, allowedMomentumSessions } =
+      await this.currentSessions(user);
 
-    if (activeUserSession && !payload.forceLogin) {
-      throw new Error("SESSION_ALREADY_EXISTS");
+    if (
+      activeUserSessions.length >= allowedMomentumSessions &&
+      !payload.forceLogin
+    ) {
+      throw new Error(`SESSION_ALREADY_EXISTS_${allowedMomentumSessions}`);
     }
 
-    if (activeUserSession && payload.forceLogin) {
+    if (
+      activeUserSessions.length >= allowedMomentumSessions &&
+      payload.forceLogin
+    ) {
+      const outdatedSession = first(activeUserSessions);
+
       await prisma.userSession.update({
-        where: { id: activeUserSession.id },
+        where: { id: outdatedSession?.id },
         data: { destroyedAt: new Date() },
       });
 
-      ActiveConnections[user.id]?.forEach((socket) =>
-        socket.emit(ACTIONS.FORCE_LOGOUT, {
-          reason: FORCE_LOGOUT_REASON.NEW_SESSION,
-        }),
-      );
+      ActiveConnections[user.id]
+        ?.filter(
+          (x) => jwt.decode(x.token)?.deviceId === outdatedSession.deviceId,
+        )
+        .forEach(({ socket }) =>
+          socket.emit(ACTIONS.FORCE_LOGOUT, {
+            reason: FORCE_LOGOUT_REASON.NEW_SESSION,
+            allowedMomentumSessions,
+          }),
+        );
     }
 
     const token = jwt.sign(
@@ -107,18 +134,6 @@ export class SessionsService {
       });
 
       throw new Error("SESSION_EXPIRED");
-    }
-
-    const otherActiveSessions = await prisma.userSession.findFirst({
-      where: {
-        userId,
-        deviceId: { not: payload.deviceId },
-        destroyedAt: null,
-      },
-    });
-
-    if (otherActiveSessions) {
-      throw new Error("SESSION_ALREADY_EXISTS");
     }
 
     await prisma.$transaction(async () => {
@@ -200,7 +215,7 @@ export class SessionsService {
 
     for (const session of userSessions) {
       if (ActiveConnections[session.userId]?.length) {
-        ActiveConnections[session.userId]?.forEach((socket) => {
+        ActiveConnections[session.userId]?.forEach(({ socket }) => {
           socket.emit(ACTIONS.INACTIVITY_LOGOUT);
 
           setTimeout(async () => {

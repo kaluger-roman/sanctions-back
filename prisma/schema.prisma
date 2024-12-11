@@ -10,9 +10,11 @@ datasource db {
 }
 
 model Preferences {
-  id                  Int @id @default(autoincrement())
-  autoLogoutTime      Int @default(3600000)
-  autoLogoutCheckTime Int @default(600000)
+  id                           Int @id @default(autoincrement())
+  autoLogoutTime               Int @default(3600000)
+  autoLogoutCheckTime          Int @default(600000)
+  // count of active sessions per account without force login
+  momentumOnlineDevicesPerUser Int @default(1)
 }
 
 model Sanction {
@@ -25,25 +27,27 @@ model Sanction {
 }
 
 model User {
-  id                         Int           @id @default(autoincrement())
-  createdAt                  DateTime      @default(now())
-  email                      String        @unique
-  passwordHash               String
-  isAdmin                    Boolean       @default(false)
-  recoverPasswordToken       String?
-  recoverPasswordRequestTime DateTime?
-  name                       String
-  surname                    String
-  secondName                 String?
-  phone                      String
-  INN                        String?
-  companyName                String?
-  category                   String
-  isConfirmed                Boolean       @default(false)
-  registrationConfirmToken   String?
-  lastPasswordChangeTime     DateTime?     @default(now())
-  tarrifs                    UserTarrif[]
-  UserSession                UserSession[]
+  id                           Int           @id @default(autoincrement())
+  createdAt                    DateTime      @default(now())
+  email                        String        @unique
+  passwordHash                 String
+  isAdmin                      Boolean       @default(false)
+  recoverPasswordToken         String?
+  recoverPasswordRequestTime   DateTime?
+  name                         String
+  surname                      String
+  secondName                   String?
+  phone                        String
+  INN                          String?
+  companyName                  String?
+  category                     String
+  isConfirmed                  Boolean       @default(false)
+  registrationConfirmToken     String?
+  lastPasswordChangeTime       DateTime?     @default(now())
+  tarrifs                      UserTarrif[]
+  UserSession                  UserSession[]
+  // count of active sessions per account without force login
+  momentumOnlineDevicesPerUser Int?          @default(1)
 }
 
 model UserSession {

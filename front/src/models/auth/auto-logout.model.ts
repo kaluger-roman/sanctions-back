@@ -12,12 +12,14 @@ export const $isAutoLogoutConfirmShowed = createStore(false);
 export const $isForceLogoutConfirmShowed =
   createStore<FORCE_LOGOUT_REASON | null>(null);
 export const $isSessionAlreadyExistsConfirmShowed = createStore(false);
+export const $sessionExistsLimit = createStore(1);
 export const $logoutConfirmLeftTime = createStore<number>(30);
 
 export const autoLogoutConfirmShowed = createEvent<boolean>();
 export const sessionAlreadyExistsConfirmShowed = createEvent<boolean>();
 export const forceLogoutShowed = createEvent<FORCE_LOGOUT_REASON | null>();
 export const startLogoutConfirmationTimer = createEvent();
+export const sessionExistsLimitChanged = createEvent<number>();
 export const stopLogoutConfirmationTimer = createEvent();
 export const userActionDone = createEvent();
 export const logoutAsked = createEvent();
@@ -36,6 +38,11 @@ export const logoutConfirmTimer = webWorkerInterval({
   start: startLogoutConfirmationTimer,
   stop: stopLogoutConfirmationTimer,
   interval: 1000,
+});
+
+sample({
+  clock: sessionExistsLimitChanged,
+  target: $sessionExistsLimit,
 });
 
 sample({
@@ -98,10 +105,14 @@ sample({
   filter: (isConnected) => isConnected,
   target: createEffect(() => {
     socket.client.on(ACTIONS.INACTIVITY_LOGOUT, () => logoutAsked());
-    socket.client.on(ACTIONS.FORCE_LOGOUT, ({ reason }) => {
-      forceLogoutShowed(reason);
-      appModel.LogOut();
-    });
+    socket.client.on(
+      ACTIONS.FORCE_LOGOUT,
+      ({ reason, allowedMomentumSessions }) => {
+        forceLogoutShowed(reason);
+        sessionExistsLimitChanged(allowedMomentumSessions || 1);
+        appModel.LogOut();
+      },
+    );
   }),
 });
 
@@ -122,9 +133,19 @@ sample({
 
 sample({
   clock: authApi.authFx.failData,
-  filter: (message) => message === AuthSystemError.SESSION_ALREADY_EXISTS,
+  filter: (message) =>
+    message.startsWith(AuthSystemError.SESSION_ALREADY_EXISTS),
   fn: () => true,
   target: sessionAlreadyExistsConfirmShowed,
+});
+
+sample({
+  clock: authApi.authFx.failData,
+  filter: (message) =>
+    message.startsWith(AuthSystemError.SESSION_ALREADY_EXISTS),
+  fn: (message) =>
+    Number(message.replace(`${AuthSystemError.SESSION_ALREADY_EXISTS}_`, "")),
+  target: $sessionExistsLimit,
 });
 
 sample({
@@ -141,11 +162,4 @@ sample({
     !!authorizationData && message === AuthSystemError.SESSION_EXPIRED,
   fn: () => FORCE_LOGOUT_REASON.INACTIVITY,
   target: [$isForceLogoutConfirmShowed, appModel.LogOut],
-});
-
-sample({
-  clock: authApi.verifyFx.failData,
-  filter: (message) => message === AuthSystemError.SESSION_ALREADY_EXISTS,
-  fn: () => FORCE_LOGOUT_REASON.NEW_SESSION,
-  target: $isForceLogoutConfirmShowed,
 });

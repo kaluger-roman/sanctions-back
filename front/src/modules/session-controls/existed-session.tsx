@@ -1,11 +1,12 @@
 import { Box, Button, Modal, Paper, Typography } from "@mui/material";
 import { useUnit } from "effector-react";
-import { appModel, authModel, autoLogoutModel } from "models";
+import { authModel, autoLogoutModel } from "models";
 
 export const ExistedSessionAuth = () => {
   const isSessionAlreadyExistsConfirmShowed = useUnit(
     autoLogoutModel.$isSessionAlreadyExistsConfirmShowed,
   );
+  const sessionExistsLimit = useUnit(autoLogoutModel.$sessionExistsLimit);
 
   return (
     <Modal
@@ -18,8 +19,9 @@ export const ExistedSessionAuth = () => {
         <Box sx={{ display: "flex", gap: 3, flexDirection: "column" }}>
           <Typography variant="h5">Авторизация с другого устройства</Typography>
           <Typography variant="body1">
-            У вас уже есть активная сессия на другом устройстве. При продолжении
-            сессия на другом устройстве будет завершена. Вы хотите продолжить?
+            Превышено количество разрешенных активных сессий (
+            {sessionExistsLimit}). При продолжении сессия на другом устройстве
+            будет завершена. Вы хотите продолжить?
           </Typography>
           <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
             <Button

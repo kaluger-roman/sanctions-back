@@ -29,6 +29,7 @@ export const $authorizationData = createStore<User | null>(null);
 
 const $commonPendingRequests = combine(
   searchAppApi.loadCountriesFx.pending,
+  searchAppApi.searchFx.pending,
   authApi.recoverRequestFx.pending,
   authApi.registrationConfirmFx.pending,
   profileApi.loadCurrentProfileFx.pending,

@@ -45,11 +45,15 @@ if (process.env.NODE_ENV !== "development") {
     app,
   );
 
-  server = new Server(httpsServer);
+  server = new Server(httpsServer, {
+    maxHttpBufferSize: 1e7,
+  });
 
   httpsServer.listen(443);
 } else {
-  server = new Server(httpServer);
+  server = new Server(httpServer, {
+    maxHttpBufferSize: 1e7,
+  });
 }
 
 app.use(require("express").static(path.resolve(__dirname, "..", "public")));

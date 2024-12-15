@@ -18,6 +18,7 @@ import { Paths } from "shared/paths";
 import { navigation } from "shared/navigate";
 import { theme } from "shared/theme";
 import { CategoryNames, TarrifCategories } from "pages/billing/constants";
+import { $profile } from "models/profile/profile.model";
 
 export const createPayment = createEvent<TarrifKind>();
 export const createAddRequestsPayment =
@@ -25,8 +26,9 @@ export const createAddRequestsPayment =
 export const tarrifUpdatedNoticeChanged = createEvent<boolean>();
 export const tarrifSoonExpiredNoticeChanged = createEvent<boolean>();
 
-export const $isTarrifUpdateNotification = createStore<boolean>(
-  localStorage[TARRIF_UPDATED_SHOWED_KEY] === "true" || false,
+export const $isTarrifUpdateNotification = $profile.map(
+  (profile) =>
+    (!!profile && localStorage[TARRIF_UPDATED_SHOWED_KEY] === "true") || false,
 );
 
 export const $isTarrifSoonExpireNotification = createStore<boolean>(false);

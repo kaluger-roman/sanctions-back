@@ -18,7 +18,7 @@ export const DescriptionBlock = ({
   matchedWords: Array<string>;
 }) => {
   const [expanded, setExpanded] = useState(false);
-  const [isOverflow, setIsOverflow] = useState<boolean>(true);
+  const [isOverflow, setIsOverflow] = useState<boolean>(false);
   const highlightRef = useRef<HTMLSpanElement>(null);
   const maxHeight = 198;
 

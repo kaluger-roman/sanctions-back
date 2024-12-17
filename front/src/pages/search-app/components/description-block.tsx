@@ -18,11 +18,16 @@ export const DescriptionBlock = ({
   matchedWords: Array<string>;
 }) => {
   const [expanded, setExpanded] = useState(false);
-  const [isOverflow, setIsOverflow] = useState<boolean>(false);
+  const [isOverflow, setIsOverflow] = useState<boolean>(true);
+  const [isFirstRender, setIsFirstRender] = useState<boolean>(true);
   const highlightRef = useRef<HTMLSpanElement>(null);
   const maxHeight = 198;
 
   const toggleExpand = () => setExpanded((prev) => !prev);
+
+  useEffect(() => {
+    setIsFirstRender(false);
+  }, []);
 
   useLayoutEffect(() => {
     if (!highlightRef.current) return;
@@ -60,7 +65,7 @@ export const DescriptionBlock = ({
       <Collapse
         in={!isOverflow || expanded}
         collapsedSize={isOverflow ? maxHeight : undefined}
-        timeout={300}
+        timeout={isFirstRender ? 0 : 300}
       >
         <Typography
           ref={highlightRef}

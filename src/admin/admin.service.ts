@@ -14,6 +14,7 @@ class AdminService {
       sourceDocument: string;
       sourceCountry: string;
       restriction: string;
+      sourceLink: string;
     }> = xlsx.utils
       .sheet_to_json(workbook.Sheets[workbook.SheetNames[0]])
       .map((x) => ({
@@ -22,6 +23,7 @@ class AdminService {
         sourceDocument: String(x["Источник ограничения"]),
         sourceCountry: String(x["Страна"]),
         restriction: String(x["Тип ограничения"]),
+        sourceLink: String(x["ссылка"]),
       }));
 
     await prisma.sanction.deleteMany();

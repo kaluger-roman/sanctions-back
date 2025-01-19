@@ -70,7 +70,7 @@ export const searchByDescription = async (
       ...(
         await prisma.$queryRawUnsafe<any>(`
       with tokens as (select unnest(string_to_array('${descriptionTag}',' ')) as t), 
-      all_rows as (select id, "sourceCountry", "sourceDocument", "restriction", code, description,
+      all_rows as (select id, "sourceCountry", "sourceLink", "sourceDocument", "restriction", code, description,
       sum(1.0 - (tokens.t <<<-> description)) as score, count(tokens.t <<%  description) as match_count
       from "Sanction" as s, tokens where tokens.t <<% description  
       ${
@@ -88,7 +88,7 @@ export const searchByDescription = async (
           : ""
       } 
       group by id, description)
-      select id, "sourceCountry", "sourceDocument", "restriction",score, code, description
+      select id, "sourceCountry", "sourceLink", "sourceDocument", "restriction",score, code, description
       from all_rows WHERE match_count=${tagArr.length} 
       order by score desc, "code" asc;`)
       ).map((x) => ({

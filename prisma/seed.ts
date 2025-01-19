@@ -25,6 +25,7 @@ const baseTariffs = [
     allowedDevices: 3,
     price: 6500,
     allowedCountries: countries,
+    id: 2,
   },
   {
     identifier: TarrifKind.physUpper,
@@ -32,6 +33,7 @@ const baseTariffs = [
     allowedDevices: 3,
     price: 32500,
     allowedCountries: countries,
+    id: 3,
   },
   {
     identifier: TarrifKind.physPro,
@@ -39,6 +41,7 @@ const baseTariffs = [
     allowedDevices: 3,
     price: 58500,
     allowedCountries: countries,
+    id: 4,
   },
   {
     identifier: TarrifKind.jurBasic,
@@ -46,18 +49,28 @@ const baseTariffs = [
     allowedRequests: 1000,
     price: 15000,
     allowedCountries: countries,
+    id: 5,
   },
   {
     identifier: TarrifKind.jurUpper,
     duration: 6,
     price: 75000,
     allowedCountries: countries,
+    id: 6,
   },
   {
     identifier: TarrifKind.jurPro,
     duration: 12,
     price: 135000,
     allowedCountries: countries,
+    id: 7,
+  },
+  {
+    identifier: TarrifKind.demoPro,
+    duration: 0,
+    price: 0,
+    allowedCountries: countries,
+    id: 8,
   },
 ];
 

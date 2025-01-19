@@ -6,6 +6,7 @@ export type Sanction = {
   code: string;
   description: string;
   matchedWords: Array<string>;
+  sourceLink: string;
 };
 
 export type CountrySearchMatch = Record<

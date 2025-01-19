@@ -10,6 +10,7 @@ export const DataRow = ({
   description,
   matchedWords,
   isLast,
+  sourceLink
 }: Sanction & { isLast: boolean }) => (
   <TableRow
     sx={{
@@ -20,7 +21,7 @@ export const DataRow = ({
   >
     <TableCell sx={{ verticalAlign: "top" }}>{code}</TableCell>
     <TableCell sx={{ verticalAlign: "top" }}>
-      <Link href="#">{sourceDocument}</Link>
+      <Link target="_blank" href={sourceLink || "#"}>{sourceDocument}</Link>
     </TableCell>
     <TableCell sx={{ verticalAlign: "top" }}>{restriction}</TableCell>
     <TableCell>

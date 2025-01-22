@@ -30,14 +30,8 @@ export const UserTariffsTable = () => {
   const [deletePrompt, setDeletePrompt] = useState<number | null>(null);
 
   return (
-    <Paper sx={{ p: 2 }}>
+    <Paper sx={{ p: 2, overflow: "scroll", maxHeight: "500px" }}>
       <Typography variant="h6">Тарифы пользователей</Typography>
-      <Typography
-        variant="caption"
-        sx={{ mb: 2, color: theme.palette.grey[600] }}
-      >
-        Отображены неистекшие тарифы
-      </Typography>
       <Table>
         <TableHead>
           <TableRow>

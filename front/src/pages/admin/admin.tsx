@@ -3,6 +3,8 @@ import { adminModel, appModel } from "models";
 import { ManageSanctions } from "./manage-sanctions";
 import { Box } from "@mui/material";
 import { TarrifManagement } from "./tarrif-management";
+import { UserTariffsTable } from "./user-tariffs-table";
+import { GrantTariffForm } from "./grant-tariff-form";
 
 export const Admin = () => {
   const authorizationData = useUnit(appModel.$authorizationData);
@@ -15,6 +17,8 @@ export const Admin = () => {
     <Box sx={{ p: 2, display: "flex", flexDirection: "column", gap: 4 }}>
       <ManageSanctions />
       <TarrifManagement />
+      <GrantTariffForm />
+      <UserTariffsTable />
     </Box>
   );
 };

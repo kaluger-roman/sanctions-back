@@ -24,6 +24,7 @@ export type ChangePasswordPayload = {
 };
 
 export type UserTarrif = {
+  id: number;
   start: string;
   end: string;
   tarrif: Tarrif;

@@ -6,6 +6,7 @@ import { Tarrif } from "shared/profile";
 import { Notification } from "@master_kufa/client-tools";
 
 export const $tarrifsSettings = createStore<Array<Partial<Tarrif>>>([]);
+export const $tarrifs = createStore<Array<Tarrif>>([]);
 
 export const $selectedFreeCountries = $tarrifsSettings.map(
   (tarrifs) =>
@@ -49,7 +50,11 @@ sample({
 
 sample({
   clock: [AdminGate.open, adminApi.changeTarrifsSettingsFx.doneData],
-  target: [searchAppApi.loadCountriesFx, adminApi.loadTarrifsSettingsFx],
+  target: [
+    searchAppApi.loadCountriesFx,
+    adminApi.loadTarrifsSettingsFx,
+    adminApi.loadTarrifsFx,
+  ],
 });
 
 sample({
@@ -77,4 +82,9 @@ sample({
     message: "Сохранено!",
   }),
   target: Notification.add,
+});
+
+sample({
+  clock: adminApi.loadTarrifsFx.doneData,
+  target: $tarrifs,
 });

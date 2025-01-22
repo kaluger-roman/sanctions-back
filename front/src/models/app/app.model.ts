@@ -39,6 +39,8 @@ const $commonPendingRequests = combine(
   billingApi.addRequestsPaymentFx.pending,
   adminApi.changeTarrifsSettingsFx.pending,
   adminApi.changeTarrifsSettingsFx.pending,
+  adminApi.grantUserTariffFx.pending,
+  adminApi.deleteUserTariffFx.pending,
   profileApi.retryConfirmEmailFx.pending,
   socket.$isConnected.map((isConnected) => !isConnected),
   (...requests: Array<boolean>) => requests.some(Boolean),
@@ -108,6 +110,8 @@ sample({
     billingApi.addRequestsPaymentFx.failData,
     adminApi.changeTarrifsSettingsFx.failData,
     adminApi.changeTarrifsSettingsFx.failData,
+    adminApi.grantUserTariffFx.failData,
+    adminApi.deleteUserTariffFx.failData,
   ],
   fn: (error?: string): Notification.PayloadType => ({
     type: "error",

@@ -4,6 +4,7 @@ export {
   manageSanctionsModel,
   manageTarrifsModel,
   adminModel,
+  grantTarrifModel
 } from "./manage-sanctions";
 export { authModel, autoLogoutModel } from "./auth";
 export { contactUsModel } from "./contact-us";

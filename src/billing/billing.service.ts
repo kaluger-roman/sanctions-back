@@ -71,7 +71,7 @@ export class BillingService {
     newStartTarrif.setDate(newEndTarrif.getDate() + (userLastTarrif ? 1 : 0));
     newStartTarrif.setHours(0, 0, 0, 0);
 
-    await prisma.userTarrif.create({
+    const newTarrif = await prisma.userTarrif.create({
       data: {
         user: { connect: { id: user.id } },
         tarrif: { connect: { id: tarrif.id } },
@@ -93,6 +93,8 @@ export class BillingService {
     ActiveConnections[user.id]?.forEach(async ({ socket }) => {
       socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, { tarrifs: userTarrifs });
     });
+
+    return newTarrif
   }
   async updateSearchRequests(paymentInfo: Payment) {
     const user = await prisma.user.findFirst({

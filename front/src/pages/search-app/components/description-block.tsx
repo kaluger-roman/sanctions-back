@@ -22,6 +22,7 @@ export const DescriptionBlock = ({
   const [isFirstRender, setIsFirstRender] = useState<boolean>(true);
   const highlightRef = useRef<HTMLSpanElement>(null);
   const maxHeight = 198;
+  const [isDescriptionOnScreen, setIsDescriptionOnScreen] = useState(false);
 
   const toggleExpand = () => setExpanded((prev) => !prev);
 
@@ -36,8 +37,39 @@ export const DescriptionBlock = ({
   }, [highlightRef]);
 
   useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isDescriptionOnScreen) {
+          setIsDescriptionOnScreen(true);
+        }
+
+        if (!entries[0].isIntersecting && isDescriptionOnScreen) {
+          setIsDescriptionOnScreen(false);
+        }
+      },
+      { threshold: [0] },
+    );
+
+    if (highlightRef.current) observer.observe(highlightRef.current);
+
+    return () => {
+      if (highlightRef.current) observer.unobserve(highlightRef.current);
+
+      observer.disconnect();
+    };
+  }, [highlightRef, isDescriptionOnScreen]);
+
+  useEffect(() => {
     const text = highlightRef.current?.firstChild;
-    if (!(CSS as any).highlights || !text || !matchedWords) return;
+    if (
+      !(CSS as any).highlights ||
+      !text ||
+      !matchedWords ||
+      !isDescriptionOnScreen
+    )
+      return;
+
+    const ranges: Array<Range> = [];
 
     for (let word of matchedWords) {
       const regex = new RegExp(
@@ -51,14 +83,15 @@ export const DescriptionBlock = ({
 
         range.setStart(text, match.index as number);
         range.setEnd(text, (match.index as number) + match[0].length);
+        ranges.push(range);
         colorHighlight.add(range);
       }
     }
 
     return () => {
-      colorHighlight.clear();
+      ranges.forEach((range) => colorHighlight.delete(range));
     };
-  }, [description, matchedWords]);
+  }, [description, matchedWords, isDescriptionOnScreen]);
 
   return (
     <Box sx={{ position: "relative", overflow: "hidden" }}>

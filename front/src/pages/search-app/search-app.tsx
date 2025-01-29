@@ -19,6 +19,7 @@ import {
   searchTypeChanged,
   selectedCountriesChanged,
   selectedRestrictionsChanged,
+  selectedSourceDocumentOriginsChanged,
   searchTagsChanged,
   syncFilters,
 } from "models/search-app/search-app";
@@ -37,7 +38,11 @@ export const SearchApp = () => {
   const countries = useUnit(searchAppModel.$countries);
   const allowedCountries = useUnit(searchAppModel.$allowedCountries);
   const restrictions = useUnit(searchAppModel.$restrictions);
+  const sourceDocumentOrigins = useUnit(searchAppModel.$sourceDocumentOrigins);
   const selectedRestrictions = useUnit(searchAppModel.$selectedRestrictions);
+  const selectedSourceDocumentOrigins = useUnit(
+    searchAppModel.$selectedSourceDocumentOrigins,
+  );
   const selectedCountries = useUnit(searchAppModel.$selectedCountries);
   const availableFilters = useUnit(searchAppModel.$availableFilters);
   const filtersSyncPending = useUnit(searchAppModel.$filtersSyncPending);
@@ -50,6 +55,12 @@ export const SearchApp = () => {
   const isAllAvailableSanctionsSelected =
     intersection(selectedRestrictions, availableFilters.restrictions).length ===
     availableFilters.restrictions.length;
+
+  const isAllAvailableSourceDocumentOriginsSelected =
+    intersection(
+      selectedSourceDocumentOrigins,
+      availableFilters.sourceDocumentOrigins,
+    ).length === availableFilters.sourceDocumentOrigins.length;
 
   useGate(searchAppModel.SearchAppGate);
 
@@ -249,6 +260,67 @@ export const SearchApp = () => {
                       },
                     }}
                     primary={restriction}
+                  />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel>Источник</InputLabel>
+            <Select
+              onClose={() => syncFilters()}
+              multiple
+              value={selectedSourceDocumentOrigins}
+              onChange={({ target }) => {
+                selectedSourceDocumentOriginsChanged(
+                  last(target.value as string) === "all"
+                    ? isAllAvailableSourceDocumentOriginsSelected
+                      ? []
+                      : availableFilters.sourceDocumentOrigins
+                    : (target.value as Array<string>),
+                );
+              }}
+              input={<OutlinedInput label="Источник" />}
+              renderValue={(selected) => selected.join(", ")}
+              MenuProps={{ sx: { maxHeight: 600 } }}
+            >
+              <MenuItem key="all" value={"all"}>
+                <Checkbox
+                  disabled={filtersSyncPending}
+                  indeterminate={
+                    selectedSourceDocumentOrigins.length > 0 &&
+                    !isAllAvailableSourceDocumentOriginsSelected
+                  }
+                  checked={isAllAvailableSourceDocumentOriginsSelected}
+                />
+                <ListItemText primary="Все источники" />
+              </MenuItem>
+              {sortBy(sourceDocumentOrigins, (a) =>
+                availableFilters.sourceDocumentOrigins.includes(a) ? -1 : 1,
+              ).map((sourceDocumentOrigin) => (
+                <MenuItem
+                  disabled={
+                    availableFilters.sourceDocumentOrigins.indexOf(
+                      sourceDocumentOrigin,
+                    ) === -1 || filtersSyncPending
+                  }
+                  key={sourceDocumentOrigin}
+                  value={sourceDocumentOrigin}
+                >
+                  <Checkbox
+                    checked={selectedSourceDocumentOrigins.includes(
+                      sourceDocumentOrigin,
+                    )}
+                  />
+                  <ListItemText
+                    primaryTypographyProps={{
+                      title: sourceDocumentOrigin,
+                      sx: {
+                        whiteSpace: "normal",
+                      },
+                    }}
+                    primary={sourceDocumentOrigin}
                   />
                 </MenuItem>
               ))}

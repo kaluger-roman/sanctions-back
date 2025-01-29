@@ -55,7 +55,16 @@ class SearchService {
 
     return restrictions.map(({ restriction }) => restriction);
   }
+  async loadSourceDocumentOrigins() {
+    const sourceDocumentOrigins = await prisma.sanction.findMany({
+      select: { sourceDocumentOrigin: true },
+      distinct: ["sourceDocumentOrigin"],
+    });
 
+    return sourceDocumentOrigins.map(
+      ({ sourceDocumentOrigin }) => sourceDocumentOrigin,
+    );
+  }
   async applyIntermediateFilters({ countries }: { countries: Array<string> }) {
     return {
       restrictions: (
@@ -71,6 +80,19 @@ class SearchService {
           },
         })
       ).map(({ restriction }) => restriction),
+      sourceDocumentOrigins: (
+        await prisma.sanction.findMany({
+          select: { sourceDocumentOrigin: true },
+          distinct: ["sourceDocumentOrigin"],
+          where: {
+            sourceCountry: countries.length
+              ? {
+                  in: countries,
+                }
+              : undefined,
+          },
+        })
+      ).map(({ sourceDocumentOrigin }) => sourceDocumentOrigin),
     };
   }
 
@@ -79,6 +101,7 @@ class SearchService {
     searchTags,
     countries,
     restrictions,
+    sourceDocumentOrigins,
     deviceId,
     token,
   }: Request<SearchFilters>) {
@@ -92,6 +115,7 @@ class SearchService {
           countries,
           restrictions,
           searchTags,
+          sourceDocumentOrigins,
         })),
       );
     }
@@ -102,13 +126,19 @@ class SearchService {
           countries,
           restrictions,
           searchTags,
+          sourceDocumentOrigins,
         })),
       );
     }
 
     if (searchTypes.includes("description")) {
       sanctions.push(
-        ...(await searchByDescription(searchTags, countries, restrictions)),
+        ...(await searchByDescription(
+          searchTags,
+          countries,
+          restrictions,
+          sourceDocumentOrigins,
+        )),
       );
     }
 
@@ -172,7 +202,13 @@ class SearchService {
     if (!isEmpty(groupedSanctions) && token) {
       await searchQuotasService.registerDevice(deviceId, token);
       await searchQuotasService.registerSearchRequest(
-        { searchTypes, searchTags, countries, restrictions },
+        {
+          searchTypes,
+          searchTags,
+          countries,
+          restrictions,
+          sourceDocumentOrigins,
+        },
         token,
       );
     }

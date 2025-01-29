@@ -21,9 +21,11 @@ export const searchByCode = async ({
   countries,
   restrictions,
   searchTags,
+  sourceDocumentOrigins,
 }: {
   countries: Array<string>;
   restrictions: Array<string>;
+  sourceDocumentOrigins: Array<string>;
   searchTags: Array<string>;
 }) => {
   const res: Array<Sanction> = [];
@@ -46,6 +48,11 @@ export const searchByCode = async ({
                   in: restrictions,
                 }
               : undefined,
+            sourceDocumentOrigin: sourceDocumentOrigins.length
+              ? {
+                  in: sourceDocumentOrigins,
+                }
+              : undefined,
           },
           orderBy: { code: "asc" },
         })
@@ -60,6 +67,7 @@ export const searchByDescription = async (
   searchTags: Array<string>,
   countries: Array<string>,
   restrictions: Array<string>,
+  sourceDocumentOrigins: Array<string>,
 ) => {
   const res: Array<Sanction> = [];
 
@@ -70,12 +78,19 @@ export const searchByDescription = async (
       ...(
         await prisma.$queryRawUnsafe<any>(`
       with tokens as (select unnest(string_to_array('${descriptionTag}',' ')) as t), 
-      all_rows as (select id, "sourceCountry", "sourceLink", "sourceDocument", "restriction", code, description,
+      all_rows as (select id, "sourceCountry", "sourceDocumentOrigin" ,"sourceLink", "sourceDocument", "restriction", code, description,
       sum(1.0 - (tokens.t <<<-> description)) as score, count(tokens.t <<%  description) as match_count
       from "Sanction" as s, tokens where tokens.t <<% description  
       ${
         countries.length
           ? ` and "sourceCountry" in (${countries
+              .map((x) => `'${x}' `)
+              .join(",")})`
+          : ""
+      }
+      ${
+        sourceDocumentOrigins.length
+          ? ` and "sourceDocumentOrigin" in (${sourceDocumentOrigins
               .map((x) => `'${x}' `)
               .join(",")})`
           : ""
@@ -88,7 +103,7 @@ export const searchByDescription = async (
           : ""
       } 
       group by id, description)
-      select id, "sourceCountry", "sourceLink", "sourceDocument", "restriction",score, code, description
+      select id, "sourceCountry", "sourceDocumentOrigin", "sourceLink", "sourceDocument", "restriction",score, code, description
       from all_rows WHERE match_count=${tagArr.length} 
       order by score desc, "code" asc;`)
       ).map((x) => ({
@@ -112,10 +127,12 @@ export const searchByCodeAddition = async ({
   countries,
   restrictions,
   searchTags,
+  sourceDocumentOrigins,
 }: {
   countries: Array<string>;
   restrictions: Array<string>;
   searchTags: Array<string>;
+  sourceDocumentOrigins: Array<string>;
 }) => {
   const res: Array<Sanction> = [];
 
@@ -133,6 +150,11 @@ export const searchByCodeAddition = async ({
         sourceCountry: countries.length
           ? {
               in: countries,
+            }
+          : undefined,
+        sourceDocumentOrigin: sourceDocumentOrigins.length
+          ? {
+              in: sourceDocumentOrigins,
             }
           : undefined,
         restriction: restrictions.length
@@ -169,7 +191,7 @@ export const postLimitCodeAddition = (
 export const postLimitDescription = (
   data: Record<string, Record<string, Array<Sanction>>>,
 ) => {
-  const takeLimit = 50;
+  const takeLimit = 75;
 
   return mapValues(data, (x) =>
     mapValues(x, (y) =>

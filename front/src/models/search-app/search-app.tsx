@@ -10,6 +10,7 @@ import { SearchType } from "shared/search-type";
 export const $countries = createStore<Array<string>>([]);
 export const $allowedCountries = createStore<Array<string>>([]);
 export const $restrictions = createStore<Array<string>>([]);
+export const $sourceDocumentOrigins = createStore<Array<string>>([]);
 export const $searchTags = createStore<Array<string>>([]);
 export const $searchType = createStore<Array<SearchType>>([
   "code",
@@ -23,16 +24,20 @@ export const $searchResult = createStore<SearchResult>({
 });
 export const $availableFilters = createStore<SyncedFilters>({
   restrictions: [],
+  sourceDocumentOrigins: [],
 });
 
 export const $selectedCountries = createStore<Array<string>>([]);
 export const $selectedRestrictions = createStore<Array<string>>([]);
+export const $selectedSourceDocumentOrigins = createStore<Array<string>>([]);
 export const $selectedSearchTypes = createStore<Array<SearchType>>([]);
 export const $isSearchHappened = createStore<boolean>(false);
 
 export const searchTagsChanged = createEvent<Array<string>>();
 export const selectedCountriesChanged = createEvent<Array<string>>();
 export const selectedRestrictionsChanged = createEvent<Array<string>>();
+export const selectedSourceDocumentOriginsChanged =
+  createEvent<Array<string>>();
 export const searchTypeChanged = createEvent<Array<SearchType>>();
 export const syncFilters = createEvent<void>();
 export const search = createEvent<void>();
@@ -52,6 +57,11 @@ sample({
 });
 
 sample({
+  clock: [SearchAppGate.open, $profile.map((x) => x?.id || null)],
+  target: searchAppApi.loadSourceDocumentOriginsFx,
+});
+
+sample({
   clock: searchTagsChanged,
   target: $searchTags,
 });
@@ -64,6 +74,11 @@ sample({
 sample({
   clock: selectedRestrictionsChanged,
   target: $selectedRestrictions,
+});
+
+sample({
+  clock: selectedSourceDocumentOriginsChanged,
+  target: $selectedSourceDocumentOrigins,
 });
 
 sample({
@@ -98,6 +113,11 @@ sample({
 });
 
 sample({
+  clock: searchAppApi.loadSourceDocumentOriginsFx.doneData,
+  target: $sourceDocumentOrigins,
+});
+
+sample({
   clock: searchAppApi.loadCountriesFx.doneData,
   source: $availableFilters,
   fn: (availableFilters, countries) => ({
@@ -116,11 +136,31 @@ sample({
 });
 
 sample({
+  clock: $availableFilters,
+  source: $selectedSourceDocumentOrigins,
+  fn: (selectedSourceDocumentOrigins, { sourceDocumentOrigins }) =>
+    selectedSourceDocumentOrigins.filter((x) =>
+      sourceDocumentOrigins.includes(x),
+    ),
+  target: $selectedSourceDocumentOrigins,
+});
+
+sample({
   clock: searchAppApi.loadRestrictionsFx.doneData,
   source: $availableFilters,
   fn: (availableFilters, restrictions) => ({
     ...availableFilters,
     restrictions,
+  }),
+  target: $availableFilters,
+});
+
+sample({
+  clock: searchAppApi.loadSourceDocumentOriginsFx.doneData,
+  source: $availableFilters,
+  fn: (availableFilters, sourceDocumentOrigins) => ({
+    ...availableFilters,
+    sourceDocumentOrigins,
   }),
   target: $availableFilters,
 });
@@ -144,12 +184,20 @@ sample({
   source: [
     $selectedCountries,
     $selectedRestrictions,
+    $selectedSourceDocumentOrigins,
     $searchType,
     $searchTags,
   ] as const,
-  fn: ([countries, restrictions, searchTypes, searchTags]) => ({
+  fn: ([
     countries,
     restrictions,
+    sourceDocumentOrigins,
+    searchTypes,
+    searchTags,
+  ]) => ({
+    countries,
+    restrictions,
+    sourceDocumentOrigins,
     searchTypes,
     searchTags,
   }),
@@ -167,4 +215,10 @@ sample({
   target: $searchResult,
 });
 
-$isSearchHappened.reset($countries, $searchTags, $searchType, $restrictions);
+$isSearchHappened.reset(
+  $countries,
+  $searchTags,
+  $searchType,
+  $restrictions,
+  $sourceDocumentOrigins,
+);

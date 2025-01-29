@@ -17,6 +17,7 @@ class AdminService {
       description: string;
       sourceDocument: string;
       sourceCountry: string;
+      sourceDocumentOrigin: string;
       restriction: string;
       sourceLink: string;
     }> = xlsx.utils
@@ -28,6 +29,7 @@ class AdminService {
         sourceCountry: String(x["Страна"]),
         restriction: String(x["Тип ограничения"]),
         sourceLink: String(x["ссылка"]),
+        sourceDocumentOrigin: String(x["источник коротко"]),
       }));
 
     await prisma.sanction.deleteMany();

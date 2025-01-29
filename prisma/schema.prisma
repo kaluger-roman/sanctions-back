@@ -18,17 +18,19 @@ model Preferences {
 }
 
 model Sanction {
-  id             Int    @id @default(autoincrement())
-  sourceCountry  String
-  sourceDocument String
-  restriction    String
-  code           String
-  description    String
-  sourceLink     String @default("")
+  id                   Int    @id @default(autoincrement())
+  sourceCountry        String
+  sourceDocument       String
+  restriction          String
+  code                 String
+  description          String
+  sourceLink           String @default("")
+  sourceDocumentOrigin String @default("")
 
   @@index([description(ops: raw("gin_trgm_ops"))], map: "description_trgm_idx", type: Gin)
   @@index([restriction], map: "idx_restriction")
   @@index([sourceCountry], map: "idx_sourcecountry")
+  @@index([sourceDocumentOrigin], map: "idx_sourcedocumentorigin")
 }
 
 model User {
@@ -81,13 +83,14 @@ model UserTarrif {
 }
 
 model SearchRequest {
-  id           Int         @id @default(autoincrement())
-  countries    String[]
-  searchTypes  String[]
-  restrictions String[]
-  searchTags   String[]
-  UserTarrif   UserTarrif? @relation(fields: [userTarrifId], references: [id])
-  userTarrifId Int?
+  id                    Int         @id @default(autoincrement())
+  countries             String[]
+  searchTypes           String[]
+  restrictions          String[]
+  sourceDocumentOrigins String[]
+  searchTags            String[]
+  UserTarrif            UserTarrif? @relation(fields: [userTarrifId], references: [id])
+  userTarrifId          Int?
 }
 
 model Device {

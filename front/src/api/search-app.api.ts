@@ -12,6 +12,16 @@ export const loadRestrictionsFx = createEffect<void, Array<string>, string>(
   () => socket.emitWithAnswer<void, Array<string>>(ACTIONS.LOAD_RESTRICTIONS),
 );
 
+export const loadSourceDocumentOriginsFx = createEffect<
+  void,
+  Array<string>,
+  string
+>(() =>
+  socket.emitWithAnswer<void, Array<string>>(
+    ACTIONS.LOAD_SOURCE_DOCUMENT_ORIGINS,
+  ),
+);
+
 export const checkFiltersFx = createEffect<
   { countries: Array<string> },
   SyncedFilters,

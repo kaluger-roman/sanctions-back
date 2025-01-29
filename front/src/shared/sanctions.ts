@@ -2,6 +2,7 @@ export type Sanction = {
   id: number | "uplimit_code_addition" | "uplimit_description";
   sourceCountry: string;
   sourceDocument: string;
+  sourceDocumentOrigin: string;
   restriction: string;
   code: string;
   description: string;

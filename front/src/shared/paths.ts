@@ -17,5 +17,4 @@ export enum Paths {
 
   // path that does not match tabs must be below
   root = "/",
-  admin = "/admin",
 }

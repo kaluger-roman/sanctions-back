@@ -11,3 +11,11 @@ export type GrantUserTarrifPayload = {
   endDate: Date | null;
   tarrifId: TarrifKind;
 };
+
+export enum AdminPaths {
+  root = "/admin",
+
+  preferences = "/admin/preferences",
+  data = "/admin/data",
+  users = "/admin/users",
+}

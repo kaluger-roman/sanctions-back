@@ -22,6 +22,7 @@ import { useEffect } from "react";
 import { Admin } from "pages/admin";
 import { RecoverRequest } from "pages/auth/recover-request";
 import { RecoverConfirm, RegistrationConfirm } from "pages/auth";
+import { AdminPaths } from "shared/admin";
 
 export const AppNavigation = () => {
   useInitNavigation();
@@ -78,7 +79,7 @@ export const AppNavigation = () => {
               <Route path={Paths.search_app} element={<SearchApp />} />
               <Route path={Paths.references} element={<References />} />
               <Route path={Paths.contacts} element={<Contacts />} />
-              <Route path={Paths.admin} element={<Admin />} />
+              <Route path={`${AdminPaths.root}/*`} element={<Admin />} />
             </Route>
           </Route>
         </Routes>

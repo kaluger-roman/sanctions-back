@@ -42,6 +42,7 @@ import {
   TarrifCategories,
   TarrifNames,
 } from "pages/billing/constants";
+import { AdminPaths } from "shared/admin";
 
 const Link = ({ name, path, subLinks, onClick }: LinkOption) => {
   const isMd = useMediaQuery(theme.breakpoints.down("lg"));
@@ -244,7 +245,7 @@ export const Navigation = () => {
                 {authorizationData.isAdmin && (
                   <Button
                     sx={{ width: "100%" }}
-                    onClick={() => navigation.navigate(Paths.admin)}
+                    onClick={() => navigation.navigate(AdminPaths.root)}
                   >
                     Админ панель
                   </Button>

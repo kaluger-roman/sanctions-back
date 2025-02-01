@@ -16,7 +16,6 @@ import {
   Button,
 } from "@mui/material";
 import { grantTarrifModel } from "models";
-import { theme } from "shared/theme";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
   CategoryNames,
@@ -30,19 +29,21 @@ export const UserTariffsTable = () => {
   const [deletePrompt, setDeletePrompt] = useState<number | null>(null);
 
   return (
-    <Paper sx={{ p: 2, overflow: "scroll", maxHeight: "500px" }}>
-      <Typography variant="h6">Тарифы пользователей</Typography>
-      <Table>
+    <>
+      <Typography variant="h6">Пользователи</Typography>
+      <Table stickyHeader size="small">
         <TableHead>
           <TableRow>
-            <TableCell>Пользователь</TableCell>
-            <TableCell>Тариф</TableCell>
-            <TableCell>Дата начала</TableCell>
-            <TableCell>Дата окончания</TableCell>
-            <TableCell />
+            {["Пользователь", "Тариф", "Дата начала", "Дата окончания", ""].map(
+              (cell) => (
+                <TableCell sx={{ fontWeight: "bold" }} key={cell}>
+                  {cell}
+                </TableCell>
+              ),
+            )}
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody sx={{ td: { fontSize: 12 } }}>
           {userTariffs.length === 0 && (
             <TableRow>
               <TableCell colSpan={4}>
@@ -132,6 +133,6 @@ export const UserTariffsTable = () => {
           </Button>
         </DialogActions>
       </Dialog>
-    </Paper>
+    </>
   );
 };

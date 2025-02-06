@@ -104,6 +104,7 @@ class SearchService {
     sourceDocumentOrigins,
     deviceId,
     token,
+    searchLanguage,
   }: Request<SearchFilters>) {
     const sanctions: Array<
       Sanction & { descriptionTag?: string; codeTag?: string }
@@ -138,6 +139,7 @@ class SearchService {
           countries,
           restrictions,
           sourceDocumentOrigins,
+          searchLanguage,
         )),
       );
     }
@@ -208,6 +210,7 @@ class SearchService {
           countries,
           restrictions,
           sourceDocumentOrigins,
+          searchLanguage,
         },
         token,
       );

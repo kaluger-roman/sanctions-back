@@ -4,12 +4,13 @@ import { createGate } from "effector-react";
 import { $profile } from "models/profile/profile.model";
 import { spread } from "patronum";
 import { SearchResult } from "shared/sanctions";
-import { SyncedFilters } from "shared/search";
+import { Lang, SyncedFilters } from "shared/search";
 import { SearchType } from "shared/search-type";
 
 export const $countries = createStore<Array<string>>([]);
 export const $allowedCountries = createStore<Array<string>>([]);
 export const $restrictions = createStore<Array<string>>([]);
+export const $searchLanguage = createStore<Lang>(Lang.en);
 export const $sourceDocumentOrigins = createStore<Array<string>>([]);
 export const $searchTags = createStore<Array<string>>([]);
 export const $searchType = createStore<Array<SearchType>>([
@@ -35,6 +36,7 @@ export const $isSearchHappened = createStore<boolean>(false);
 
 export const searchTagsChanged = createEvent<Array<string>>();
 export const selectedCountriesChanged = createEvent<Array<string>>();
+export const searchLanguageChanged = createEvent<Lang>();
 export const selectedRestrictionsChanged = createEvent<Array<string>>();
 export const selectedSourceDocumentOriginsChanged =
   createEvent<Array<string>>();
@@ -79,6 +81,11 @@ sample({
 sample({
   clock: selectedSourceDocumentOriginsChanged,
   target: $selectedSourceDocumentOrigins,
+});
+
+sample({
+  clock: searchLanguageChanged,
+  target: $searchLanguage,
 });
 
 sample({
@@ -187,6 +194,7 @@ sample({
     $selectedSourceDocumentOrigins,
     $searchType,
     $searchTags,
+    $searchLanguage,
   ] as const,
   fn: ([
     countries,
@@ -194,12 +202,14 @@ sample({
     sourceDocumentOrigins,
     searchTypes,
     searchTags,
+    searchLanguage,
   ]) => ({
     countries,
     restrictions,
     sourceDocumentOrigins,
     searchTypes,
     searchTags,
+    searchLanguage,
   }),
   target: searchAppApi.searchFx,
 });

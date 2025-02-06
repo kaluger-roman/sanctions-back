@@ -1,8 +1,11 @@
-import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUp from "@mui/icons-material/KeyboardArrowUp";
-import { IconButton, Box, Collapse, Typography } from "@mui/material";
+import { Box, Collapse, Typography } from "@mui/material";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { theme } from "shared/theme";
+import { TranslateSelector } from "./translate-selector";
+import { ExpandDescriptionButton } from "./expand-description-button";
+import { Lang } from "shared/search";
+import { useUnit } from "effector-react";
+import { searchAppModel } from "models";
 
 const colorHighlight = (window as any).Highlight
   ? new (window as any).Highlight()
@@ -12,17 +15,24 @@ if (colorHighlight) (CSS as any).highlights.set(`higlight`, colorHighlight);
 
 export const DescriptionBlock = ({
   description,
+  descriptionRussian,
   matchedWords,
 }: {
   description: string;
+  descriptionRussian: string;
   matchedWords: Array<string>;
 }) => {
+  const searchLanguage = useUnit(searchAppModel.$searchLanguage);
   const [expanded, setExpanded] = useState(false);
+  const [lang, setLang] = useState<Lang>(searchLanguage);
   const [isOverflow, setIsOverflow] = useState<boolean>(true);
   const [isFirstRender, setIsFirstRender] = useState<boolean>(true);
   const highlightRef = useRef<HTMLSpanElement>(null);
   const maxHeight = 198;
   const [isDescriptionOnScreen, setIsDescriptionOnScreen] = useState(false);
+  const translatedDescription =
+    { [Lang.en]: description, [Lang.ru]: descriptionRussian }[lang] ??
+    description;
 
   const toggleExpand = () => setExpanded((prev) => !prev);
 
@@ -76,7 +86,7 @@ export const DescriptionBlock = ({
         word.replaceAll(/[#-.]|[[-^]|[?|{}]/g, "\\$&"),
         "g",
       );
-      const matches = Array.from(description.matchAll(regex));
+      const matches = Array.from(translatedDescription.matchAll(regex));
 
       for (let match of matches) {
         const range = new Range();
@@ -91,55 +101,39 @@ export const DescriptionBlock = ({
     return () => {
       ranges.forEach((range) => colorHighlight.delete(range));
     };
-  }, [description, matchedWords, isDescriptionOnScreen]);
+  }, [translatedDescription, matchedWords, isDescriptionOnScreen]);
 
   return (
-    <Box sx={{ position: "relative", overflow: "hidden" }}>
-      <Collapse
-        in={!isOverflow || expanded}
-        collapsedSize={isOverflow ? maxHeight : undefined}
-        timeout={isFirstRender ? 0 : 300}
-      >
-        <Typography
-          ref={highlightRef}
-          variant="body2"
-          sx={{
-            mr: 1,
-            verticalAlign: "top",
-            whiteSpace: "pre-wrap",
-            "::highlight(higlight)": {
-              background: theme.palette.primary.light,
-            },
-          }}
+    <>
+      <Box sx={{ position: "relative", overflow: "hidden" }}>
+        <Collapse
+          in={!isOverflow || expanded}
+          collapsedSize={isOverflow ? maxHeight : undefined}
+          timeout={isFirstRender ? 0 : 300}
         >
-          {description}
-        </Typography>
-      </Collapse>
-      {isOverflow && (
-        <Box
-          sx={{
-            position: "absolute",
-            bottom: 0,
-            right: 0,
-            background: expanded
-              ? undefined
-              : "linear-gradient(to top, rgba(255, 255, 255, 0.9), transparent)",
-            display: "flex",
-            justifyContent: "flex-end",
-            width: "100%",
-            pointerEvents: "none",
-          }}
-        >
-          <IconButton
-            onClick={toggleExpand}
-            color="primary"
-            size="small"
-            sx={{ pointerEvents: "auto", padding: 0 }}
+          <Typography
+            ref={highlightRef}
+            variant="body2"
+            sx={{
+              mr: 1,
+              verticalAlign: "top",
+              whiteSpace: "pre-wrap",
+              "::highlight(higlight)": {
+                background: theme.palette.primary.light,
+              },
+            }}
           >
-            {expanded ? <KeyboardArrowUp /> : <KeyboardArrowDown />}
-          </IconButton>
-        </Box>
+            {translatedDescription}
+          </Typography>
+        </Collapse>
+      </Box>
+      <TranslateSelector lang={lang} setLang={setLang} />
+      {isOverflow && (
+        <ExpandDescriptionButton
+          expanded={expanded}
+          toggleExpand={toggleExpand}
+        />
       )}
-    </Box>
+    </>
   );
 };

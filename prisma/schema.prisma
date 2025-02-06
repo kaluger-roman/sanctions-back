@@ -14,7 +14,7 @@ model Preferences {
   autoLogoutTime               Int @default(3600000)
   autoLogoutCheckTime          Int @default(600000)
   // count of active sessions per account without force login
-  momentumOnlineDevicesPerUser Int @default(1)
+  momentumOnlineDevicesPerUser Int @default(3)
 }
 
 model Sanction {
@@ -24,10 +24,12 @@ model Sanction {
   restriction          String
   code                 String
   description          String
+  descriptionRussian   String @default("")
   sourceLink           String @default("")
   sourceDocumentOrigin String @default("")
 
   @@index([description(ops: raw("gin_trgm_ops"))], map: "description_trgm_idx", type: Gin)
+  @@index([descriptionRussian(ops: raw("gin_trgm_ops"))], map: "descriptionrussian_trgm_idx", type: Gin)
   @@index([restriction], map: "idx_restriction")
   @@index([sourceCountry], map: "idx_sourcecountry")
   @@index([sourceDocumentOrigin], map: "idx_sourcedocumentorigin")
@@ -54,7 +56,7 @@ model User {
   tarrifs                      UserTarrif[]
   UserSession                  UserSession[]
   // count of active sessions per account without force login
-  momentumOnlineDevicesPerUser Int?          @default(1)
+  momentumOnlineDevicesPerUser Int?          @default(3)
 }
 
 model UserSession {
@@ -91,6 +93,7 @@ model SearchRequest {
   searchTags            String[]
   UserTarrif            UserTarrif? @relation(fields: [userTarrifId], references: [id])
   userTarrifId          Int?
+  searchLanguage        String      @default("")
 }
 
 model Device {

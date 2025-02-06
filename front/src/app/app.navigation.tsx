@@ -79,6 +79,10 @@ export const AppNavigation = () => {
               <Route path={Paths.search_app} element={<SearchApp />} />
               <Route path={Paths.references} element={<References />} />
               <Route path={Paths.contacts} element={<Contacts />} />
+              <Route
+                path={AdminPaths.root}
+                element={<Navigate replace to={AdminPaths.users} />}
+              />
               <Route path={`${AdminPaths.root}/*`} element={<Admin />} />
             </Route>
           </Route>

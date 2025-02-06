@@ -8,9 +8,10 @@ export const DataRow = ({
   sourceDocument,
   restriction,
   description,
+  descriptionRussian,
   matchedWords,
   isLast,
-  sourceLink
+  sourceLink,
 }: Sanction & { isLast: boolean }) => (
   <TableRow
     sx={{
@@ -21,11 +22,17 @@ export const DataRow = ({
   >
     <TableCell sx={{ verticalAlign: "top" }}>{code}</TableCell>
     <TableCell sx={{ verticalAlign: "top" }}>
-      <Link target="_blank" href={sourceLink || "#"}>{sourceDocument}</Link>
+      <Link target="_blank" href={sourceLink || "#"}>
+        {sourceDocument}
+      </Link>
     </TableCell>
     <TableCell sx={{ verticalAlign: "top" }}>{restriction}</TableCell>
-    <TableCell>
-      <DescriptionBlock matchedWords={matchedWords} description={description} />
+    <TableCell sx={{ position: "relative" }}>
+      <DescriptionBlock
+        matchedWords={matchedWords}
+        description={description}
+        descriptionRussian={descriptionRussian}
+      />
     </TableCell>
   </TableRow>
 );

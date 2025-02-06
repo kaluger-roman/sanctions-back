@@ -22,6 +22,7 @@ import {
   selectedSourceDocumentOriginsChanged,
   searchTagsChanged,
   syncFilters,
+  searchLanguageChanged,
 } from "models/search-app/search-app";
 import { MuiChipsInput } from "mui-chips-input";
 import { SearchType, SearchTypeName } from "shared/search-type";
@@ -31,6 +32,7 @@ import { SearchAppMetadata } from "modules/search-app-metadata";
 import PaidIcon from "@mui/icons-material/Paid";
 import LockIcon from "@mui/icons-material/Lock";
 import { TarrifKind } from "shared/billing";
+import { Lang, LANG_NAMES } from "shared/search";
 
 export const SearchApp = () => {
   const searchTags = useUnit(searchAppModel.$searchTags);
@@ -38,6 +40,7 @@ export const SearchApp = () => {
   const countries = useUnit(searchAppModel.$countries);
   const allowedCountries = useUnit(searchAppModel.$allowedCountries);
   const restrictions = useUnit(searchAppModel.$restrictions);
+  const searchLanguage = useUnit(searchAppModel.$searchLanguage);
   const sourceDocumentOrigins = useUnit(searchAppModel.$sourceDocumentOrigins);
   const selectedRestrictions = useUnit(searchAppModel.$selectedRestrictions);
   const selectedSourceDocumentOrigins = useUnit(
@@ -356,6 +359,24 @@ export const SearchApp = () => {
               </MenuItem>
             </Select>
           </FormControl>
+
+          <FormControl fullWidth>
+            <InputLabel>Язык</InputLabel>
+            <Select
+              value={searchLanguage}
+              onChange={({ target }) =>
+                searchLanguageChanged(target.value as Lang)
+              }
+              input={<OutlinedInput label="Язык" />}
+            >
+              {Object.values(Lang).map((lang) => (
+                <MenuItem key={lang} value={lang}>
+                  {LANG_NAMES[lang]}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           {isSm && (
             <Button
               variant="contained"

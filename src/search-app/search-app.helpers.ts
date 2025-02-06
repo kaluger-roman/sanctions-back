@@ -2,6 +2,7 @@ import { mapValues, uniq } from "lodash";
 import { prisma } from "../../prisma/prisma";
 import { Sanction } from "@prisma/client";
 import * as trigramSimilarity from "trigram-similarity";
+import { DESCRIPTION_FIELD, Lang } from "../shared/search";
 
 const keyPoints = [2, 4, 6, 8, 10, 12];
 
@@ -68,19 +69,29 @@ export const searchByDescription = async (
   countries: Array<string>,
   restrictions: Array<string>,
   sourceDocumentOrigins: Array<string>,
+  searchLanguage: Lang,
 ) => {
   const res: Array<Sanction> = [];
 
   for await (const descriptionTag of searchTags) {
     const tagArr = descriptionTag.split(" ");
+    const descFields = Object.values(DESCRIPTION_FIELD)
+      .map((x) => `"${x}"`)
+      .join(", ");
 
     res.push(
       ...(
         await prisma.$queryRawUnsafe<any>(`
       with tokens as (select unnest(string_to_array('${descriptionTag}',' ')) as t), 
-      all_rows as (select id, "sourceCountry", "sourceDocumentOrigin" ,"sourceLink", "sourceDocument", "restriction", code, description,
-      sum(1.0 - (tokens.t <<<-> description)) as score, count(tokens.t <<%  description) as match_count
-      from "Sanction" as s, tokens where tokens.t <<% description  
+      all_rows as (select id, "sourceCountry", "sourceDocumentOrigin" ,"sourceLink", "sourceDocument", "restriction", code, ${descFields},
+      sum(1.0 - (tokens.t <<<-> "${
+        DESCRIPTION_FIELD[searchLanguage]
+      }")) as score, count(tokens.t <<%  "${
+          DESCRIPTION_FIELD[searchLanguage]
+        }") as match_count
+      from "Sanction" as s, tokens where tokens.t <<% "${
+        DESCRIPTION_FIELD[searchLanguage]
+      }"  
       ${
         countries.length
           ? ` and "sourceCountry" in (${countries
@@ -102,14 +113,14 @@ export const searchByDescription = async (
               .join(",")}) `
           : ""
       } 
-      group by id, description)
-      select id, "sourceCountry", "sourceDocumentOrigin", "sourceLink", "sourceDocument", "restriction",score, code, description
+      group by id, "${DESCRIPTION_FIELD[searchLanguage]}")
+      select id, "sourceCountry", "sourceDocumentOrigin", "sourceLink", "sourceDocument", "restriction",score, code, ${descFields}
       from all_rows WHERE match_count=${tagArr.length} 
       order by score desc, "code" asc;`)
       ).map((x) => ({
         ...x,
         descriptionTag,
-        matchedWords: x.description
+        matchedWords: x[DESCRIPTION_FIELD[searchLanguage]]
           .split(/\s+/g)
           .filter((descWord: string) =>
             tagArr.some(

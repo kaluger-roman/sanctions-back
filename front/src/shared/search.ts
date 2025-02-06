@@ -6,6 +6,7 @@ export type SearchFilters = {
   restrictions: Array<string>;
   sourceDocumentOrigins: Array<string>;
   searchTags: Array<string>;
+  searchLanguage: Lang;
 };
 
 export type SyncedFilters = {
@@ -16,4 +17,14 @@ export type SyncedFilters = {
 export type CountriesResult = {
   countries: Array<string>;
   allowedCountries: Array<string>;
+};
+
+export enum Lang {
+  en = "en",
+  ru = "ru",
+}
+
+export const LANG_NAMES: Record<Lang, string> = {
+  [Lang.en]: "Английский",
+  [Lang.ru]: "Русский",
 };

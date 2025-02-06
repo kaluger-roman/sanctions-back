@@ -25,6 +25,7 @@ class AdminService {
       .map((x) => ({
         code: String(x["CNCode"]),
         description: String(x["Описание"]),
+        descriptionRussian: String(x["Описание на русском"]),
         sourceDocument: String(x["Источник ограничения"]),
         sourceCountry: String(x["Страна"]),
         restriction: String(x["Тип ограничения"]),

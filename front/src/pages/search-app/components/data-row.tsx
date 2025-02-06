@@ -27,7 +27,7 @@ export const DataRow = ({
       </Link>
     </TableCell>
     <TableCell sx={{ verticalAlign: "top" }}>{restriction}</TableCell>
-    <TableCell sx={{ position: "relative" }}>
+    <TableCell sx={{ position: "relative", width: "50%" }}>
       <DescriptionBlock
         matchedWords={matchedWords}
         description={description}

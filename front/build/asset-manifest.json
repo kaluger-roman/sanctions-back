@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.6d4c2c8c.css",
-    "main.js": "/static/js/main.796f355b.js",
+    "main.js": "/static/js/main.2e4b7768.js",
     "static/media/EU_dual-use_items.pdf": "/static/media/EU_dual-use_items.a992d470e6ceff40cb55.pdf",
     "static/media/Spisok_tovarov_zapreschennykh_k_exportu_iz_Yaponii_v_RF.pdf": "/static/media/Spisok_tovarov_zapreschennykh_k_exportu_iz_Yaponii_v_RF.78b138f454d88d235770.pdf",
     "static/media/ogranichenia_ES_po_RF_EU_833_2014.pdf": "/static/media/ogranichenia_ES_po_RF_EU_833_2014.6e51f997d8f38f8705dc.pdf",
@@ -12,6 +12,8 @@
     "static/media/China_export_control_items.pdf": "/static/media/China_export_control_items.92d76327a334d83bfa5b.pdf",
     "static/media/UK_common_military_list__dual-use.pdf": "/static/media/UK_common_military_list__dual-use.782cf9529dfe71a959c2.pdf",
     "static/media/spisok_tovarov_zapreschennykh_exportu_iz_Korei_v_RF.pdf": "/static/media/spisok_tovarov_zapreschennykh_exportu_iz_Korei_v_RF.bbf98fdf94067b346058.pdf",
+    "static/media/presentation.jpg": "/static/media/presentation.f38d2cab58709d1b317f.jpg",
+    "static/media/GoodSanctionCheck.pdf": "/static/media/GoodSanctionCheck.63d0f130d65bde2dd64a.pdf",
     "static/media/EU_common_military_list.pdf": "/static/media/EU_common_military_list.eb8bf0a62a9405740a55.pdf",
     "static/media/Import_Sanctioned_goods_from_Russia.pdf": "/static/media/Import_Sanctioned_goods_from_Russia.8b75ceebacbd8fdb125b.pdf",
     "static/media/BIS_Russia_and_Belarus_restrictions_list_of_goods.pdf": "/static/media/BIS_Russia_and_Belarus_restrictions_list_of_goods.90b141a288f5e88f8af3.pdf",
@@ -40,10 +42,10 @@
     "index.html": "/index.html",
     "static/media/web-worker-timer.js": "/static/media/web-worker-timer.56cbb4b7331c0df00f17.js",
     "main.6d4c2c8c.css.map": "/static/css/main.6d4c2c8c.css.map",
-    "main.796f355b.js.map": "/static/js/main.796f355b.js.map"
+    "main.2e4b7768.js.map": "/static/js/main.2e4b7768.js.map"
   },
   "entrypoints": [
     "static/css/main.6d4c2c8c.css",
-    "static/js/main.796f355b.js"
+    "static/js/main.2e4b7768.js"
   ]
 }

@@ -1,6 +1,6 @@
 import { Tooltip, IconButton, Box } from "@mui/material";
 import { TarrifCard, TarrifKind } from "shared/billing";
-import { DEVICE_INFO, REQUESTS_INFO } from "./constants";
+import { REQUESTS_INFO } from "./constants";
 import InfoIcon from "@mui/icons-material/Info";
 
 export const RequestInfoTooltip = () => (
@@ -11,8 +11,15 @@ export const RequestInfoTooltip = () => (
   </Tooltip>
 );
 
-export const DeviceInfoTooltip = () => (
-  <Tooltip enterTouchDelay={0} title={DEVICE_INFO}>
+export const DeviceInfoTooltip = ({
+  countMomentum,
+}: {
+  countMomentum: number;
+}) => (
+  <Tooltip
+    enterTouchDelay={0}
+    title={`Cчитается количество уникальных устройств, с которых заходил пользователь. Также пользователь не может одновременно находиться в 1 учетной записи более чем с ${countMomentum} устройств. При заходе с устройства будет всплывать предупреждение, что будет произведен выход с одного устройства и вход с другого`}
+  >
     <IconButton size="small" sx={{ p: "2px" }}>
       <InfoIcon sx={{ fontSize: 20 }} />
     </IconButton>
@@ -30,7 +37,7 @@ export const TARRIFS: Array<TarrifCard> = [
         300 запросов в месяц <RequestInfoTooltip />
       </Box>,
       <Box>
-        3 устройств для доступа <DeviceInfoTooltip />
+        3 устройств для доступа <DeviceInfoTooltip countMomentum={1} />
       </Box>,
     ],
     price: 6500,
@@ -47,7 +54,7 @@ export const TARRIFS: Array<TarrifCard> = [
         Неограниченное число запросов <RequestInfoTooltip />
       </Box>,
       <Box>
-        3 устройств для доступа <DeviceInfoTooltip />
+        3 устройств для доступа <DeviceInfoTooltip countMomentum={1} />
       </Box>,
       "Экономия 17%",
     ],
@@ -65,7 +72,7 @@ export const TARRIFS: Array<TarrifCard> = [
         Неограниченное число запросов <RequestInfoTooltip />
       </Box>,
       <Box>
-        3 устройств для доступа <DeviceInfoTooltip />
+        3 устройств для доступа <DeviceInfoTooltip countMomentum={1} />
       </Box>,
       "Экономия 25%",
     ],
@@ -82,7 +89,8 @@ export const TARRIFS: Array<TarrifCard> = [
         1000 запросов в месяц <RequestInfoTooltip />
       </Box>,
       <Box>
-        Неограниченное число устройств для доступа <DeviceInfoTooltip />
+        Неограниченное число устройств для доступа{" "}
+        <DeviceInfoTooltip countMomentum={3} />
       </Box>,
     ],
     price: 15000,
@@ -99,7 +107,8 @@ export const TARRIFS: Array<TarrifCard> = [
         Неограниченное число запросов <RequestInfoTooltip />
       </Box>,
       <Box>
-        Неограниченное число устройств для доступа <DeviceInfoTooltip />
+        Неограниченное число устройств для доступа{" "}
+        <DeviceInfoTooltip countMomentum={3} />
       </Box>,
       "Экономия 17%",
     ],
@@ -117,7 +126,8 @@ export const TARRIFS: Array<TarrifCard> = [
         Неограниченное число запросов <RequestInfoTooltip />
       </Box>,
       <Box>
-        Неограниченное число устройств для доступа <DeviceInfoTooltip />
+        Неограниченное число устройств для доступа{" "}
+        <DeviceInfoTooltip countMomentum={3} />
       </Box>,
       "Экономия 25%",
     ],

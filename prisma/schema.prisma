@@ -10,11 +10,12 @@ datasource db {
 }
 
 model Preferences {
-  id                           Int @id @default(autoincrement())
-  autoLogoutTime               Int @default(3600000)
-  autoLogoutCheckTime          Int @default(600000)
+  id                               Int @id @default(autoincrement())
+  autoLogoutTime                   Int @default(3600000)
+  autoLogoutCheckTime              Int @default(600000)
   // count of active sessions per account without force login
-  momentumOnlineDevicesPerUser Int @default(3)
+  momentumOnlineDevicesPerJurUser  Int @default(3)
+  momentumOnlineDevicesPerPhysUser Int @default(1)
 }
 
 model Sanction {

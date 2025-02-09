@@ -22,7 +22,9 @@ export class SessionsService {
     const preferences = await prisma.preferences.findFirst();
     const allowedMomentumSessions =
       user.momentumOnlineDevicesPerUser ||
-      preferences.momentumOnlineDevicesPerUser ||
+      (user.category === "private"
+        ? preferences.momentumOnlineDevicesPerPhysUser
+        : preferences.momentumOnlineDevicesPerJurUser) ||
       1;
 
     const activeUserSessions = await prisma.userSession.findMany({

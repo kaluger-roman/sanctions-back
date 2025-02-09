@@ -45,6 +45,7 @@ export const syncFilters = createEvent<void>();
 export const search = createEvent<void>();
 
 export const $filtersSyncPending = searchAppApi.checkFiltersFx.pending;
+export const $searchPending = searchAppApi.searchFx.pending;
 
 export const SearchAppGate = createGate();
 

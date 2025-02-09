@@ -23,6 +23,7 @@ export const DescriptionBlock = ({
   matchedWords: Array<string>;
 }) => {
   const searchLanguage = useUnit(searchAppModel.$searchLanguage);
+  const searchPending = useUnit(searchAppModel.$searchPending);
   const [expanded, setExpanded] = useState(false);
   const [lang, setLang] = useState<Lang>(searchLanguage);
   const [isOverflow, setIsOverflow] = useState<boolean>(true);
@@ -39,6 +40,13 @@ export const DescriptionBlock = ({
   useEffect(() => {
     setIsFirstRender(false);
   }, []);
+
+  useEffect(() => {
+    if (!searchPending) {
+      setLang(searchLanguage);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchPending]);
 
   useLayoutEffect(() => {
     if (!highlightRef.current) return;

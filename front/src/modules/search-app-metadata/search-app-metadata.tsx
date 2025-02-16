@@ -9,7 +9,7 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import { US, EU, GB, AU, KR, CN } from "country-flag-icons/react/3x2";
+import { US, EU, GB, AU, KR, CN, JP, TW } from "country-flag-icons/react/3x2";
 import DownloadIcon from "@mui/icons-material/Download";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
 import EmailIcon from "@mui/icons-material/Email";
@@ -28,11 +28,13 @@ const ACTUAL_DATES: Array<{
   flag: React.ReactElement;
 }> = [
   { country: "ЕС", date: "16.12.2024", flag: <EU /> },
-  { country: "Великобритания", date: "28.05.2024", flag: <GB /> },
-  { country: "США", date: "15.01.2025", flag: <US /> },
+  { country: "Великобритания", date: "05.12.2024", flag: <GB /> },
+  { country: "США", date: "04.02.2025", flag: <US /> },
   { country: "Южная Корея", date: "09.09.2024", flag: <KR /> },
   { country: "Австралия", date: "08.04.2024", flag: <AU /> },
   { country: "Китай", date: "01.12.2024", flag: <CN /> },
+  { country: "Япония", date: "10.01.2025", flag: <JP /> },
+  { country: "Тайвань", date: "05.11.2024", flag: <TW /> },
 ];
 
 export const SearchAppMetadata = () => {

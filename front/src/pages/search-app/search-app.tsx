@@ -33,6 +33,7 @@ import PaidIcon from "@mui/icons-material/Paid";
 import LockIcon from "@mui/icons-material/Lock";
 import { TarrifKind } from "shared/billing";
 import { Lang, LANG_NAMES } from "shared/search";
+import { WebAnalytics } from "components";
 
 export const SearchApp = () => {
   const searchTags = useUnit(searchAppModel.$searchTags);
@@ -77,6 +78,7 @@ export const SearchApp = () => {
         m: 4,
       }}
     >
+      <WebAnalytics />
       <Box
         sx={{
           ml: "auto",

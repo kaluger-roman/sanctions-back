@@ -2,6 +2,29 @@
 import { useEffect } from "react";
 
 export const WebAnalytics = () => {
+  // Add Yandex verification meta tag
+  useEffect(() => {
+    const metaTag = document.createElement("meta");
+    metaTag.name = "yandex-verification";
+    metaTag.content = "9afc31a43e94d559";
+
+    // Check if the meta tag already exists
+    const existingTag = document.querySelector(
+      'meta[name="yandex-verification"]',
+    );
+    if (!existingTag) {
+      document.head.appendChild(metaTag);
+    }
+
+    // Clean up function to remove the tag when component unmounts
+    return () => {
+      const tag = document.querySelector('meta[name="yandex-verification"]');
+      if (tag) {
+        document.head.removeChild(tag);
+      }
+    };
+  }, []);
+
   useEffect(() => {
     (function (m, e, t, r, i, k, a) {
       m[i] =

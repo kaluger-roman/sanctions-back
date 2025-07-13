@@ -5,7 +5,7 @@ import { theme } from "shared/theme";
 import { TableHeader } from "./components/table-head";
 import { EmptySearch } from "./components/empty-search";
 import { CategoryRows } from "./components/category-rows";
-import { isSearchEmpty } from "./search-table.helpers";
+import { isSearchEmpty } from "shared/search";
 
 export const SearchTable = () => {
   const searchResult = useUnit(searchAppModel.$searchResult);

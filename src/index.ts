@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { searchApiHandlers, searchApi } from "./search-app";
+import { reportsApiHandlers, reportsApi } from "./reports";
 import { registerApi } from "./api.service";
 import { adminApi, adminApiHandlers } from "./admin";
 import { execSync } from "child_process";
@@ -11,7 +12,6 @@ import { readFileSync } from "fs";
 import { userApi, userApiHandlers } from "./user/user.api";
 import { contactApi, contactApiHandlers } from "./contact";
 import { billingApi, billingApiHandlers } from "./billing";
-import { deleteActiveUserConnection } from "./active-connections";
 import { initConnection } from "./init-connection";
 
 const app = express();
@@ -72,4 +72,5 @@ server.on("connection", async (socket: Socket) => {
   registerApi(userApiHandlers, userApi, socket);
   registerApi(contactApiHandlers, contactApi, socket);
   registerApi(billingApiHandlers, billingApi, socket);
+  registerApi(reportsApiHandlers, reportsApi, socket);
 });

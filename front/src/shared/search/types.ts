@@ -1,4 +1,4 @@
-import { SearchType } from "./search-type";
+import { SearchType } from "../search-type";
 
 export type SearchFilters = {
   countries: Array<string>;

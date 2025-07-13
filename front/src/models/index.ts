@@ -4,9 +4,10 @@ export {
   manageSanctionsModel,
   manageTarrifsModel,
   adminModel,
-  grantTarrifModel
+  grantTarrifModel,
 } from "./manage-sanctions";
 export { authModel, autoLogoutModel } from "./auth";
 export { contactUsModel } from "./contact-us";
 export { profileModel } from "./profile";
 export { billingModel } from "./billing";
+export { reportsModel } from "./reports";

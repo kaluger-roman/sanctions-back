@@ -29,11 +29,13 @@ import { SearchType, SearchTypeName } from "shared/search-type";
 import { theme } from "shared/theme";
 import { SearchTable } from "./search-table";
 import { SearchAppMetadata } from "modules/search-app-metadata";
+import { ReportSaveDialog } from "modules";
 import PaidIcon from "@mui/icons-material/Paid";
 import LockIcon from "@mui/icons-material/Lock";
 import { TarrifKind } from "shared/billing";
 import { Lang, LANG_NAMES } from "shared/search";
 import { WebAnalytics } from "components";
+import { SearchResultActions } from "modules";
 
 export const SearchApp = () => {
   const searchTags = useUnit(searchAppModel.$searchTags);
@@ -393,10 +395,11 @@ export const SearchApp = () => {
             </Button>
           )}
         </Box>
-
+        <SearchResultActions />
         <SearchTable />
       </Box>
       <SearchAppMetadata />
+      <ReportSaveDialog />
     </Box>
   );
 };

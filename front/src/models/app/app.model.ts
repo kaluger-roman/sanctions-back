@@ -6,6 +6,7 @@ import {
   profileApi,
   adminApi,
   searchAppApi,
+  reportsApi,
 } from "api";
 import {
   Store,
@@ -30,6 +31,10 @@ export const $authorizationData = createStore<User | null>(null);
 const $commonPendingRequests = combine(
   searchAppApi.loadCountriesFx.pending,
   searchAppApi.searchFx.pending,
+  reportsApi.generateExcelReportFx.pending,
+  reportsApi.downloadReportFx.pending,
+  reportsApi.saveReportToMyReportsFx.pending,
+  reportsApi.removeReportFx.pending,
   authApi.recoverRequestFx.pending,
   authApi.registrationConfirmFx.pending,
   profileApi.loadCurrentProfileFx.pending,
@@ -107,6 +112,8 @@ sample({
     profileApi.changeProfileFx.failData,
     billingApi.createPaymentFx.failData,
     searchAppApi.searchFx.failData,
+    reportsApi.generateExcelReportFx.failData,
+    reportsApi.downloadReportFx.failData,
     billingApi.addRequestsPaymentFx.failData,
     adminApi.changeTarrifsSettingsFx.failData,
     adminApi.changeTarrifsSettingsFx.failData,

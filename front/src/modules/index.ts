@@ -7,3 +7,5 @@ export { ProfileData } from "./profile-data";
 export { Tarrif } from "./tarrif";
 export { PermanentNotifications } from "./notifications";
 export { SessionControls } from "./session-controls";
+export { SearchResultActions } from "./search-result-actions";
+export { ReportSaveDialog } from "./report-save-dialog";

@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material";
 import { useUnit } from "effector-react";
 import { searchAppModel } from "models";
-import { isSearchEmpty } from "../search-table.helpers";
+import { isSearchEmpty } from "shared/search";
 
 export const EmptySearch = () => {
   const searchResult = useUnit(searchAppModel.$searchResult);

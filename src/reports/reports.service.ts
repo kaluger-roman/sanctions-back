@@ -455,9 +455,7 @@ class ReportsService {
     }
   };
 
-  removeReport = async ({
-    reportId,
-  }: Request<{ reportId: string }>): Promise<void> => {
+  removeReport = async ({ reportId }: Request<{ reportId: string }>) => {
     const filePath = path.join(REPORTS_STORAGE_PATH, `${reportId}.xlsx`);
 
     try {
@@ -477,6 +475,8 @@ class ReportsService {
     } catch (error) {
       console.log(`Report ${reportId} not found in database`);
     }
+
+    return "success";
   };
 
   downloadReport = async ({

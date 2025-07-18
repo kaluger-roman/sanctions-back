@@ -11,3 +11,4 @@ export { contactUsModel } from "./contact-us";
 export { profileModel } from "./profile";
 export { billingModel } from "./billing";
 export { reportsModel } from "./reports";
+export { myReportsModel } from "./my-reports";

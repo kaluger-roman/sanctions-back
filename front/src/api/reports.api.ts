@@ -1,7 +1,7 @@
 import { createEffect } from "effector";
 import { ACTIONS } from "./actions";
 import { SearchFilters } from "shared/search";
-import { ReportGenerationResult } from "shared/reports";
+import { ReportGenerationResult, UserReport } from "shared/reports";
 import { socket } from "./app.api";
 
 export const generateExcelReportFx = createEffect<
@@ -25,18 +25,48 @@ export const saveReportToMyReportsFx = createEffect<string, void, string>(
     ),
 );
 
-export const removeReportFx = createEffect<string, void, string>((reportId) =>
-  socket.emitWithAnswer<{ reportId: string }, void>(ACTIONS.REMOVE_REPORT, {
-    reportId,
-  }),
+export const removeReportFx = createEffect<{ reportId: string }, void, string>(
+  (params) =>
+    socket.emitWithAnswer<{ reportId: string }, void>(
+      ACTIONS.REMOVE_REPORT,
+      params,
+    ),
 );
 
-export const downloadReportFx = createEffect<string, ArrayBuffer, string>(
-  (reportId) =>
-    socket.emitWithAnswer<{ reportId: string }, ArrayBuffer>(
+export const downloadReportFx = createEffect<
+  { reportId: string; isDeleteAfter?: boolean; title?: string },
+  { arrayBuffer: ArrayBuffer; title?: string },
+  string
+>(({ reportId, title }: { reportId: string; title?: string }) =>
+  socket
+    .emitWithAnswer<{ reportId: string }, ArrayBuffer>(
       ACTIONS.DOWNLOAD_REPORT,
       {
         reportId,
       },
+    )
+    .then((arrayBuffer) => ({ arrayBuffer, title })),
+);
+
+export const loadUserReportsFx = createEffect<void, UserReport[], string>(() =>
+  socket.emitWithAnswer<void, UserReport[]>(ACTIONS.LOAD_USER_REPORTS),
+);
+
+export const downloadMultipleReportsFx = createEffect<
+  string[],
+  ArrayBuffer,
+  string
+>((reportIds) =>
+  socket.emitWithAnswer<{ reportIds: string[] }, ArrayBuffer>(
+    ACTIONS.DOWNLOAD_MULTIPLE_REPORTS,
+    { reportIds },
+  ),
+);
+
+export const deleteMultipleReportsFx = createEffect<string[], string, string>(
+  (reportIds) =>
+    socket.emitWithAnswer<{ reportIds: string[] }, string>(
+      ACTIONS.DELETE_MULTIPLE_REPORTS,
+      { reportIds },
     ),
 );

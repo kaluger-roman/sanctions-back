@@ -18,6 +18,7 @@ import {
   REPORTS_STORAGE_PATH,
 } from "./reports.constants";
 import * as xlsx from "xlsx";
+import * as archiver from "archiver";
 
 class ReportsService {
   constructor() {
@@ -156,12 +157,8 @@ class ReportsService {
   saveReportToMyReports = async ({
     reportId,
     token,
-  }: Request<{ reportId: string }>): Promise<void> => {
+  }: Request<{ reportId: string }>) => {
     const user = token ? await UserService.getUserByToken(token) : null;
-
-    if (!user) {
-      throw new Error("User not authenticated");
-    }
 
     const report = await prisma.report.findUnique({
       where: { id: reportId },
@@ -173,12 +170,64 @@ class ReportsService {
 
     await this.cleanupUserReports(user.id);
 
-    await prisma.report.update({
-      where: { id: reportId },
-      data: { userId: user.id },
+    const userReports = await prisma.report.findMany({
+      where: {
+        userId: user.id,
+        title: { startsWith: "sanctions-report-" },
+        isDeleted: false, // Фильтруем только не удаленные отчеты
+      },
+      select: { title: true },
     });
 
-    console.log(`Report ${reportId} saved to user ${user.id} reports`);
+    // Извлекаем номера из существующих названий
+    const existingNumbers = userReports
+      .map((r) => r.title?.match(/sanctions-report-(\d+)$/)?.[1])
+      .filter(Boolean)
+      .map(Number)
+      .filter((num) => !isNaN(num));
+
+    // Находим следующий доступный номер
+    const nextNumber =
+      existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+
+    const reportTitle = `sanctions-report-${nextNumber}`;
+
+    await prisma.report.update({
+      where: { id: reportId },
+      data: {
+        userId: user.id,
+        title: reportTitle,
+      },
+    });
+
+    console.log(
+      `Report ${reportId} saved to user ${user.id} reports with title: ${reportTitle}`,
+    );
+
+    return "success";
+  };
+
+  loadUserReports = async ({ token }: Request<void>) => {
+    const user = await UserService.getUserByToken(token);
+
+    const reports = await prisma.report.findMany({
+      where: {
+        userId: user.id,
+        isDeleted: false, // Фильтруем только не удаленные отчеты
+      },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+      },
+    });
+
+    return reports.map((report) => ({
+      id: report.id,
+      name: report.title || "Отчет без названия",
+      createdAt: report.createdAt,
+    }));
   };
 
   private cleanupUnlinkedReports = async (): Promise<void> => {
@@ -206,25 +255,33 @@ class ReportsService {
 
   private cleanupUserReports = async (userId: number): Promise<void> => {
     const userReportsCount = await prisma.report.count({
-      where: { userId },
+      where: {
+        userId,
+        isDeleted: false, // Считаем только не удаленные отчеты
+      },
     });
 
     if (userReportsCount >= 100) {
       const reportsToDelete = await prisma.report.findMany({
-        where: { userId },
+        where: {
+          userId,
+          isDeleted: false, // Берем только не удаленные отчеты
+        },
         orderBy: { createdAt: "asc" },
         take: userReportsCount - 99, // Keep 99, so after adding new one we'll have 100
       });
 
       for (const report of reportsToDelete) {
         await this.deleteReportFile(report.id);
-        await prisma.report.delete({
+        // Помечаем как удаленные вместо физического удаления
+        await prisma.report.update({
           where: { id: report.id },
+          data: { isDeleted: true },
         });
       }
 
       console.log(
-        `Cleaned up ${reportsToDelete.length} old user reports for user ${userId}`,
+        `Marked ${reportsToDelete.length} old user reports as deleted for user ${userId}`,
       );
     }
   };
@@ -467,11 +524,12 @@ class ReportsService {
     }
 
     try {
-      // Remove record from database
-      await prisma.report.delete({
+      // Mark record as deleted in database (soft delete)
+      await prisma.report.update({
         where: { id: reportId },
+        data: { isDeleted: true },
       });
-      console.log(`Report ${reportId} deleted from database`);
+      console.log(`Report ${reportId} marked as deleted in database`);
     } catch (error) {
       console.log(`Report ${reportId} not found in database`);
     }
@@ -501,6 +559,104 @@ class ReportsService {
       console.log(`Error downloading report ${reportId}:`, error);
       return null;
     }
+  };
+
+  downloadMultipleReports = async ({
+    reportIds,
+    token,
+  }: Request<{ reportIds: string[] }>): Promise<Buffer> => {
+    const user = await UserService.getUserByToken(token);
+
+    // Verify all reports belong to the user and are not deleted
+    const reports = await prisma.report.findMany({
+      where: {
+        id: { in: reportIds },
+        userId: user.id,
+        isDeleted: false, // Проверяем только не удаленные отчеты
+      },
+      select: {
+        id: true,
+        title: true,
+      },
+    });
+
+    if (reports.length !== reportIds.length) {
+      throw new Error("Some reports not found or access denied");
+    }
+
+    // Create ZIP archive
+    const archive = archiver("zip", {
+      zlib: { level: 9 }, // Maximum compression
+    });
+
+    const chunks: Buffer[] = [];
+
+    archive.on("data", (chunk) => {
+      chunks.push(chunk);
+    });
+
+    // Add each report to the archive
+    for (const report of reports) {
+      const filePath = path.join(REPORTS_STORAGE_PATH, `${report.id}.xlsx`);
+
+      try {
+        await fs.access(filePath);
+        const fileName = `${report.title || `report-${report.id}`}.xlsx`;
+        archive.file(filePath, { name: fileName });
+      } catch (error) {
+        console.log(`Report file ${report.id}.xlsx not found, skipping`);
+      }
+    }
+
+    await archive.finalize();
+
+    return Buffer.concat(chunks);
+  };
+
+  deleteMultipleReports = async ({
+    reportIds,
+    token,
+  }: Request<{ reportIds: string[] }>): Promise<string> => {
+    const user = await UserService.getUserByToken(token);
+
+    // Verify all reports belong to the user and are not already deleted
+    const reports = await prisma.report.findMany({
+      where: {
+        id: { in: reportIds },
+        userId: user.id,
+        isDeleted: false,
+      },
+    });
+
+    if (reports.length !== reportIds.length) {
+      throw new Error("Some reports not found or access denied");
+    }
+
+    // Delete files only, mark records as deleted in database
+    for (const reportId of reportIds) {
+      const filePath = path.join(REPORTS_STORAGE_PATH, `${reportId}.xlsx`);
+
+      try {
+        await fs.unlink(filePath);
+        console.log(`Report file ${reportId}.xlsx deleted from filesystem`);
+      } catch (error) {
+        console.log(`Report file ${reportId}.xlsx not found in filesystem`);
+      }
+    }
+
+    // Mark reports as deleted (soft delete)
+    await prisma.report.updateMany({
+      where: {
+        id: { in: reportIds },
+        userId: user.id,
+      },
+      data: { isDeleted: true },
+    });
+
+    console.log(
+      `Marked ${reportIds.length} reports as deleted for user ${user.id}`,
+    );
+    return "success";
   };
 }
 

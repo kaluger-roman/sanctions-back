@@ -6,7 +6,6 @@ import {
   Button,
   Box,
   Typography,
-  Tooltip,
 } from "@mui/material";
 import { useUnit } from "effector-react";
 import { reportsModel } from "models";
@@ -45,22 +44,19 @@ export const ReportSaveDialog = () => {
         </Typography>
 
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <Tooltip title="В разработке" arrow>
-            <span>
-              <Button
-                variant="contained"
-                color="primary"
-                startIcon={<SaveIcon />}
-                disabled
-                onClick={() =>
-                  reportsModel.saveReportToMyReports(currentReportId!)
-                }
-                sx={{ width: "100%" }}
-              >
-                Загрузить в мои отчеты
-              </Button>
-            </span>
-          </Tooltip>
+          <span>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<SaveIcon />}
+              onClick={() =>
+                reportsModel.saveReportToMyReports(currentReportId!)
+              }
+              sx={{ width: "100%" }}
+            >
+              Загрузить в мои отчеты
+            </Button>
+          </span>
 
           <Button
             variant="outlined"

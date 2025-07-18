@@ -9,3 +9,4 @@ export { PermanentNotifications } from "./notifications";
 export { SessionControls } from "./session-controls";
 export { SearchResultActions } from "./search-result-actions";
 export { ReportSaveDialog } from "./report-save-dialog";
+export { MyReports } from "./my-reports";

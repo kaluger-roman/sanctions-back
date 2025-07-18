@@ -14,6 +14,14 @@ export const reportsApiHandlers = {
   [ACTIONS.SAVE_REPORT_TO_MY_REPORTS]: (
     payload: Request<{ reportId: string }>,
   ) => reportsService.saveReportToMyReports(payload),
+  [ACTIONS.LOAD_USER_REPORTS]: (payload: Request<void>) =>
+    reportsService.loadUserReports(payload),
+  [ACTIONS.DOWNLOAD_MULTIPLE_REPORTS]: (
+    payload: Request<{ reportIds: string[] }>,
+  ) => reportsService.downloadMultipleReports(payload),
+  [ACTIONS.DELETE_MULTIPLE_REPORTS]: (
+    payload: Request<{ reportIds: string[] }>,
+  ) => reportsService.deleteMultipleReports(payload),
 };
 
 export const reportsApi = new Api(reportsApiHandlers);

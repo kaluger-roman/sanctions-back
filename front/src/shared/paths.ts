@@ -14,6 +14,7 @@ export enum Paths {
   recoverPasswordConfirm = "/recover_password_confirm/:token",
   profileTariff = "/profile/tariff",
   profileMy = "/profile/my",
+  profileReports = "/profile/reports",
 
   // path that does not match tabs must be below
   root = "/",

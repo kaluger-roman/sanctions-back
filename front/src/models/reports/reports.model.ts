@@ -2,6 +2,7 @@ import { createEvent, createStore, sample, createEffect } from "effector";
 import { reportsApi } from "api";
 import { ReportGenerationResult } from "shared/reports";
 import { searchAppModel } from "models/search-app";
+import { Notification } from "@master_kufa/client-tools";
 
 // Stores
 
@@ -17,22 +18,28 @@ export const downloadReportToComputer = createEvent<string>();
 export const discardReport = createEvent<string>();
 
 // Effect for handling the file download
-const handleFileDownloadFx = createEffect((arrayBuffer: ArrayBuffer) => {
-  // Convert ArrayBuffer to Blob and create download link
-  const blob = new Blob([arrayBuffer], {
-    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-  });
-  const url = window.URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `sanctions-report-${
-    new Date().toISOString().split("T")[0]
-  }.xlsx`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  window.URL.revokeObjectURL(url);
-});
+const handleFileDownloadFx = createEffect(
+  ({ arrayBuffer, title }: { arrayBuffer: ArrayBuffer; title?: string }) => {
+    // Convert ArrayBuffer to Blob and create download link
+    const blob = new Blob([arrayBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+
+    // Use title if available, otherwise use default name with date
+    const filename = title
+      ? `${title}.xlsx`
+      : `sanctions-report-${new Date().toISOString().split("T")[0]}.xlsx`;
+
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  },
+);
 
 // Samples
 sample({
@@ -100,6 +107,7 @@ sample({
 
 sample({
   clock: downloadReportToComputer,
+  fn: (reportId) => ({ reportId, isDeleteAfter: true }),
   target: reportsApi.downloadReportFx,
 });
 
@@ -111,14 +119,25 @@ sample({
 // Auto-delete report after successful download to computer
 sample({
   clock: reportsApi.downloadReportFx.done,
-  fn: ({ params }) => params,
+  filter: ({ params }) => !!params.isDeleteAfter,
+  fn: ({ params }) => ({ reportId: params.reportId }),
   target: reportsApi.removeReportFx,
 });
 
 sample({
   clock: discardReport,
+  fn: (reportId) => ({ reportId }),
   target: reportsApi.removeReportFx,
 });
 
 // Reset stores
 $currentReportId.reset(generateExcelReportClicked);
+
+sample({
+  clock: reportsApi.saveReportToMyReportsFx.doneData,
+  fn: (): Notification.PayloadType => ({
+    type: "success",
+    message: "Отчет успешно сохранен!",
+  }),
+  target: Notification.add,
+});

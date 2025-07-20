@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/static/css/main.6d4c2c8c.css",
-    "main.js": "/static/js/main.e1ee77ba.js",
+    "main.js": "/static/js/main.2a0f2eec.js",
     "static/media/EU_dual-use_items.pdf": "/static/media/EU_dual-use_items.a992d470e6ceff40cb55.pdf",
     "static/media/Spisok_tovarov_zapreschennykh_k_exportu_iz_Yaponii_v_RF.pdf": "/static/media/Spisok_tovarov_zapreschennykh_k_exportu_iz_Yaponii_v_RF.78b138f454d88d235770.pdf",
     "static/media/ogranichenia_ES_po_RF_EU_833_2014.pdf": "/static/media/ogranichenia_ES_po_RF_EU_833_2014.6e51f997d8f38f8705dc.pdf",
@@ -42,10 +42,10 @@
     "index.html": "/index.html",
     "static/media/web-worker-timer.js": "/static/media/web-worker-timer.56cbb4b7331c0df00f17.js",
     "main.6d4c2c8c.css.map": "/static/css/main.6d4c2c8c.css.map",
-    "main.e1ee77ba.js.map": "/static/js/main.e1ee77ba.js.map"
+    "main.2a0f2eec.js.map": "/static/js/main.2a0f2eec.js.map"
   },
   "entrypoints": [
     "static/css/main.6d4c2c8c.css",
-    "static/js/main.e1ee77ba.js"
+    "static/js/main.2a0f2eec.js"
   ]
 }

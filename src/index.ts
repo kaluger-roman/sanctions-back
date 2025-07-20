@@ -12,6 +12,7 @@ import { readFileSync } from "fs";
 import { userApi, userApiHandlers } from "./user/user.api";
 import { contactApi, contactApiHandlers } from "./contact";
 import { billingApi, billingApiHandlers } from "./billing";
+import { preferencesApi, preferencesApiHandlers } from "./preferences";
 import { initConnection } from "./init-connection";
 
 const app = express();
@@ -73,4 +74,5 @@ server.on("connection", async (socket: Socket) => {
   registerApi(contactApiHandlers, contactApi, socket);
   registerApi(billingApiHandlers, billingApi, socket);
   registerApi(reportsApiHandlers, reportsApi, socket);
+  registerApi(preferencesApiHandlers, preferencesApi, socket);
 });

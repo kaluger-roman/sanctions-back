@@ -16,6 +16,10 @@ model Preferences {
   // count of active sessions per account without force login
   momentumOnlineDevicesPerJurUser  Int @default(3)
   momentumOnlineDevicesPerPhysUser Int @default(1)
+  // максимальное количество отчетов на пользователя
+  maxUserReports                   Int @default(100)
+  // максимальное количество отчетов не привязанных к пользователю
+  maxUnlinkedReports               Int @default(500)
 }
 
 model Sanction {

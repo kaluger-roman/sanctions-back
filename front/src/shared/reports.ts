@@ -7,3 +7,8 @@ export type UserReport = {
   name: string;
   createdAt: string;
 };
+
+export type UserReportsLimitStatus = {
+  currentReportsCount: number;
+  maxUserReports: number;
+};

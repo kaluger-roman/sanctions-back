@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Dialog,
   DialogTitle,
@@ -6,6 +5,7 @@ import {
   Button,
   Box,
   Typography,
+  Alert,
 } from "@mui/material";
 import { useUnit } from "effector-react";
 import { reportsModel } from "models";
@@ -16,6 +16,11 @@ import CancelIcon from "@mui/icons-material/Cancel";
 export const ReportSaveDialog = () => {
   const isOpen = useUnit(reportsModel.$isReportSaveDialogOpen);
   const currentReportId = useUnit(reportsModel.$currentReportId);
+  const limitStatus = useUnit(reportsModel.$userReportsLimitStatus);
+
+  const willDeleteOldest = limitStatus
+    ? limitStatus.currentReportsCount >= limitStatus.maxUserReports
+    : false;
 
   return (
     <Dialog
@@ -43,8 +48,19 @@ export const ReportSaveDialog = () => {
           Отчет успешно сгенерирован. Выберите действие:
         </Typography>
 
+        {willDeleteOldest && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            <Typography variant="body2">
+              У вас достигнут лимит сохраненных отчетов (
+              {limitStatus!.currentReportsCount}/{limitStatus!.maxUserReports}).
+              При сохранении нового отчета в "Мои отчеты" самый старый будет
+              автоматически удален.
+            </Typography>
+          </Alert>
+        )}
+
         <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-          <span>
+          <Box sx={{ position: "relative" }}>
             <Button
               variant="contained"
               color="primary"
@@ -56,7 +72,7 @@ export const ReportSaveDialog = () => {
             >
               Загрузить в мои отчеты
             </Button>
-          </span>
+          </Box>
 
           <Button
             variant="outlined"

@@ -1,6 +1,7 @@
 import { createEvent, createStore, sample, createEffect } from "effector";
 import { reportsApi } from "api";
-import { ReportGenerationResult } from "shared/reports";
+import { loadPreferencesFx } from "api/preferences.api";
+import { ReportGenerationResult, UserReportsLimitStatus } from "shared/reports";
 import { searchAppModel } from "models/search-app";
 import { Notification } from "@master_kufa/client-tools";
 
@@ -8,6 +9,8 @@ import { Notification } from "@master_kufa/client-tools";
 
 export const $currentReportId = createStore<string | null>(null);
 export const $isReportSaveDialogOpen = createStore<boolean>(false);
+export const $userReportsLimitStatus =
+  createStore<UserReportsLimitStatus | null>(null);
 
 // Events
 export const generateExcelReportClicked = createEvent<void>();
@@ -83,6 +86,11 @@ sample({
 });
 
 sample({
+  clock: searchAppModel.SearchAppGate.open,
+  target: loadPreferencesFx,
+});
+
+sample({
   clock: setReportSaveDialogOpen,
   target: $isReportSaveDialogOpen,
 });
@@ -140,4 +148,16 @@ sample({
     message: "Отчет успешно сохранен!",
   }),
   target: Notification.add,
+});
+
+// Load limit status when opening save dialog
+sample({
+  clock: setReportSaveDialogOpen,
+  filter: (isOpen) => isOpen,
+  target: loadPreferencesFx,
+});
+
+sample({
+  clock: loadPreferencesFx.doneData,
+  target: $userReportsLimitStatus,
 });

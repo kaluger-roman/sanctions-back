@@ -23,6 +23,7 @@ import { TOKEN_KEY, User } from "shared/authorization";
 import { jwtDecode } from "jwt-decode";
 import { navigation } from "shared/navigate";
 import { Paths } from "shared/paths";
+import { loadPreferencesFx } from "api/preferences.api";
 
 export const $isLoading = createStore<boolean>(true);
 export const $loadingProgress = createStore<number>(NaN);
@@ -154,3 +155,8 @@ sample({
 export function AdminGate(AdminGate: any) {
   throw new Error("Function not implemented.");
 }
+
+sample({
+  clock: AppGate.open,
+  target: loadPreferencesFx,
+});

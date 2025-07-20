@@ -231,29 +231,39 @@ class ReportsService {
   };
 
   private cleanupUnlinkedReports = async (): Promise<void> => {
+    const preferences = await prisma.preferences.findFirst();
+    const maxUnlinkedReports = preferences?.maxUnlinkedReports || 500;
+
     const unlinkedReportsCount = await prisma.report.count({
-      where: { userId: null },
+      where: { userId: null, isDeleted: false }, // Считаем только не удаленные отчеты
     });
 
-    if (unlinkedReportsCount > 500) {
+    if (unlinkedReportsCount > maxUnlinkedReports) {
       const reportsToDelete = await prisma.report.findMany({
-        where: { userId: null },
+        where: { userId: null, isDeleted: false },
         orderBy: { createdAt: "asc" },
-        take: unlinkedReportsCount - 500,
+        take: unlinkedReportsCount - maxUnlinkedReports,
       });
 
       for (const report of reportsToDelete) {
         await this.deleteReportFile(report.id);
-        await prisma.report.delete({
+        // Помечаем как удаленные вместо физического удаления
+        await prisma.report.update({
           where: { id: report.id },
+          data: { isDeleted: true },
         });
       }
 
-      console.log(`Cleaned up ${reportsToDelete.length} old unlinked reports`);
+      console.log(
+        `Marked ${reportsToDelete.length} old unlinked reports as deleted`,
+      );
     }
   };
 
   private cleanupUserReports = async (userId: number): Promise<void> => {
+    const preferences = await prisma.preferences.findFirst();
+    const maxUserReports = preferences?.maxUserReports || 100;
+
     const userReportsCount = await prisma.report.count({
       where: {
         userId,
@@ -261,14 +271,14 @@ class ReportsService {
       },
     });
 
-    if (userReportsCount >= 100) {
+    if (userReportsCount >= maxUserReports) {
       const reportsToDelete = await prisma.report.findMany({
         where: {
           userId,
           isDeleted: false, // Берем только не удаленные отчеты
         },
         orderBy: { createdAt: "asc" },
-        take: userReportsCount - 99, // Keep 99, so after adding new one we'll have 100
+        take: userReportsCount - (maxUserReports - 1), // Keep max-1, so after adding new one we'll have max
       });
 
       for (const report of reportsToDelete) {
@@ -307,6 +317,7 @@ class ReportsService {
     const oldUnlinkedReports = await prisma.report.findMany({
       where: {
         userId: null,
+        isDeleted: false, // Считаем только не удаленные отчеты
         createdAt: {
           lte: oneDayAgo,
         },
@@ -315,14 +326,16 @@ class ReportsService {
 
     for (const report of oldUnlinkedReports) {
       await this.deleteReportFile(report.id);
-      await prisma.report.delete({
+      // Помечаем как удаленные вместо физического удаления
+      await prisma.report.update({
         where: { id: report.id },
+        data: { isDeleted: true },
       });
     }
 
     if (oldUnlinkedReports.length > 0) {
       console.log(
-        `Cleaned up ${oldUnlinkedReports.length} old unlinked reports (older than 24h)`,
+        `Marked ${oldUnlinkedReports.length} old unlinked reports as deleted (older than 24h)`,
       );
     }
   };

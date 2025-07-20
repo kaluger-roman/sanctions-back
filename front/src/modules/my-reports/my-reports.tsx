@@ -21,6 +21,7 @@ import {
   DialogContent,
   DialogActions,
   DialogContentText,
+  Alert,
 } from "@mui/material";
 import {
   Download as DownloadIcon,
@@ -44,6 +45,7 @@ export const MyReports = () => {
     isSelectAllChecked,
     pending,
     isDeleteConfirmDialogOpen,
+    limitStatus,
   } = useUnit({
     userReports: myReportsModel.$userReports,
     selectedReportIds: myReportsModel.$selectedReportIds,
@@ -52,6 +54,7 @@ export const MyReports = () => {
     isSelectAllChecked: myReportsModel.$isSelectAllChecked,
     pending: reportsApi.loadUserReportsFx.pending,
     isDeleteConfirmDialogOpen: myReportsModel.$isDeleteConfirmDialogOpen,
+    limitStatus: myReportsModel.$userReportsLimitStatus,
   });
 
   const {
@@ -94,6 +97,17 @@ export const MyReports = () => {
           Мои отчеты
         </Typography>
       </Box>
+
+      {limitStatus &&
+        limitStatus.currentReportsCount >= limitStatus.maxUserReports && (
+          <Alert severity="warning" sx={{ mb: 2 }}>
+            <Typography variant="body2">
+              Достигнут лимит отчетов ({limitStatus.currentReportsCount}/
+              {limitStatus.maxUserReports}). При сохранении нового отчета самый
+              старый будет автоматически удален.
+            </Typography>
+          </Alert>
+        )}
 
       {userReports.length === 0 ? (
         <Typography variant="body1" color="text.secondary">

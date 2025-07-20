@@ -1,7 +1,8 @@
 import { createEvent, createStore, sample, createEffect } from "effector";
 import { createGate } from "effector-react";
 import { reportsApi } from "api";
-import { UserReport } from "shared/reports";
+import { loadPreferencesFx } from "api/preferences.api";
+import { UserReport, UserReportsLimitStatus } from "shared/reports";
 import { Notification } from "@master_kufa/client-tools";
 
 // Gate
@@ -12,6 +13,8 @@ export const $userReports = createStore<UserReport[]>([]);
 export const $selectedReportIds = createStore<string[]>([]);
 export const $isSelectAllChecked = createStore<boolean>(false);
 export const $isDeleteConfirmDialogOpen = createStore<boolean>(false);
+export const $userReportsLimitStatus =
+  createStore<UserReportsLimitStatus | null>(null);
 
 // Events
 export const toggleReportSelection = createEvent<string>();
@@ -73,8 +76,27 @@ sample({
 });
 
 sample({
+  clock: MyReportsGate.open,
+  target: loadPreferencesFx,
+});
+
+sample({
   clock: reportsApi.loadUserReportsFx.doneData,
   target: $userReports,
+});
+
+sample({
+  clock: loadPreferencesFx.doneData,
+  target: $userReportsLimitStatus,
+});
+
+// Reload limit status after operations that might affect it
+sample({
+  clock: [
+    reportsApi.deleteMultipleReportsFx.done,
+    reportsApi.removeReportFx.done,
+  ],
+  target: loadPreferencesFx,
 });
 
 sample({
@@ -211,6 +233,7 @@ $userReports.reset(MyReportsGate.close);
 $selectedReportIds.reset(MyReportsGate.close);
 $isSelectAllChecked.reset(MyReportsGate.close);
 $isDeleteConfirmDialogOpen.reset(MyReportsGate.close);
+$userReportsLimitStatus.reset(MyReportsGate.close);
 
 sample({
   clock: reportsApi.deleteMultipleReportsFx.doneData,

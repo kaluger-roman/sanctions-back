@@ -5,11 +5,17 @@ export type Request<T> = T & {
   token?: string;
   deviceId?: string;
 };
+
 export type SocketResponse<T> = {
   requestId?: string;
   error?: string;
   payload: T;
 };
+
+export type PreferencesResponse = {
+  currentReportsCount: number;
+  maxUserReports: number;
+} | null;
 
 export type ApiHandlers<ACTIONS extends string> = Record<ACTIONS, ApiHandler>;
 

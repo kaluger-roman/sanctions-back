@@ -149,6 +149,9 @@ sample({
 // Handle single report download
 sample({
   clock: reportsApi.downloadReportFx.doneData,
+  source: MyReportsGate.status,
+  filter: (status) => status,
+  fn: (_, { arrayBuffer, title }) => ({ arrayBuffer, title }),
   target: handleFileDownloadFx,
 });
 

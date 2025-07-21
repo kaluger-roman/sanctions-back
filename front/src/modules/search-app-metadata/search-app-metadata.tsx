@@ -37,7 +37,7 @@ const ACTUAL_DATES: Array<{
   date: string;
   flag: React.ReactElement;
 }> = [
-  { country: "ЕС", date: "20.05.2025", flag: <EU /> },
+  { country: "ЕС", date: "20.07.2025", flag: <EU /> },
   { country: "Великобритания", date: "24.04.2025", flag: <GB /> },
   { country: "США", date: "04.02.2025", flag: <US /> },
   { country: "Южная Корея", date: "09.09.2024", flag: <KR /> },

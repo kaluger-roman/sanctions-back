@@ -121,6 +121,9 @@ sample({
 
 sample({
   clock: reportsApi.downloadReportFx.doneData,
+  source: searchAppModel.SearchAppGate.status,
+  filter: (status) => status,
+  fn: (_, { arrayBuffer, title }) => ({ arrayBuffer, title }),
   target: handleFileDownloadFx,
 });
 

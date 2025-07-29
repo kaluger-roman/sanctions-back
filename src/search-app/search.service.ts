@@ -15,7 +15,38 @@ import { TarrifKind } from "../billing/types";
 import { UserService } from "../user/user.service";
 import { billingService } from "../billing/billing.service";
 
+import * as XLSX from "xlsx";
+import * as path from "path";
+import { readFileSync } from "fs";
+
 class SearchService {
+  async downloadExcelTemplate(): Promise<{ buffer: Buffer }> {
+    const filePath = path.resolve(__dirname, "./excel-search-request.xlsx");
+    const buffer = readFileSync(filePath);
+    return { buffer };
+  }
+  async parseExcelTags(
+    file: Buffer | ArrayBuffer | Uint8Array,
+  ): Promise<string[]> {
+    const buffer = Buffer.isBuffer(file) ? file : Buffer.from(file as any);
+    const workbook = XLSX.read(buffer, { type: "buffer" });
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const tags: string[] = [];
+    let row = 2;
+    while (true) {
+      const cell = sheet[`A${row}`];
+      if (!cell || !cell.v) break;
+      tags.push(String(cell.v).trim());
+      row++;
+    }
+    const preferences = await prisma.preferences.findFirst();
+
+    const maxExcelTags = preferences?.maxExcelTags ?? 1000;
+    if (tags.length > maxExcelTags) {
+      throw new Error(`В файле должно быть не более ${maxExcelTags} тегов`);
+    }
+    return tags;
+  }
   async loadCountries({ token }: Request<void>) {
     const user = token ? await UserService.getUserByToken(token) : null;
     const userTarrif = user

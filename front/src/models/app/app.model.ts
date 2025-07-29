@@ -51,6 +51,7 @@ const $commonPendingRequests = combine(
   adminApi.grantUserTariffFx.pending,
   adminApi.deleteUserTariffFx.pending,
   profileApi.retryConfirmEmailFx.pending,
+  searchAppApi.parseSearchExcelFileFx.pending,
   socket.$isConnected.map((isConnected) => !isConnected),
   (...requests: Array<boolean>) => requests.some(Boolean),
 ) as unknown as Store<boolean>;
@@ -123,6 +124,7 @@ sample({
     adminApi.changeTarrifsSettingsFx.failData,
     adminApi.grantUserTariffFx.failData,
     adminApi.deleteUserTariffFx.failData,
+    searchAppApi.parseSearchExcelFileFx.failData,
   ],
   fn: (error?: string): Notification.PayloadType => ({
     type: "error",

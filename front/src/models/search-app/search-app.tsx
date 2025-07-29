@@ -1,10 +1,10 @@
 import { searchAppApi } from "api";
-import { createEvent, createStore, sample } from "effector";
+import { createEffect, createEvent, createStore, sample } from "effector";
 import { createGate } from "effector-react";
 import { $profile } from "models/profile/profile.model";
-import { spread } from "patronum";
+import { reset, spread } from "patronum";
 import { SearchResult } from "shared/sanctions";
-import { Lang, SyncedFilters } from "shared/search";
+import { Lang, SyncedFilters, QueryFormat } from "shared/search";
 import { SearchType } from "shared/search-type";
 
 export const $countries = createStore<Array<string>>([]);
@@ -13,6 +13,7 @@ export const $restrictions = createStore<Array<string>>([]);
 export const $searchLanguage = createStore<Lang>(Lang.en);
 export const $sourceDocumentOrigins = createStore<Array<string>>([]);
 export const $searchTags = createStore<Array<string>>([]);
+export const $queryFormat = createStore<QueryFormat>(QueryFormat.searchString);
 export const $searchType = createStore<Array<SearchType>>([
   "code",
   "description",
@@ -33,21 +34,52 @@ export const $selectedRestrictions = createStore<Array<string>>([]);
 export const $selectedSourceDocumentOrigins = createStore<Array<string>>([]);
 export const $selectedSearchTypes = createStore<Array<SearchType>>([]);
 export const $isSearchHappened = createStore<boolean>(false);
+export const $uploadedExcelFile = createStore<File | null>(null);
+export const $excelTagsCount = createStore<number>(0);
 
 export const searchTagsChanged = createEvent<Array<string>>();
 export const selectedCountriesChanged = createEvent<Array<string>>();
 export const searchLanguageChanged = createEvent<Lang>();
+export const queryFormatChanged = createEvent<QueryFormat>();
 export const selectedRestrictionsChanged = createEvent<Array<string>>();
 export const selectedSourceDocumentOriginsChanged =
   createEvent<Array<string>>();
 export const searchTypeChanged = createEvent<Array<SearchType>>();
 export const syncFilters = createEvent<void>();
 export const search = createEvent<void>();
+export const downloadExcelTemplateClicked = createEvent<void>();
+export const parseExcelFileChanged = createEvent<File>();
 
 export const $filtersSyncPending = searchAppApi.checkFiltersFx.pending;
 export const $searchPending = searchAppApi.searchFx.pending;
 
 export const SearchAppGate = createGate();
+
+reset({
+  clock: queryFormatChanged,
+  target: [$uploadedExcelFile, $searchTags, $excelTagsCount],
+});
+
+sample({
+  clock: parseExcelFileChanged,
+  target: $uploadedExcelFile,
+});
+
+sample({
+  clock: searchTagsChanged,
+  fn: (tags) => tags.length,
+  target: $excelTagsCount,
+});
+
+sample({
+  clock: parseExcelFileChanged,
+  target: searchAppApi.parseSearchExcelFileFx,
+});
+
+sample({
+  clock: searchAppApi.parseSearchExcelFileFx.doneData,
+  target: searchTagsChanged,
+});
 
 sample({
   clock: [SearchAppGate.open, $profile.map((x) => x?.id || null)],
@@ -87,6 +119,35 @@ sample({
 sample({
   clock: searchLanguageChanged,
   target: $searchLanguage,
+});
+
+sample({
+  clock: queryFormatChanged,
+  target: $queryFormat,
+});
+
+sample({
+  clock: downloadExcelTemplateClicked,
+  target: searchAppApi.downloadExcelTemplateFx,
+});
+
+sample({
+  clock: searchAppApi.downloadExcelTemplateFx.doneData,
+  target: createEffect<{ buffer: Blob }, void>(({ buffer }) => {
+    const blob = new Blob([buffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Пример.xlsx";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
+  }),
 });
 
 sample({

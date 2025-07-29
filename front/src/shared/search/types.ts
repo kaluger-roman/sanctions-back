@@ -28,3 +28,8 @@ export const LANG_NAMES: Record<Lang, string> = {
   [Lang.en]: "Английский",
   [Lang.ru]: "Русский",
 };
+
+export enum QueryFormat {
+  searchString = "searchString",
+  excelFile = "excelFile",
+}

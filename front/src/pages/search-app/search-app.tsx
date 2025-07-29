@@ -12,7 +12,7 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { useGate, useUnit } from "effector-react";
-import { intersection, last, sortBy, trim } from "lodash";
+import { intersection, last, sortBy } from "lodash";
 import { profileModel, searchAppModel } from "models";
 import {
   search,
@@ -23,13 +23,13 @@ import {
   searchTagsChanged,
   syncFilters,
   searchLanguageChanged,
+  queryFormatChanged,
 } from "models/search-app/search-app";
-import { MuiChipsInput } from "mui-chips-input";
 import { SearchType, SearchTypeName } from "shared/search-type";
 import { theme } from "shared/theme";
 import { SearchTable } from "./search-table";
 import { SearchAppMetadata } from "modules/search-app-metadata";
-import { ReportSaveDialog } from "modules";
+import { ReportSaveDialog, QueryFormatInput } from "modules";
 import PaidIcon from "@mui/icons-material/Paid";
 import LockIcon from "@mui/icons-material/Lock";
 import { TarrifKind } from "shared/billing";
@@ -44,6 +44,7 @@ export const SearchApp = () => {
   const allowedCountries = useUnit(searchAppModel.$allowedCountries);
   const restrictions = useUnit(searchAppModel.$restrictions);
   const searchLanguage = useUnit(searchAppModel.$searchLanguage);
+  const queryFormat = useUnit(searchAppModel.$queryFormat);
   const sourceDocumentOrigins = useUnit(searchAppModel.$sourceDocumentOrigins);
   const selectedRestrictions = useUnit(searchAppModel.$selectedRestrictions);
   const selectedSourceDocumentOrigins = useUnit(
@@ -56,7 +57,7 @@ export const SearchApp = () => {
 
   const isFree =
     !currentTarrif || currentTarrif?.tarrif.identifier === TarrifKind.free;
-  const isSm = useMediaQuery(theme.breakpoints.down("sm"));
+  const isSm = useMediaQuery(theme.breakpoints.down("md"));
 
   const isAllAvailableSanctionsSelected =
     intersection(selectedRestrictions, availableFilters.restrictions).length ===
@@ -95,38 +96,12 @@ export const SearchApp = () => {
           gap: 2,
         }}
       >
-        <Box sx={{ width: "100%", display: "flex", gap: 2 }}>
-          <MuiChipsInput
-            addOnBlur
-            placeholder="Коды или описание (через Enter)"
-            sx={{ flexGrow: 1 }}
-            value={searchTags}
-            onChange={searchTagsChanged}
-            name="searchTags"
-            onPaste={(e) => {
-              e.preventDefault();
-              const value = e.clipboardData.getData("text");
-
-              const newTags = [
-                ...searchTags,
-                ...value
-                  .split(/(\r)?\n/g)
-                  .map(trim)
-                  .filter(Boolean),
-              ];
-
-              searchTagsChanged(newTags);
-            }}
-          />
-          {!isSm && (
-            <Button
-              variant="contained"
-              onClick={() => setTimeout(() => search(), 0)}
-            >
-              Поиск
-            </Button>
-          )}
-        </Box>
+        <QueryFormatInput
+          queryFormat={queryFormat}
+          onFormatChange={queryFormatChanged}
+          searchTags={searchTags}
+          onSearchTagsChange={searchTagsChanged}
+        />
 
         <Box
           sx={{
@@ -380,20 +355,23 @@ export const SearchApp = () => {
               ))}
             </Select>
           </FormControl>
-
-          {isSm && (
-            <Button
-              variant="contained"
-              onClick={() => setTimeout(() => search(), 0)}
-              onTouchEnd={() =>
-                setTimeout(() => {
-                  search();
-                }, 0)
-              }
-            >
-              Поиск
-            </Button>
-          )}
+          <Button
+            sx={{
+              maxWidth: isSm ? "100%" : 400,
+              minWidth: 150,
+              ml: "auto",
+              width: isSm ? "100%" : "auto",
+            }}
+            variant="contained"
+            onClick={() => setTimeout(() => search(), 0)}
+            onTouchEnd={() =>
+              setTimeout(() => {
+                search();
+              }, 0)
+            }
+          >
+            Поиск
+          </Button>
         </Box>
         <SearchResultActions />
         <SearchTable />

@@ -39,9 +39,7 @@ export const Profile = () => {
       >
         <Tab label="Профиль" value={Paths.profileMy} />
         <Tab label="Тариф" value={Paths.profileTariff} />
-        {authorizationData?.isAdmin && (
-          <Tab label="Мои отчеты" value={Paths.profileReports} />
-        )}
+        <Tab label="Мои отчеты" value={Paths.profileReports} />
       </Tabs>
 
       {window.location?.pathname === Paths.profileMy && <ProfileData />}

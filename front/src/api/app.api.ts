@@ -21,16 +21,13 @@ class AppSocket {
   client: Socket;
   $isConnected = createStore(false);
   deviceId: string;
+  serverHost: string =
+    (process.env.NODE_ENV === "production"
+      ? process.env.REACT_APP_SERVER_HOST
+      : process.env.REACT_APP_SERVER_HOST_DEV) || "/";
 
   connect() {
-    this.client = io(
-      (process.env.NODE_ENV === "production"
-        ? process.env.REACT_APP_SERVER_HOST
-        : process.env.REACT_APP_SERVER_HOST_DEV) || "/",
-      {
-        transports: ["websocket"],
-      },
-    );
+    this.client = io(this.serverHost, { transports: ["websocket"] });
 
     this.init();
   }

@@ -4,6 +4,26 @@ import { SearchResult } from "shared/sanctions";
 import { CountriesResult, SearchFilters, SyncedFilters } from "shared/search";
 import { socket } from "./app.api";
 
+export const parseSearchExcelFileFx = createEffect<File, string[], string>(
+  (data) => {
+    return socket.emitWithAnswer<{ data: File }, string[]>(
+      ACTIONS.PARSE_SEARCH_EXCEL_FILE,
+      { data },
+    );
+  },
+);
+
+export const downloadExcelTemplateFx = createEffect<
+  void,
+  { buffer: Blob },
+  string
+>(
+  async () =>
+    await socket.emitWithAnswer<void, { buffer: Blob }>(
+      ACTIONS.DOWNLOAD_EXCEL_TEMPLATE,
+    ),
+);
+
 export const loadCountriesFx = createEffect<void, CountriesResult, string>(() =>
   socket.emitWithAnswer<void, CountriesResult>(ACTIONS.LOAD_COUNTRIES),
 );

@@ -9,14 +9,13 @@ export const SearchResultActions = () => {
   const authorizationData = useUnit(appModel.$authorizationData);
   const hasResults = !isSearchEmpty(searchResult);
   const isAuthenticated = Boolean(authorizationData);
-  const isAdmin = Boolean(authorizationData?.isAdmin);
 
   const isDisabled = !hasResults || !isAuthenticated;
   const tooltipTitle = !isAuthenticated
     ? "Операция доступна только зарегистрированным пользователям, пожалуйста, войдите в систему."
     : "";
 
-  if (!hasResults || !isAdmin) return null;
+  if (!hasResults) return null;
 
   return (
     <Tooltip disableHoverListener={isAuthenticated} title={tooltipTitle}>

@@ -20,6 +20,8 @@ model Preferences {
   maxUserReports                   Int @default(100)
   // максимальное количество отчетов не привязанных к пользователю
   maxUnlinkedReports               Int @default(500)
+  // максимальное количество тегов в Excel-файле поискового запроса
+  maxExcelTags                     Int @default(1000)
 }
 
 model Sanction {

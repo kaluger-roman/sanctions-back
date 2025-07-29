@@ -10,3 +10,5 @@ export { SessionControls } from "./session-controls";
 export { SearchResultActions } from "./search-result-actions";
 export { ReportSaveDialog } from "./report-save-dialog";
 export { MyReports } from "./my-reports";
+export { QueryFormatInput } from "./query-format-input";
+export { ExcelFileDropZone } from "./excel-file-drop-zone";

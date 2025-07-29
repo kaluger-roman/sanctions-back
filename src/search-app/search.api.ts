@@ -18,6 +18,11 @@ export const searchApiHandlers = {
   ) => searchService.applyIntermediateFilters(payload),
   [ACTIONS.SEARCH]: (payload: Request<SearchFilters>) =>
     searchService.search(payload),
+  [ACTIONS.PARSE_SEARCH_EXCEL_FILE]: async (
+    payload: Request<{ data: Buffer | ArrayBuffer | Uint8Array }>,
+  ) => searchService.parseExcelTags(payload.data),
+  [ACTIONS.DOWNLOAD_EXCEL_TEMPLATE]: async () =>
+    searchService.downloadExcelTemplate(),
 };
 
 export const searchApi = new Api(searchApiHandlers);

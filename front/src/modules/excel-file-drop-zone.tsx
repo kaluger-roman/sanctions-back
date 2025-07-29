@@ -13,6 +13,7 @@ export const ExcelFileDropZone = () => {
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setIsDragOver(false);
+    handleFileInput(e.dataTransfer.files);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -25,8 +26,7 @@ export const ExcelFileDropZone = () => {
     setIsDragOver(false);
   };
 
-  const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
+  const handleFileInput = (files: FileList | null) => {
     if (files && files.length > 0) {
       const file = files[0];
       searchAppModel.parseExcelFileChanged(file);
@@ -103,7 +103,7 @@ export const ExcelFileDropZone = () => {
         type="file"
         accept=".xlsx,.xls"
         style={{ display: "none" }}
-        onChange={handleFileInput}
+        onChange={(e) => handleFileInput(e.target.files)}
       />
     </Paper>
   );

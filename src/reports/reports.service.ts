@@ -32,7 +32,6 @@ class ReportsService {
     searchTypes,
     searchTags,
     searchLanguage,
-    token,
   }: Request<SearchFilters>): Promise<ReportGenerationResult> => {
     // Get search results using existing search service, not pass token to not trigger user limits
     const searchResults = await searchService.search({
@@ -42,6 +41,7 @@ class ReportsService {
       searchTypes,
       searchTags,
       searchLanguage,
+      mode: "excel",
     });
 
     const reportId = randomUUID();

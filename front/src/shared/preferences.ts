@@ -1,3 +1,5 @@
 import { UserReportsLimitStatus } from "./reports";
 
-export type Preferences = UserReportsLimitStatus;
+export type Preferences = UserReportsLimitStatus & {
+  maxWebViewTagsCount: number;
+};

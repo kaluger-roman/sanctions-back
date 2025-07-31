@@ -10,6 +10,7 @@ import {
   Select,
   Tooltip,
   useMediaQuery,
+  Alert,
 } from "@mui/material";
 import { useGate, useUnit } from "effector-react";
 import { intersection, last, sortBy } from "lodash";
@@ -54,6 +55,8 @@ export const SearchApp = () => {
   const availableFilters = useUnit(searchAppModel.$availableFilters);
   const filtersSyncPending = useUnit(searchAppModel.$filtersSyncPending);
   const currentTarrif = useUnit(profileModel.$currentTarrif);
+  const tooManyTagsError = useUnit(searchAppModel.$tooManyTagsError);
+  const maxWebViewTagsCount = useUnit(searchAppModel.$maxWebViewTagsCount);
 
   const isFree =
     !currentTarrif || currentTarrif?.tarrif.identifier === TarrifKind.free;
@@ -374,6 +377,12 @@ export const SearchApp = () => {
           </Button>
         </Box>
         <SearchResultActions />
+        {tooManyTagsError && (
+          <Alert variant="outlined" severity="warning">
+            Запрос слишком объемный (более {maxWebViewTagsCount} тегов), для
+            выгрузки результата используйте Excel-отчет
+          </Alert>
+        )}
         <SearchTable />
       </Box>
       <SearchAppMetadata />

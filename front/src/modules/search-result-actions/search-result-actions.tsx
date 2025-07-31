@@ -9,13 +9,14 @@ export const SearchResultActions = () => {
   const authorizationData = useUnit(appModel.$authorizationData);
   const hasResults = !isSearchEmpty(searchResult);
   const isAuthenticated = Boolean(authorizationData);
+  const tooManyTagsError = useUnit(searchAppModel.$tooManyTagsError);
 
-  const isDisabled = !hasResults || !isAuthenticated;
+  const isDisabled = (!hasResults && !tooManyTagsError) || !isAuthenticated;
   const tooltipTitle = !isAuthenticated
     ? "Операция доступна только зарегистрированным пользователям, пожалуйста, войдите в систему."
     : "";
 
-  if (!hasResults) return null;
+  if (!hasResults && !tooManyTagsError) return null;
 
   return (
     <Tooltip disableHoverListener={isAuthenticated} title={tooltipTitle}>

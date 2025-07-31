@@ -13,8 +13,9 @@ export type SocketResponse<T> = {
 };
 
 export type PreferencesResponse = {
-  currentReportsCount: number;
-  maxUserReports: number;
+  currentReportsCount?: number;
+  maxUserReports?: number;
+  maxWebViewTagsCount: number;
 } | null;
 
 export type ApiHandlers<ACTIONS extends string> = Record<ACTIONS, ApiHandler>;

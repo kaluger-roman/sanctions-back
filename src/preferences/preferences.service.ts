@@ -14,7 +14,9 @@ class PreferencesService {
 
     // If user is authenticated, return user reports limit status
     if (!token) {
-      return null;
+      return {
+        maxWebViewTagsCount: preferences.maxWebViewTagsCount,
+      };
     }
 
     try {
@@ -27,6 +29,7 @@ class PreferencesService {
       return {
         currentReportsCount,
         maxUserReports: preferences.maxUserReports,
+        maxWebViewTagsCount: preferences.maxWebViewTagsCount,
       };
     } catch (error) {
       // If token is invalid or user not found, return null

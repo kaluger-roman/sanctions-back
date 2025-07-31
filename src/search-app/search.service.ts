@@ -136,7 +136,16 @@ class SearchService {
     deviceId,
     token,
     searchLanguage,
-  }: Request<SearchFilters>) {
+    mode = "web",
+  }: Request<SearchFilters> & {
+    mode?: "web" | "excel";
+  }) {
+    const preferences = await prisma.preferences.findFirst();
+    const tagLimit = preferences?.maxWebViewTagsCount ?? 50;
+    if (searchTags.length > tagLimit && mode === "web") {
+      throw new Error("too_many_tags");
+    }
+
     const sanctions: Array<
       Sanction & { descriptionTag?: string; codeTag?: string }
     > = [];
@@ -232,7 +241,7 @@ class SearchService {
       ),
     };
 
-    if (!isEmpty(groupedSanctions) && token) {
+    if (!isEmpty(groupedSanctions) && token && mode === "web") {
       await searchQuotasService.registerDevice(deviceId, token);
       await searchQuotasService.registerSearchRequest(
         {

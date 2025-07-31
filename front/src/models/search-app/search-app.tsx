@@ -1,4 +1,5 @@
 import { searchAppApi } from "api";
+import { loadPreferencesFx } from "api/preferences.api";
 import { createEffect, createEvent, createStore, sample } from "effector";
 import { createGate } from "effector-react";
 import { $profile } from "models/profile/profile.model";
@@ -19,11 +20,13 @@ export const $searchType = createStore<Array<SearchType>>([
   "description",
   "codeAddition",
 ]);
-export const $searchResult = createStore<SearchResult>({
+
+const DEFAULT_SEARCH_RESULT: SearchResult = {
   code: {},
   description: {},
   codeAddition: {},
-});
+};
+export const $searchResult = createStore<SearchResult>(DEFAULT_SEARCH_RESULT);
 export const $availableFilters = createStore<SyncedFilters>({
   restrictions: [],
   sourceDocumentOrigins: [],
@@ -34,8 +37,10 @@ export const $selectedRestrictions = createStore<Array<string>>([]);
 export const $selectedSourceDocumentOrigins = createStore<Array<string>>([]);
 export const $selectedSearchTypes = createStore<Array<SearchType>>([]);
 export const $isSearchHappened = createStore<boolean>(false);
+export const $tooManyTagsError = createStore<boolean>(false);
 export const $uploadedExcelFile = createStore<File | null>(null);
 export const $excelTagsCount = createStore<number>(0);
+export const $maxWebViewTagsCount = createStore<number>(0);
 
 export const searchTagsChanged = createEvent<Array<string>>();
 export const selectedCountriesChanged = createEvent<Array<string>>();
@@ -280,6 +285,32 @@ sample({
   clock: searchAppApi.searchFx.done,
   fn: () => true,
   target: $isSearchHappened,
+});
+
+sample({
+  clock: searchAppApi.searchFx.failData,
+  filter: (message) => message === "too_many_tags",
+  fn: () => true,
+  target: $tooManyTagsError,
+});
+
+sample({
+  clock: searchAppApi.searchFx.doneData,
+  fn: () => false,
+  target: $tooManyTagsError,
+});
+
+sample({
+  clock: $tooManyTagsError,
+  filter: (error) => error,
+  fn: () => DEFAULT_SEARCH_RESULT,
+  target: $searchResult,
+});
+
+sample({
+  clock: loadPreferencesFx.doneData,
+  fn: ({ maxWebViewTagsCount }) => maxWebViewTagsCount,
+  target: $maxWebViewTagsCount,
 });
 
 sample({

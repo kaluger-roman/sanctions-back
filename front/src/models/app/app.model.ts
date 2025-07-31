@@ -126,6 +126,7 @@ sample({
     adminApi.deleteUserTariffFx.failData,
     searchAppApi.parseSearchExcelFileFx.failData,
   ],
+  filter: (error) => error !== "too_many_tags",
   fn: (error?: string): Notification.PayloadType => ({
     type: "error",
     message: error || "An error occurred. Please try again later.",

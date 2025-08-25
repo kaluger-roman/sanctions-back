@@ -207,7 +207,10 @@ export const TarrifItem = ({ tarrif }: { tarrif: UserTarrif }) => {
             </IconButton>
           </Tooltip>
         }
-        count={tarrif._count.searchRequest}
+        count={
+          tarrif._count.searchRequest +
+          tarrif._count.counterSanctionSearchRequest
+        }
         limit={tarrif.tarrif.allowedRequests + tarrif.additionalRequestsCount}
         isUnlimited={
           !!isUnlimitedRequests || tarrif.tarrif.identifier === TarrifKind.free

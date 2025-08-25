@@ -2,6 +2,7 @@ import { Tarrif, UserTarrif } from "@prisma/client";
 import { billingService } from "../billing/billing.service";
 import { UserService } from "../user/user.service";
 import { SearchFilters } from "./search-app.types";
+import { CounterSanctionSearchFilters } from "./counter-sanctions.types";
 import { prisma } from "../../prisma";
 import { ActiveConnections } from "../active-connections";
 import { ACTIONS } from "../actions";
@@ -120,17 +121,63 @@ class SearchQuotasService {
 
     if (!tarrif) return;
 
+    // Считаем общее количество запросов (обычные + контрсанкции)
+    const totalSearchRequests = await prisma.searchRequest.count({
+      where: { userTarrifId: tarrif.id },
+    });
+    const totalCounterSanctionRequests =
+      await prisma.counterSanctionSearchRequest.count({
+        where: { userTarrifId: tarrif.id },
+      });
+
     if (
       !isUserUnlimitedRequests &&
-      (await prisma.searchRequest.count({
-        where: { userTarrifId: tarrif.id },
-      })) >=
+      totalSearchRequests + totalCounterSanctionRequests >=
         tarrif.tarrif.allowedRequests + tarrif.additionalRequestsCount
     ) {
       throw new Error("Превышен лимит запросов для поиска, улучшите ваш тариф");
     }
 
     return prisma.searchRequest.create({
+      data: {
+        UserTarrif: { connect: { id: tarrif.id } },
+        ...payload,
+      },
+    });
+  }
+
+  async registerCounterSanctionSearchRequest(
+    payload: CounterSanctionSearchFilters,
+    token: string,
+  ) {
+    const { id: userId } = await UserService.getUserByToken(token);
+    const tarrif = await billingService.getUserCurrentTarrif(userId);
+    const tarrifs = await prisma.userTarrif.findMany({
+      where: { userId },
+      include: { tarrif: true },
+    });
+    const isUserUnlimitedRequests = this.isUserUnlimitedRequests(tarrifs);
+
+    if (!tarrif) return;
+
+    // Считаем общее количество запросов (обычные + контрсанкции)
+    const totalSearchRequests = await prisma.searchRequest.count({
+      where: { userTarrifId: tarrif.id },
+    });
+    const totalCounterSanctionRequests =
+      await prisma.counterSanctionSearchRequest.count({
+        where: { userTarrifId: tarrif.id },
+      });
+
+    if (
+      !isUserUnlimitedRequests &&
+      totalSearchRequests + totalCounterSanctionRequests >=
+        tarrif.tarrif.allowedRequests + tarrif.additionalRequestsCount
+    ) {
+      throw new Error("Превышен лимит запросов для поиска, улучшите ваш тариф");
+    }
+
+    return prisma.counterSanctionSearchRequest.create({
       data: {
         UserTarrif: { connect: { id: tarrif.id } },
         ...payload,

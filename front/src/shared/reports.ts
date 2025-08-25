@@ -6,6 +6,7 @@ export type UserReport = {
   id: string;
   name: string;
   createdAt: string;
+  type: "sanctions" | "counter-sanctions";
 };
 
 export type UserReportsLimitStatus = {

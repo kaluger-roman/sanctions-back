@@ -2,6 +2,7 @@ export { appModel } from "./app";
 export { searchAppModel } from "./search-app";
 export {
   manageSanctionsModel,
+  manageCounterSanctionsModel,
   manageTarrifsModel,
   adminModel,
   grantTarrifModel,

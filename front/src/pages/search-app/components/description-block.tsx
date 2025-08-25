@@ -135,7 +135,9 @@ export const DescriptionBlock = ({
           </Typography>
         </Collapse>
       </Box>
-      <TranslateSelector lang={lang} setLang={setLang} />
+      {descriptionRussian ? (
+        <TranslateSelector lang={lang} setLang={setLang} />
+      ) : null}
       {isOverflow && (
         <ExpandDescriptionButton
           expanded={expanded}

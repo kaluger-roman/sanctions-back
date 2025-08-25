@@ -30,11 +30,16 @@ export const $loadingProgress = createStore<number>(NaN);
 export const $authorizationData = createStore<User | null>(null);
 
 const $commonPendingRequests = combine(
+  searchAppApi.loadCounterSanctionsRestrictionsFx.pending,
+  searchAppApi.loadCounterSanctionsSourceDocumentsFx.pending,
   searchAppApi.loadCountriesFx.pending,
   searchAppApi.searchFx.pending,
+  searchAppApi.searchCounterSanctionsFx.pending,
   reportsApi.generateExcelReportFx.pending,
+  reportsApi.generateCounterSanctionsExcelReportFx.pending,
   reportsApi.downloadReportFx.pending,
   reportsApi.saveReportToMyReportsFx.pending,
+  reportsApi.saveCounterSanctionReportToMyReportsFx.pending,
   reportsApi.removeReportFx.pending,
   reportsApi.loadUserReportsFx.pending,
   reportsApi.deleteMultipleReportsFx.pending,
@@ -109,6 +114,7 @@ sample({
 sample({
   clock: [
     adminApi.uploadSanctionsFileFx.failData,
+    adminApi.uploadCounterSanctionsFileFx.failData,
     contactUsApi.submitForm.failData,
     authApi.recoverRequestFx.failData,
     authApi.recoverConfirmFx.failData,
@@ -117,6 +123,7 @@ sample({
     profileApi.changeProfileFx.failData,
     billingApi.createPaymentFx.failData,
     searchAppApi.searchFx.failData,
+    searchAppApi.searchCounterSanctionsFx.failData,
     reportsApi.generateExcelReportFx.failData,
     reportsApi.downloadReportFx.failData,
     billingApi.addRequestsPaymentFx.failData,

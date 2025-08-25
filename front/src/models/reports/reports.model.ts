@@ -1,8 +1,9 @@
-import { createEvent, createStore, sample, createEffect } from "effector";
-import { reportsApi } from "api";
+import { createEvent, createStore, createEffect, sample } from "effector";
+import * as reportsApi from "api/reports.api";
+import { searchAppModel } from "models/search-app";
+import { SearchCategory } from "models/search-app/search-app";
 import { loadPreferencesFx } from "api/preferences.api";
 import { ReportGenerationResult, UserReportsLimitStatus } from "shared/reports";
-import { searchAppModel } from "models/search-app";
 import { Notification } from "@master_kufa/client-tools";
 
 // Stores
@@ -48,6 +49,7 @@ const handleFileDownloadFx = createEffect(
 sample({
   clock: generateExcelReportClicked,
   source: [
+    searchAppModel.$searchCategory,
     searchAppModel.$selectedCountries,
     searchAppModel.$selectedRestrictions,
     searchAppModel.$selectedSourceDocumentOrigins,
@@ -55,7 +57,9 @@ sample({
     searchAppModel.$searchTags,
     searchAppModel.$searchLanguage,
   ] as const,
+  filter: ([searchCategory]) => searchCategory === SearchCategory.sanctions,
   fn: ([
+    ,
     countries,
     restrictions,
     sourceDocumentOrigins,
@@ -74,13 +78,39 @@ sample({
 });
 
 sample({
-  clock: reportsApi.generateExcelReportFx.doneData,
+  clock: generateExcelReportClicked,
+  source: [
+    searchAppModel.$searchCategory,
+    searchAppModel.$selectedCounterSanctionsRestrictions,
+    searchAppModel.$selectedCounterSanctionsSourceDocuments,
+    searchAppModel.$searchType,
+    searchAppModel.$searchTags,
+  ] as const,
+  filter: ([searchCategory]) =>
+    searchCategory === SearchCategory.counterSanctions,
+  fn: ([, restrictions, sourceDocumentShorts, searchTypes, searchTags]) => ({
+    restrictions,
+    sourceDocumentShorts,
+    searchTypes,
+    searchTags,
+  }),
+  target: reportsApi.generateCounterSanctionsExcelReportFx,
+});
+
+sample({
+  clock: [
+    reportsApi.generateExcelReportFx.doneData,
+    reportsApi.generateCounterSanctionsExcelReportFx.doneData,
+  ],
   fn: ({ id }: ReportGenerationResult) => id,
   target: $currentReportId,
 });
 
 sample({
-  clock: reportsApi.generateExcelReportFx.doneData,
+  clock: [
+    reportsApi.generateExcelReportFx.doneData,
+    reportsApi.generateCounterSanctionsExcelReportFx.doneData,
+  ],
   fn: () => true,
   target: setReportSaveDialogOpen,
 });
@@ -110,7 +140,19 @@ sample({
 
 sample({
   clock: saveReportToMyReports,
+  source: searchAppModel.$searchCategory,
+  filter: (searchCategory) => searchCategory === SearchCategory.sanctions,
+  fn: (_, reportId) => reportId,
   target: reportsApi.saveReportToMyReportsFx,
+});
+
+sample({
+  clock: saveReportToMyReports,
+  source: searchAppModel.$searchCategory,
+  filter: (searchCategory) =>
+    searchCategory === SearchCategory.counterSanctions,
+  fn: (_, reportId) => reportId,
+  target: reportsApi.saveCounterSanctionReportToMyReportsFx,
 });
 
 sample({
@@ -145,7 +187,10 @@ sample({
 $currentReportId.reset(generateExcelReportClicked);
 
 sample({
-  clock: reportsApi.saveReportToMyReportsFx.doneData,
+  clock: [
+    reportsApi.saveReportToMyReportsFx.doneData,
+    reportsApi.saveCounterSanctionReportToMyReportsFx.doneData,
+  ],
   fn: (): Notification.PayloadType => ({
     type: "success",
     message: "Отчет успешно сохранен!",

@@ -7,17 +7,21 @@ import { isEmpty } from "lodash";
 export const CategoryRows = ({
   data,
   label,
+  isCounterSanctions = false,
 }: {
   data: CategorySearchMath;
   label: string;
+  isCounterSanctions?: boolean;
 }) => {
   if (isEmpty(data)) return null;
+
+  const colSpan = isCounterSanctions ? 6 : 5;
 
   return (
     <>
       <TableRow>
         <TableCell
-          colSpan={5}
+          colSpan={colSpan}
           sx={{
             background: theme.palette.grey[200],
             verticalAlign: "top",
@@ -28,7 +32,7 @@ export const CategoryRows = ({
           </Typography>
         </TableCell>
       </TableRow>
-      <CountryRows data={data} />
+      <CountryRows data={data} isCounterSanctions={isCounterSanctions} />
     </>
   );
 };

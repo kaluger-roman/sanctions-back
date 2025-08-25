@@ -39,7 +39,11 @@ export const AdditionalPayments = {
 export const UserTarrifsInclude = {
   select: {
     _count: {
-      select: { searchRequest: true, devices: true },
+      select: {
+        searchRequest: true,
+        counterSanctionSearchRequest: true,
+        devices: true,
+      },
     },
     start: true,
     end: true,

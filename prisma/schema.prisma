@@ -44,12 +44,27 @@ model Sanction {
   @@index([sourceDocumentOrigin], map: "idx_sourcedocumentorigin")
 }
 
+model CounterSanction {
+  id                  Int    @id @default(autoincrement())
+  code                String
+  description         String
+  exception           String @default("")
+  sourceDocument      String
+  restriction         String
+  sourceDocumentShort String @default("")
+
+  @@index([description(ops: raw("gin_trgm_ops"))], map: "countersanction_description_trgm_idx", type: Gin)
+  @@index([exception(ops: raw("gin_trgm_ops"))], map: "countersanction_exception_trgm_idx", type: Gin)
+  @@index([restriction], map: "idx_countersanction_restriction")
+  @@index([sourceDocumentShort], map: "idx_countersanction_sourcedocumentshort")
+}
+
 model User {
-  id                           Int           @id @default(autoincrement())
-  createdAt                    DateTime      @default(now())
-  email                        String        @unique
+  id                           Int                     @id @default(autoincrement())
+  createdAt                    DateTime                @default(now())
+  email                        String                  @unique
   passwordHash                 String
-  isAdmin                      Boolean       @default(false)
+  isAdmin                      Boolean                 @default(false)
   recoverPasswordToken         String?
   recoverPasswordRequestTime   DateTime?
   name                         String
@@ -59,14 +74,15 @@ model User {
   INN                          String?
   companyName                  String?
   category                     String
-  isConfirmed                  Boolean       @default(false)
+  isConfirmed                  Boolean                 @default(false)
   registrationConfirmToken     String?
-  lastPasswordChangeTime       DateTime?     @default(now())
+  lastPasswordChangeTime       DateTime?               @default(now())
   tarrifs                      UserTarrif[]
   UserSession                  UserSession[]
   reports                      Report[]
+  counterSanctionReports       CounterSanctionReport[]
   // count of active sessions per account without force login
-  momentumOnlineDevicesPerUser Int?          @default(3)
+  momentumOnlineDevicesPerUser Int?                    @default(3)
 }
 
 model UserSession {
@@ -81,17 +97,18 @@ model UserSession {
 }
 
 model UserTarrif {
-  id                      Int             @id @default(autoincrement())
-  user                    User            @relation(fields: [userId], references: [id])
-  tarrif                  Tarrif          @relation(fields: [tarrifId], references: [id])
-  start                   DateTime?
-  end                     DateTime?
-  userId                  Int
-  tarrifId                Int
-  isUserNoticed           Boolean         @default(false)
-  devices                 Device[]
-  searchRequest           SearchRequest[]
-  additionalRequestsCount Int             @default(0)
+  id                           Int                            @id @default(autoincrement())
+  user                         User                           @relation(fields: [userId], references: [id])
+  tarrif                       Tarrif                         @relation(fields: [tarrifId], references: [id])
+  start                        DateTime?
+  end                          DateTime?
+  userId                       Int
+  tarrifId                     Int
+  isUserNoticed                Boolean                        @default(false)
+  devices                      Device[]
+  searchRequest                SearchRequest[]
+  counterSanctionSearchRequest CounterSanctionSearchRequest[]
+  additionalRequestsCount      Int                            @default(0)
 }
 
 model SearchRequest {
@@ -112,16 +129,17 @@ model Device {
 }
 
 model Tarrif {
-  id               Int          @id @default(autoincrement())
-  identifier       String       @unique
+  id                            Int          @id @default(autoincrement())
+  identifier                    String       @unique
   // in months
-  duration         Int?
-  allowedRequests  Int?
-  allowedDevices   Int?
+  duration                      Int?
+  allowedRequests               Int?
+  allowedDevices                Int?
   // in rubles
-  price            Int?
-  allowedCountries String[]
-  UserTarrif       UserTarrif[]
+  price                         Int?
+  allowedCountries              String[]
+  allowedCounterSanctionSources String[]     @default([])
+  UserTarrif                    UserTarrif[]
 }
 
 model Report {
@@ -141,4 +159,27 @@ model Report {
 
 model PendingPayment {
   id String @id
+}
+
+model CounterSanctionSearchRequest {
+  id                   Int         @id @default(autoincrement())
+  searchTypes          String[]
+  restrictions         String[]
+  sourceDocumentShorts String[]
+  searchTags           String[]
+  UserTarrif           UserTarrif? @relation(fields: [userTarrifId], references: [id])
+  userTarrifId         Int?
+}
+
+model CounterSanctionReport {
+  id                   String   @id @default(uuid())
+  title                String?
+  createdAt            DateTime @default(now())
+  user                 User?    @relation(fields: [userId], references: [id])
+  userId               Int?
+  searchTypes          String[]
+  restrictions         String[]
+  sourceDocumentShorts String[]
+  searchTags           String[]
+  isDeleted            Boolean  @default(false)
 }

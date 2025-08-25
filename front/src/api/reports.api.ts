@@ -1,6 +1,7 @@
 import { createEffect } from "effector";
 import { ACTIONS } from "./actions";
 import { SearchFilters } from "shared/search";
+import { CounterSanctionSearchFilters } from "shared/counter-sanctions-search";
 import { ReportGenerationResult, UserReport } from "shared/reports";
 import { socket } from "./app.api";
 
@@ -15,6 +16,17 @@ export const generateExcelReportFx = createEffect<
   ),
 );
 
+export const generateCounterSanctionsExcelReportFx = createEffect<
+  CounterSanctionSearchFilters,
+  ReportGenerationResult,
+  string
+>((payload) =>
+  socket.emitWithAnswer<CounterSanctionSearchFilters, ReportGenerationResult>(
+    ACTIONS.GENERATE_COUNTER_SANCTIONS_EXCEL_REPORT,
+    payload,
+  ),
+);
+
 export const saveReportToMyReportsFx = createEffect<string, void, string>(
   (reportId) =>
     socket.emitWithAnswer<{ reportId: string }, void>(
@@ -23,6 +35,19 @@ export const saveReportToMyReportsFx = createEffect<string, void, string>(
         reportId,
       },
     ),
+);
+
+export const saveCounterSanctionReportToMyReportsFx = createEffect<
+  string,
+  void,
+  string
+>((reportId) =>
+  socket.emitWithAnswer<{ reportId: string }, void>(
+    ACTIONS.SAVE_COUNTER_SANCTION_REPORT_TO_MY_REPORTS,
+    {
+      reportId,
+    },
+  ),
 );
 
 export const removeReportFx = createEffect<{ reportId: string }, void, string>(

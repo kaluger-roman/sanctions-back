@@ -7,8 +7,16 @@ import {
   searchByCodeAddition,
   searchByDescription,
 } from "./search-app.helpers";
+import {
+  postLimitCounterSanctionCodeAddition,
+  postLimitCounterSanctionDescription,
+  searchCounterSanctionsByCode,
+  searchCounterSanctionsByCodeAddition,
+  searchCounterSanctionsByDescription,
+} from "./counter-sanctions.helpers";
 import { SearchFilters } from "./search-app.types";
-import { Sanction } from "@prisma/client";
+import { CounterSanctionSearchFilters } from "./counter-sanctions.types";
+import { Sanction, CounterSanction } from "@prisma/client";
 import { Request } from "../types";
 import { searchQuotasService } from "./search-quotas.service";
 import { TarrifKind } from "../billing/types";
@@ -79,22 +87,66 @@ class SearchService {
     };
   }
   async loadRestrictions() {
-    const restrictions = await prisma.sanction.findMany({
-      select: { restriction: true },
-      distinct: ["restriction"],
-    });
+    return (
+      await prisma.sanction.findMany({
+        select: { restriction: true },
+        distinct: ["restriction"],
+      })
+    ).map(({ restriction }) => restriction);
+  }
 
-    return restrictions.map(({ restriction }) => restriction);
+  async loadCounterSanctionsRestrictions() {
+    return (
+      await prisma.counterSanction.findMany({
+        select: { restriction: true },
+        distinct: ["restriction"],
+      })
+    ).map(({ restriction }) => restriction);
   }
   async loadSourceDocumentOrigins() {
-    const sourceDocumentOrigins = await prisma.sanction.findMany({
-      select: { sourceDocumentOrigin: true },
-      distinct: ["sourceDocumentOrigin"],
+    return (
+      await prisma.sanction.findMany({
+        select: { sourceDocumentOrigin: true },
+        distinct: ["sourceDocumentOrigin"],
+      })
+    ).map(({ sourceDocumentOrigin }) => sourceDocumentOrigin);
+  }
+
+  async loadCounterSanctionsSourceDocuments(
+    payload: Request<void> = {} as Request<void>,
+  ) {
+    const { token } = payload;
+    const user = token ? await UserService.getUserByToken(token) : null;
+    const userTarrif = user
+      ? await billingService.getUserCurrentTarrif(user.id)
+      : null;
+
+    const allSourceDocuments = await prisma.counterSanction.findMany({
+      select: { sourceDocumentShort: true },
+      distinct: ["sourceDocumentShort"],
     });
 
-    return sourceDocumentOrigins.map(
-      ({ sourceDocumentOrigin }) => sourceDocumentOrigin,
-    );
+    const allowedCounterSanctionSources =
+      userTarrif && userTarrif.tarrif.identifier !== TarrifKind.free
+        ? (
+            await prisma.tarrif.findFirst({
+              where: { identifier: TarrifKind.jurPro },
+              select: { allowedCounterSanctionSources: true },
+            })
+          )?.allowedCounterSanctionSources || []
+        : (
+            await prisma.tarrif.findFirst({
+              where: { identifier: TarrifKind.free },
+              select: { allowedCounterSanctionSources: true },
+            })
+          )?.allowedCounterSanctionSources || [];
+
+    return {
+      sourceDocuments: allSourceDocuments.map(
+        ({ sourceDocumentShort }) => sourceDocumentShort,
+      ),
+      allowedCounterSanctionSources: uniq(allowedCounterSanctionSources),
+    };
   }
   async applyIntermediateFilters({ countries }: { countries: Array<string> }) {
     return {
@@ -257,6 +309,180 @@ class SearchService {
     }
 
     return groupedSanctions;
+  }
+
+  async searchCounterSanctions({
+    searchTypes,
+    searchTags,
+    restrictions,
+    sourceDocumentShorts,
+    deviceId,
+    token,
+    mode = "web",
+  }: Request<CounterSanctionSearchFilters> & {
+    mode?: "web" | "excel";
+  }) {
+    const preferences = await prisma.preferences.findFirst();
+    const tagLimit = preferences?.maxWebViewTagsCount ?? 50;
+    if (searchTags.length > tagLimit && mode === "web") {
+      throw new Error("too_many_tags");
+    }
+
+    // Получаем разрешенные источники для текущего тарифа пользователя
+    const user = token ? await UserService.getUserByToken(token) : null;
+    const userTarrif = user
+      ? await billingService.getUserCurrentTarrif(user.id)
+      : null;
+
+    const allowedCounterSanctionSources =
+      userTarrif && userTarrif.tarrif.identifier !== TarrifKind.free
+        ? (
+            await prisma.tarrif.findFirst({
+              where: { identifier: TarrifKind.jurPro },
+              select: { allowedCounterSanctionSources: true },
+            })
+          )?.allowedCounterSanctionSources || []
+        : (
+            await prisma.tarrif.findFirst({
+              where: { identifier: TarrifKind.free },
+              select: { allowedCounterSanctionSources: true },
+            })
+          )?.allowedCounterSanctionSources || [];
+
+    // Фильтруем источники только по разрешенным
+    const filteredSourceDocumentShorts =
+      sourceDocumentShorts.length > 0
+        ? sourceDocumentShorts.filter((source) =>
+            allowedCounterSanctionSources.includes(source),
+          )
+        : allowedCounterSanctionSources;
+
+    const counterSanctions: Array<
+      CounterSanction & {
+        descriptionTag?: string;
+        exceptionTag?: string;
+        codeTag?: string;
+        codeAdditionTag?: string;
+      }
+    > = [];
+
+    if (
+      searchTypes.includes("code") &&
+      filteredSourceDocumentShorts.length > 0
+    ) {
+      counterSanctions.push(
+        ...(await searchCounterSanctionsByCode({
+          restrictions,
+          searchTags,
+          sourceDocumentShorts: filteredSourceDocumentShorts,
+        })),
+      );
+    }
+
+    if (
+      searchTypes.includes("codeAddition") &&
+      filteredSourceDocumentShorts.length > 0
+    ) {
+      counterSanctions.push(
+        ...(await searchCounterSanctionsByCodeAddition({
+          restrictions,
+          searchTags,
+          sourceDocumentShorts: filteredSourceDocumentShorts,
+        })),
+      );
+    }
+
+    if (
+      searchTypes.includes("description") &&
+      filteredSourceDocumentShorts.length > 0
+    ) {
+      counterSanctions.push(
+        ...(await searchCounterSanctionsByDescription(
+          searchTags,
+          restrictions,
+          filteredSourceDocumentShorts,
+        )),
+      );
+    }
+
+    const isCodeMatch = (
+      tag: string,
+      counterSanction: CounterSanction & { codeTag?: string },
+    ) => searchTypes.includes("code") && tag === counterSanction.codeTag;
+
+    const isCodeAdditionMatch = (
+      tag: string,
+      counterSanction: CounterSanction & { codeAdditionTag?: string },
+    ) =>
+      searchTypes.includes("codeAddition") &&
+      tag === counterSanction.codeAdditionTag;
+
+    const isDescriptionMatch = (
+      tag: string,
+      counterSanction: CounterSanction & { descriptionTag?: string },
+    ) =>
+      searchTypes.includes("description") &&
+      tag === counterSanction.descriptionTag;
+
+    const groupBySourceDocumentShortAndTag = (
+      counterSanctions: Array<
+        CounterSanction & {
+          codeTag?: string;
+          descriptionTag?: string;
+          exceptionTag?: string;
+          codeAdditionTag?: string;
+        }
+      >,
+    ) =>
+      mapValues(
+        groupBy(
+          counterSanctions,
+          (value) => value.sourceDocumentShort || "Unknown",
+        ),
+        (value) =>
+          groupBy(
+            value,
+            ({ descriptionTag, exceptionTag, codeTag, codeAdditionTag }) =>
+              descriptionTag || exceptionTag || codeTag || codeAdditionTag,
+          ),
+      );
+
+    const codeMatches = counterSanctions.filter((counterSanction) =>
+      searchTags.some((tag) => isCodeMatch(tag, counterSanction)),
+    );
+
+    const descriptionMatches = counterSanctions.filter((counterSanction) =>
+      searchTags.some((tag) => isDescriptionMatch(tag, counterSanction)),
+    );
+
+    const codeAdditionMatches = counterSanctions.filter((counterSanction) =>
+      searchTags.some((tag) => isCodeAdditionMatch(tag, counterSanction)),
+    );
+
+    const groupedCounterSanctions = {
+      code: groupBySourceDocumentShortAndTag(codeMatches),
+      description: postLimitCounterSanctionDescription(
+        groupBySourceDocumentShortAndTag(descriptionMatches),
+      ),
+      codeAddition: postLimitCounterSanctionCodeAddition(
+        groupBySourceDocumentShortAndTag(codeAdditionMatches),
+      ),
+    };
+
+    if (!isEmpty(groupedCounterSanctions) && token && mode === "web") {
+      await searchQuotasService.registerDevice(deviceId, token);
+      await searchQuotasService.registerCounterSanctionSearchRequest(
+        {
+          searchTypes,
+          searchTags,
+          restrictions,
+          sourceDocumentShorts: filteredSourceDocumentShorts,
+        },
+        token,
+      );
+    }
+
+    return groupedCounterSanctions;
   }
 }
 

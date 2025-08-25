@@ -44,8 +44,7 @@ export const Profile = () => {
 
       {window.location?.pathname === Paths.profileMy && <ProfileData />}
       {window.location?.pathname === Paths.profileTariff && <Tarrif />}
-      {window.location?.pathname === Paths.profileReports &&
-        authorizationData?.isAdmin && <MyReports />}
+      {window.location?.pathname === Paths.profileReports && <MyReports />}
     </Box>
   );
 };

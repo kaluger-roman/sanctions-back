@@ -1,8 +1,10 @@
 import { useGate, useUnit } from "effector-react";
 import { adminModel, appModel } from "models";
 import { ManageSanctions } from "./manage-sanctions";
+import { ManageCounterSanctions } from "./manage-counter-sanctions";
 import { Box, Tab, Tabs, useMediaQuery } from "@mui/material";
 import { TarrifManagement } from "./tarrif-management";
+import { CounterSanctionTarrifManagement } from "./counter-sanction-tariff-management";
 import { UserTariffsTable } from "./user-tariffs-table";
 import { GrantTariffForm } from "./grant-tariff-form";
 import { navigation } from "shared/navigate";
@@ -51,9 +53,17 @@ export const Admin = () => {
         </Box>
       )}
       {window.location?.pathname === AdminPaths.preferences && (
-        <TarrifManagement />
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <TarrifManagement />
+          <CounterSanctionTarrifManagement />
+        </Box>
       )}
-      {window.location?.pathname === AdminPaths.data && <ManageSanctions />}
+      {window.location?.pathname === AdminPaths.data && (
+        <Box sx={{ display: "flex", flexDirection: "column", gap: 4 }}>
+          <ManageSanctions />
+          <ManageCounterSanctions />
+        </Box>
+      )}
     </Box>
   );
 };

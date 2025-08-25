@@ -1,7 +1,14 @@
 import { createEffect } from "effector";
 import { ACTIONS } from "./actions";
 import { SearchResult } from "shared/sanctions";
-import { CountriesResult, SearchFilters, SyncedFilters } from "shared/search";
+import { CounterSanctionSearchResult } from "shared/counter-sanctions";
+import {
+  CountriesResult,
+  SearchFilters,
+  SyncedFilters,
+  CounterSanctionsSourceDocumentsResult,
+} from "shared/search";
+import { CounterSanctionSearchFilters } from "shared/counter-sanctions-search";
 import { socket } from "./app.api";
 
 export const parseSearchExcelFileFx = createEffect<File, string[], string>(
@@ -32,6 +39,16 @@ export const loadRestrictionsFx = createEffect<void, Array<string>, string>(
   () => socket.emitWithAnswer<void, Array<string>>(ACTIONS.LOAD_RESTRICTIONS),
 );
 
+export const loadCounterSanctionsRestrictionsFx = createEffect<
+  void,
+  Array<string>,
+  string
+>(() =>
+  socket.emitWithAnswer<void, Array<string>>(
+    ACTIONS.LOAD_COUNTER_SANCTIONS_RESTRICTIONS,
+  ),
+);
+
 export const loadSourceDocumentOriginsFx = createEffect<
   void,
   Array<string>,
@@ -39,6 +56,16 @@ export const loadSourceDocumentOriginsFx = createEffect<
 >(() =>
   socket.emitWithAnswer<void, Array<string>>(
     ACTIONS.LOAD_SOURCE_DOCUMENT_ORIGINS,
+  ),
+);
+
+export const loadCounterSanctionsSourceDocumentsFx = createEffect<
+  void,
+  CounterSanctionsSourceDocumentsResult,
+  string
+>(() =>
+  socket.emitWithAnswer<void, CounterSanctionsSourceDocumentsResult>(
+    ACTIONS.LOAD_COUNTER_SANCTIONS_SOURCE_DOCUMENTS,
   ),
 );
 
@@ -56,4 +83,15 @@ export const checkFiltersFx = createEffect<
 export const searchFx = createEffect<SearchFilters, SearchResult, string>(
   (payload) =>
     socket.emitWithAnswer<SearchFilters, SearchResult>(ACTIONS.SEARCH, payload),
+);
+
+export const searchCounterSanctionsFx = createEffect<
+  CounterSanctionSearchFilters,
+  CounterSanctionSearchResult,
+  string
+>((payload) =>
+  socket.emitWithAnswer<
+    CounterSanctionSearchFilters,
+    CounterSanctionSearchResult
+  >(ACTIONS.SEARCH_COUNTER_SANCTIONS, payload),
 );

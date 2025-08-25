@@ -29,7 +29,11 @@ export type UserTarrif = {
   end: string;
   tarrif: Tarrif;
   additionalRequestsCount: number;
-  _count: { searchRequest: number; devices: number };
+  _count: {
+    searchRequest: number;
+    devices: number;
+    counterSanctionSearchRequest: number;
+  };
 };
 
 export type Tarrif = {
@@ -37,4 +41,5 @@ export type Tarrif = {
   allowedRequests: number;
   allowedDevices: number;
   allowedCountries: Array<string>;
+  allowedCounterSanctionSources?: Array<string>;
 };

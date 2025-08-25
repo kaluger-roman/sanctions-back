@@ -59,7 +59,7 @@ export const TarrifManagement = () => {
   return (
     <Box>
       <Typography sx={{ mb: 2 }} variant="h5">
-        Управление тарифами
+        Управление тарифами международных санкций
       </Typography>
       <Box
         sx={{

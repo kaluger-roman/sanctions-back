@@ -94,7 +94,7 @@ export class BillingService {
       socket.emit(ACTIONS.BILLING_TARRIF_UPDATED, { tarrifs: userTarrifs });
     });
 
-    return newTarrif
+    return newTarrif;
   }
   async updateSearchRequests(paymentInfo: Payment) {
     const user = await prisma.user.findFirst({

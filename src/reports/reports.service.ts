@@ -1,4 +1,8 @@
 import { SearchFilters, SearchType } from "../search-app/search-app.types";
+import {
+  CounterSanctionSearchFilters,
+  CounterSanctionSearchType,
+} from "../search-app/counter-sanctions.types";
 import { Request } from "../types";
 import { searchService } from "../search-app/search.service";
 import { UserService } from "../user/user.service";
@@ -154,6 +158,129 @@ class ReportsService {
     return { id: reportId };
   };
 
+  generateCounterSanctionsExcelReport = async ({
+    restrictions,
+    sourceDocumentShorts,
+    searchTypes,
+    searchTags,
+  }: Request<CounterSanctionSearchFilters>): Promise<ReportGenerationResult> => {
+    // Get search results using existing search service, not pass token to not trigger user limits
+    const searchResults = await searchService.searchCounterSanctions({
+      restrictions,
+      sourceDocumentShorts,
+      searchTypes,
+      searchTags,
+      mode: "excel",
+    });
+
+    const reportId = randomUUID();
+    const filePath = path.join(REPORTS_STORAGE_PATH, `${reportId}.xlsx`);
+    const workbook = xlsx.utils.book_new();
+    const searchTypesToProcess: Array<CounterSanctionSearchType> = [
+      "code",
+      "description",
+      "codeAddition",
+    ];
+
+    searchTypesToProcess.forEach((searchType) => {
+      const sheetName = this.getCounterSanctionMatchTypeName(searchType);
+
+      if (!searchTypes.includes(searchType as any)) {
+        const noFilterData = [["Не установлен фильтр для данного типа поиска"]];
+        const worksheet = xlsx.utils.aoa_to_sheet(noFilterData);
+        xlsx.utils.book_append_sheet(workbook, worksheet, sheetName);
+        return;
+      }
+
+      const typeResults = searchResults[searchType] || {};
+      const transformedData =
+        this.transformCounterSanctionSearchResultsForSheet(
+          typeResults,
+          searchType,
+        );
+
+      const { sheetData, merges } = this.createCounterSanctionSheetData({
+        searchTags,
+        restrictions,
+        sourceDocumentShorts,
+        matchType: sheetName,
+        data: transformedData,
+      });
+
+      const worksheet = xlsx.utils.aoa_to_sheet(sheetData);
+
+      // Apply merges
+      merges.forEach((merge) => {
+        worksheet["!merges"] = [...(worksheet["!merges"] || []), merge];
+      });
+
+      // Set column widths for counter sanctions
+      const colWidths = [
+        { wch: 20 }, // searchTag
+        { wch: 15 }, // code
+        { wch: 30 }, // description
+        { wch: 25 }, // exception
+        { wch: 25 }, // sourceDocument
+        { wch: 20 }, // restriction
+        { wch: 20 }, // sourceDocumentShort
+      ];
+      worksheet["!cols"] = colWidths;
+
+      // Apply cell styles for vertical alignment to all cells
+      const range = xlsx.utils.decode_range(worksheet["!ref"] || "A1:A1");
+      for (let row = range.s.r; row <= range.e.r; row++) {
+        for (let col = range.s.c; col <= range.e.c; col++) {
+          const cellAddress = xlsx.utils.encode_cell({ r: row, c: col });
+          if (!worksheet[cellAddress]) {
+            // Create empty cell if it doesn't exist
+            worksheet[cellAddress] = { t: "s", v: "" };
+          }
+
+          // Apply vertical alignment to top for all cells
+          const baseStyle = {
+            alignment: {
+              vertical: "top",
+              wrapText: true,
+            },
+          };
+
+          // Make headers row (row 7 in 0-based indexing) bold
+          if (row === 7) {
+            worksheet[cellAddress].s = {
+              ...baseStyle,
+              font: {
+                bold: true,
+              },
+            };
+          } else {
+            worksheet[cellAddress].s = baseStyle;
+          }
+        }
+      }
+
+      xlsx.utils.book_append_sheet(workbook, worksheet, sheetName);
+    });
+
+    await fs.mkdir(REPORTS_STORAGE_PATH, { recursive: true });
+
+    xlsx.writeFile(workbook, filePath);
+
+    await this.cleanupUnlinkedReports();
+
+    await prisma.counterSanctionReport.create({
+      data: {
+        id: reportId,
+        userId: null,
+        searchTypes,
+        restrictions,
+        sourceDocumentShorts,
+        searchTags,
+      },
+    });
+
+    return { id: reportId };
+  };
+
   saveReportToMyReports = async ({
     reportId,
     token,
@@ -207,13 +334,66 @@ class ReportsService {
     return "success";
   };
 
+  saveCounterSanctionReportToMyReports = async ({
+    reportId,
+    token,
+  }: Request<{ reportId: string }>) => {
+    const user = token ? await UserService.getUserByToken(token) : null;
+
+    const report = await prisma.counterSanctionReport.findUnique({
+      where: { id: reportId },
+    });
+
+    if (!report) {
+      throw new Error("Counter-sanction report not found");
+    }
+
+    await this.cleanupUserReports(user.id);
+
+    const userReports = await prisma.counterSanctionReport.findMany({
+      where: {
+        userId: user.id,
+        title: { startsWith: "counter-sanctions-report-" },
+        isDeleted: false,
+      },
+      select: { title: true },
+    });
+
+    // Извлекаем номера из существующих названий
+    const existingNumbers = userReports
+      .map((r) => r.title?.match(/counter-sanctions-report-(\d+)$/)?.[1])
+      .filter(Boolean)
+      .map(Number)
+      .filter((num) => !isNaN(num));
+
+    // Находим следующий доступный номер
+    const nextNumber =
+      existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+
+    const reportTitle = `counter-sanctions-report-${nextNumber}`;
+
+    await prisma.counterSanctionReport.update({
+      where: { id: reportId },
+      data: {
+        userId: user.id,
+        title: reportTitle,
+      },
+    });
+
+    console.log(
+      `Counter-sanction report ${reportId} saved to user ${user.id} reports with title: ${reportTitle}`,
+    );
+
+    return "success";
+  };
+
   loadUserReports = async ({ token }: Request<void>) => {
     const user = await UserService.getUserByToken(token);
 
     const reports = await prisma.report.findMany({
       where: {
         userId: user.id,
-        isDeleted: false, // Фильтруем только не удаленные отчеты
+        isDeleted: false,
       },
       orderBy: { createdAt: "desc" },
       select: {
@@ -223,39 +403,102 @@ class ReportsService {
       },
     });
 
-    return reports.map((report) => ({
-      id: report.id,
-      name: report.title || "Отчет без названия",
-      createdAt: report.createdAt,
-    }));
+    const counterSanctionReports = await prisma.counterSanctionReport.findMany({
+      where: {
+        userId: user.id,
+        isDeleted: false,
+      },
+      orderBy: { createdAt: "desc" },
+      select: {
+        id: true,
+        title: true,
+        createdAt: true,
+      },
+    });
+
+    // Объединяем и сортируем по дате создания
+    const allReports = [
+      ...reports.map((report) => ({
+        id: report.id,
+        name: report.title || "Отчет без названия",
+        createdAt: report.createdAt,
+        type: "sanctions" as const,
+      })),
+      ...counterSanctionReports.map((report) => ({
+        id: report.id,
+        name: report.title || "Отчет по контрсанкциям без названия",
+        createdAt: report.createdAt,
+        type: "counter-sanctions" as const,
+      })),
+    ].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+    return allReports;
   };
 
   private cleanupUnlinkedReports = async (): Promise<void> => {
     const preferences = await prisma.preferences.findFirst();
     const maxUnlinkedReports = preferences?.maxUnlinkedReports || 500;
 
-    const unlinkedReportsCount = await prisma.report.count({
-      where: { userId: null, isDeleted: false }, // Считаем только не удаленные отчеты
+    // Получаем все несвязанные отчеты обоих типов с сортировкой по дате создания
+    const unlinkedReports = await prisma.report.findMany({
+      where: { userId: null, isDeleted: false },
+      orderBy: { createdAt: "asc" },
+      select: { id: true, createdAt: true },
     });
 
-    if (unlinkedReportsCount > maxUnlinkedReports) {
-      const reportsToDelete = await prisma.report.findMany({
+    const unlinkedCounterSanctionReports =
+      await prisma.counterSanctionReport.findMany({
         where: { userId: null, isDeleted: false },
         orderBy: { createdAt: "asc" },
-        take: unlinkedReportsCount - maxUnlinkedReports,
+        select: { id: true, createdAt: true },
       });
 
-      for (const report of reportsToDelete) {
+    // Объединяем списки и сортируем по дате создания (самые старые первыми)
+    const allUnlinkedReports = [
+      ...unlinkedReports.map((r) => ({ ...r, type: "regular" as const })),
+      ...unlinkedCounterSanctionReports.map((r) => ({
+        ...r,
+        type: "counter-sanction" as const,
+      })),
+    ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+    const totalUnlinkedReports = allUnlinkedReports.length;
+
+    if (totalUnlinkedReports > maxUnlinkedReports) {
+      const excessCount = totalUnlinkedReports - maxUnlinkedReports;
+
+      // Берем самые старые отчеты из объединенного списка
+      const reportsToDelete = allUnlinkedReports.slice(0, excessCount);
+
+      // Разделяем по типам для удаления
+      const regularReportsToDelete = reportsToDelete.filter(
+        (r) => r.type === "regular",
+      );
+      const counterSanctionReportsToDelete = reportsToDelete.filter(
+        (r) => r.type === "counter-sanction",
+      );
+
+      // Удаляем обычные отчеты
+      for (const report of regularReportsToDelete) {
         await this.deleteReportFile(report.id);
-        // Помечаем как удаленные вместо физического удаления
         await prisma.report.update({
           where: { id: report.id },
           data: { isDeleted: true },
         });
       }
 
+      // Удаляем отчеты по контрсанкциям
+      for (const report of counterSanctionReportsToDelete) {
+        await this.deleteReportFile(report.id);
+        await prisma.counterSanctionReport.update({
+          where: { id: report.id },
+          data: { isDeleted: true },
+        });
+      }
+
+      const totalDeleted = reportsToDelete.length;
       console.log(
-        `Marked ${reportsToDelete.length} old unlinked reports as deleted`,
+        `Marked ${totalDeleted} old unlinked reports as deleted (${regularReportsToDelete.length} regular, ${counterSanctionReportsToDelete.length} counter-sanctions)`,
       );
     }
   };
@@ -264,34 +507,66 @@ class ReportsService {
     const preferences = await prisma.preferences.findFirst();
     const maxUserReports = preferences?.maxUserReports || 100;
 
-    const userReportsCount = await prisma.report.count({
-      where: {
-        userId,
-        isDeleted: false, // Считаем только не удаленные отчеты
-      },
+    // Получаем все отчеты пользователя обоих типов с сортировкой по дате создания
+    const userReports = await prisma.report.findMany({
+      where: { userId, isDeleted: false },
+      orderBy: { createdAt: "asc" },
+      select: { id: true, createdAt: true },
     });
 
-    if (userReportsCount >= maxUserReports) {
-      const reportsToDelete = await prisma.report.findMany({
-        where: {
-          userId,
-          isDeleted: false, // Берем только не удаленные отчеты
-        },
+    const userCounterSanctionReports =
+      await prisma.counterSanctionReport.findMany({
+        where: { userId, isDeleted: false },
         orderBy: { createdAt: "asc" },
-        take: userReportsCount - (maxUserReports - 1), // Keep max-1, so after adding new one we'll have max
+        select: { id: true, createdAt: true },
       });
 
-      for (const report of reportsToDelete) {
+    // Объединяем списки и сортируем по дате создания (самые старые первыми)
+    const allUserReports = [
+      ...userReports.map((r) => ({ ...r, type: "regular" as const })),
+      ...userCounterSanctionReports.map((r) => ({
+        ...r,
+        type: "counter-sanction" as const,
+      })),
+    ].sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime());
+
+    const totalUserReports = allUserReports.length;
+
+    if (totalUserReports >= maxUserReports) {
+      const excessCount = totalUserReports - (maxUserReports - 1);
+
+      // Берем самые старые отчеты из объединенного списка
+      const reportsToDelete = allUserReports.slice(0, excessCount);
+
+      // Разделяем по типам для удаления
+      const regularReportsToDelete = reportsToDelete.filter(
+        (r) => r.type === "regular",
+      );
+      const counterSanctionReportsToDelete = reportsToDelete.filter(
+        (r) => r.type === "counter-sanction",
+      );
+
+      // Удаляем обычные отчеты
+      for (const report of regularReportsToDelete) {
         await this.deleteReportFile(report.id);
-        // Помечаем как удаленные вместо физического удаления
         await prisma.report.update({
           where: { id: report.id },
           data: { isDeleted: true },
         });
       }
 
+      // Удаляем отчеты по контрсанкциям
+      for (const report of counterSanctionReportsToDelete) {
+        await this.deleteReportFile(report.id);
+        await prisma.counterSanctionReport.update({
+          where: { id: report.id },
+          data: { isDeleted: true },
+        });
+      }
+
+      const totalDeleted = reportsToDelete.length;
       console.log(
-        `Marked ${reportsToDelete.length} old user reports as deleted for user ${userId}`,
+        `Marked ${totalDeleted} old user reports as deleted for user ${userId} (${regularReportsToDelete.length} regular, ${counterSanctionReportsToDelete.length} counter-sanctions)`,
       );
     }
   };
@@ -441,6 +716,163 @@ class ReportsService {
     return { sheetData, merges };
   };
 
+  private getCounterSanctionMatchTypeName(
+    searchType: CounterSanctionSearchType,
+  ): string {
+    const matchTypes: Record<CounterSanctionSearchType, string> = {
+      code: "ТНВЭД коды",
+      description: "Описание товаров",
+      codeAddition: "Дополнения к кодам",
+    };
+    return matchTypes[searchType];
+  }
+
+  private transformCounterSanctionSearchResultsForSheet(
+    results: any,
+    searchType: CounterSanctionSearchType | "exception",
+  ) {
+    const transformedData: Array<{
+      searchTag: string;
+      items: Array<{
+        code: string;
+        description: string;
+        exception: string;
+        sourceDocument: string;
+        restriction: string;
+        sourceDocumentShort: string;
+      }>;
+    }> = [];
+
+    // Handle the nested structure: sourceDocumentShort -> tag -> items
+    Object.entries(results).forEach(([sourceDocumentShort, sourceData]) => {
+      if (sourceData && typeof sourceData === "object") {
+        Object.entries(sourceData).forEach(([searchTag, items]) => {
+          if (Array.isArray(items)) {
+            transformedData.push({
+              searchTag,
+              items: items.map((item) => ({
+                code: item.code || "",
+                description: item.description || "",
+                exception: item.exception || "",
+                sourceDocument: item.sourceDocument || "",
+                restriction: item.restriction || "",
+                sourceDocumentShort: item.sourceDocumentShort || "",
+              })),
+            });
+          }
+        });
+      }
+    });
+
+    return transformedData;
+  }
+
+  private createCounterSanctionSheetData({
+    searchTags,
+    restrictions,
+    sourceDocumentShorts,
+    matchType,
+    data,
+  }: {
+    searchTags: string[];
+    restrictions: string[];
+    sourceDocumentShorts: string[];
+    matchType: string;
+    data: Array<{
+      searchTag: string;
+      items: Array<{
+        code: string;
+        description: string;
+        exception: string;
+        sourceDocument: string;
+        restriction: string;
+        sourceDocumentShort: string;
+      }>;
+    }>;
+  }) {
+    const sheetData: any[][] = [
+      ["Контрсанкции. Результаты поиска"],
+      [],
+      [`Тип поиска: ${matchType}`],
+      [`Поисковые запросы: ${searchTags.join(", ")}`],
+      [
+        `Фильтр по типу ограничения: ${
+          restrictions.length > 0 ? restrictions.join(", ") : "Не установлен"
+        }`,
+      ],
+      [
+        `Фильтр по источнику: ${
+          sourceDocumentShorts.length > 0
+            ? sourceDocumentShorts.join(", ")
+            : "Не установлен"
+        }`,
+      ],
+      [],
+      [
+        "Поисковый запрос",
+        "ТНВЭД",
+        "Описание",
+        "Исключение",
+        "Источник ограничения",
+        "Тип ограничения",
+        "Источник коротко",
+      ],
+    ];
+
+    const merges: Array<{ s: any; e: any }> = [
+      // Merge title row
+      { s: { r: 0, c: 0 }, e: { r: 0, c: 6 } },
+    ];
+
+    let currentRow = 8; // Start after headers
+
+    data.forEach(({ searchTag, items }) => {
+      if (items.length === 0) {
+        // Add "No results" row
+        sheetData.push([searchTag, "Нет результатов", "", "", "", "", ""]);
+        currentRow++;
+      } else {
+        items.forEach((item, index) => {
+          if (index === 0) {
+            // First row for this search tag
+            sheetData.push([
+              searchTag,
+              item.code,
+              item.description,
+              item.exception,
+              item.sourceDocument,
+              item.restriction,
+              item.sourceDocumentShort,
+            ]);
+          } else {
+            // Subsequent rows (merge search tag cell)
+            sheetData.push([
+              "",
+              item.code,
+              item.description,
+              item.exception,
+              item.sourceDocument,
+              item.restriction,
+              item.sourceDocumentShort,
+            ]);
+          }
+        });
+
+        // Add merge for search tag column if there are multiple items
+        if (items.length > 1) {
+          merges.push({
+            s: { r: currentRow, c: 0 },
+            e: { r: currentRow + items.length - 1, c: 0 },
+          });
+        }
+
+        currentRow += items.length;
+      }
+    });
+
+    return { sheetData, merges };
+  }
+
   private transformSearchResultsForSheet = (
     typeResults: Awaited<ReturnType<typeof searchService.search>>[
       | "code"
@@ -536,15 +968,36 @@ class ReportsService {
       console.log(`Report file ${reportId}.xlsx not found in filesystem`);
     }
 
+    let reportFound = false;
+
     try {
-      // Mark record as deleted in database (soft delete)
+      // Try to mark regular report as deleted in database (soft delete)
       await prisma.report.update({
         where: { id: reportId },
         data: { isDeleted: true },
       });
-      console.log(`Report ${reportId} marked as deleted in database`);
+      reportFound = true;
+      console.log(`Regular report ${reportId} marked as deleted in database`);
     } catch (error) {
-      console.log(`Report ${reportId} not found in database`);
+      console.log(`Regular report ${reportId} not found in database`);
+    }
+
+    try {
+      // Try to mark counter-sanction report as deleted in database (soft delete)
+      await prisma.counterSanctionReport.update({
+        where: { id: reportId },
+        data: { isDeleted: true },
+      });
+      reportFound = true;
+      console.log(
+        `Counter-sanction report ${reportId} marked as deleted in database`,
+      );
+    } catch (error) {
+      console.log(`Counter-sanction report ${reportId} not found in database`);
+    }
+
+    if (!reportFound) {
+      console.log(`Report ${reportId} not found in any database table`);
     }
 
     return "success";
@@ -556,12 +1009,17 @@ class ReportsService {
     const filePath = path.join(REPORTS_STORAGE_PATH, `${reportId}.xlsx`);
 
     try {
-      // Check if report exists in database
+      // Check if report exists in database (check both regular and counter-sanction reports)
       const report = await prisma.report.findUnique({
         where: { id: reportId },
       });
 
-      if (!report) {
+      const counterSanctionReport =
+        await prisma.counterSanctionReport.findUnique({
+          where: { id: reportId },
+        });
+
+      if (!report && !counterSanctionReport) {
         return null;
       }
 
@@ -623,7 +1081,7 @@ class ReportsService {
 
     await archive.finalize();
 
-    return Buffer.concat(chunks);
+    return Buffer.concat(chunks as any);
   };
 
   deleteMultipleReports = async ({
@@ -632,8 +1090,8 @@ class ReportsService {
   }: Request<{ reportIds: string[] }>): Promise<string> => {
     const user = await UserService.getUserByToken(token);
 
-    // Verify all reports belong to the user and are not already deleted
-    const reports = await prisma.report.findMany({
+    // Check which reports are regular sanctions reports
+    const regularReports = await prisma.report.findMany({
       where: {
         id: { in: reportIds },
         userId: user.id,
@@ -641,11 +1099,25 @@ class ReportsService {
       },
     });
 
-    if (reports.length !== reportIds.length) {
+    // Check which reports are counter-sanctions reports
+    const counterSanctionReports = await prisma.counterSanctionReport.findMany({
+      where: {
+        id: { in: reportIds },
+        userId: user.id,
+        isDeleted: false,
+      },
+    });
+
+    const foundReportIds = [
+      ...regularReports.map((r) => r.id),
+      ...counterSanctionReports.map((r) => r.id),
+    ];
+
+    if (foundReportIds.length !== reportIds.length) {
       throw new Error("Some reports not found or access denied");
     }
 
-    // Delete files only, mark records as deleted in database
+    // Delete files for all reports
     for (const reportId of reportIds) {
       const filePath = path.join(REPORTS_STORAGE_PATH, `${reportId}.xlsx`);
 
@@ -657,17 +1129,30 @@ class ReportsService {
       }
     }
 
-    // Mark reports as deleted (soft delete)
-    await prisma.report.updateMany({
-      where: {
-        id: { in: reportIds },
-        userId: user.id,
-      },
-      data: { isDeleted: true },
-    });
+    // Mark regular reports as deleted (soft delete)
+    if (regularReports.length > 0) {
+      await prisma.report.updateMany({
+        where: {
+          id: { in: regularReports.map((r) => r.id) },
+          userId: user.id,
+        },
+        data: { isDeleted: true },
+      });
+    }
+
+    // Mark counter-sanction reports as deleted (soft delete)
+    if (counterSanctionReports.length > 0) {
+      await prisma.counterSanctionReport.updateMany({
+        where: {
+          id: { in: counterSanctionReports.map((r) => r.id) },
+          userId: user.id,
+        },
+        data: { isDeleted: true },
+      });
+    }
 
     console.log(
-      `Marked ${reportIds.length} reports as deleted for user ${user.id}`,
+      `Marked ${reportIds.length} reports as deleted for user ${user.id} (${regularReports.length} regular, ${counterSanctionReports.length} counter-sanctions)`,
     );
     return "success";
   };

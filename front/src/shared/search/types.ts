@@ -19,6 +19,11 @@ export type CountriesResult = {
   allowedCountries: Array<string>;
 };
 
+export type CounterSanctionsSourceDocumentsResult = {
+  sourceDocuments: Array<string>;
+  allowedCounterSanctionSources: Array<string>;
+};
+
 export enum Lang {
   en = "en",
   ru = "ru",

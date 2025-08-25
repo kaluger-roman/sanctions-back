@@ -6,6 +6,7 @@ import { ExpandDescriptionButton } from "./expand-description-button";
 import { Lang } from "shared/search";
 import { useUnit } from "effector-react";
 import { searchAppModel } from "models";
+import { SearchCategory } from "models/search-app/search-app";
 
 const colorHighlight = (window as any).Highlight
   ? new (window as any).Highlight()
@@ -24,6 +25,7 @@ export const DescriptionBlock = ({
 }) => {
   const searchLanguage = useUnit(searchAppModel.$searchLanguage);
   const searchPending = useUnit(searchAppModel.$searchPending);
+  const searchCategory = useUnit(searchAppModel.$searchCategory);
   const [expanded, setExpanded] = useState(false);
   const [lang, setLang] = useState<Lang>(searchLanguage);
   const [isOverflow, setIsOverflow] = useState<boolean>(true);
@@ -32,8 +34,10 @@ export const DescriptionBlock = ({
   const maxHeight = 198;
   const [isDescriptionOnScreen, setIsDescriptionOnScreen] = useState(false);
   const translatedDescription =
-    { [Lang.en]: description, [Lang.ru]: descriptionRussian }[lang] ??
-    description;
+    searchCategory === SearchCategory.sanctions
+      ? { [Lang.en]: description, [Lang.ru]: descriptionRussian }[lang] ??
+        description
+      : description;
 
   const toggleExpand = () => setExpanded((prev) => !prev);
 
@@ -135,7 +139,7 @@ export const DescriptionBlock = ({
           </Typography>
         </Collapse>
       </Box>
-      {descriptionRussian ? (
+      {descriptionRussian && searchCategory === SearchCategory.sanctions ? (
         <TranslateSelector lang={lang} setLang={setLang} />
       ) : null}
       {isOverflow && (

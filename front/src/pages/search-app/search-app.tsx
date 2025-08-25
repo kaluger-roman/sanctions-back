@@ -165,7 +165,7 @@ export const SearchApp = () => {
         />
 
         <Tab
-          label="Контрсанкции РФ по товарам"
+          label="Контрсанкции РФ по товарам (в разработке)"
           value={SearchCategory.counterSanctions}
           disabled={!isAdmin}
           sx={{

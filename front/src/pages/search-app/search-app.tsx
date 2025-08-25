@@ -145,6 +145,7 @@ export const SearchApp = () => {
         aria-label="Search type tabs"
         orientation={isSm ? "vertical" : "horizontal"}
         sx={{
+          maxWidth: 1200,
           borderRight: isSm ? 1 : 0,
           borderBottom: isSm ? 0 : 1,
           mb: 2,

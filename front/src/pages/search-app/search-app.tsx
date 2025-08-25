@@ -163,21 +163,18 @@ export const SearchApp = () => {
           label="Международные ограничения против РФ и Беларуси"
           value={SearchCategory.sanctions}
         />
-        <Tooltip title={!isAdmin ? "В разработке." : ""} arrow placement="top">
-          <span>
-            <Tab
-              label="Контрсанкции РФ по товарам"
-              value={SearchCategory.counterSanctions}
-              disabled={!isAdmin}
-              sx={{
-                "&.Mui-disabled": {
-                  color: theme.palette.text.disabled,
-                  cursor: "not-allowed",
-                },
-              }}
-            />
-          </span>
-        </Tooltip>
+
+        <Tab
+          label="Контрсанкции РФ по товарам"
+          value={SearchCategory.counterSanctions}
+          disabled={!isAdmin}
+          sx={{
+            "&.Mui-disabled": {
+              color: theme.palette.text.disabled,
+              cursor: "not-allowed",
+            },
+          }}
+        />
       </Tabs>
       <Box
         sx={{

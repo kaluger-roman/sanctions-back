@@ -3,7 +3,7 @@ import { prisma } from "../../prisma/prisma";
 import { CounterSanction } from "@prisma/client";
 import * as trigramSimilarity from "trigram-similarity";
 
-const keyPoints = [2, 4, 6, 8, 10, 12];
+const keyPoints = [2, 4, 6, 8, 9, 10, 12];
 
 const expandZeros = (value: string) =>
   keyPoints

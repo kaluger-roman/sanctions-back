@@ -20,8 +20,8 @@ export const DescriptionBlock = ({
   matchedWords,
 }: {
   description: string;
-  descriptionRussian: string;
-  matchedWords: Array<string>;
+  descriptionRussian?: string;
+  matchedWords?: Array<string>;
 }) => {
   const searchLanguage = useUnit(searchAppModel.$searchLanguage);
   const searchPending = useUnit(searchAppModel.$searchPending);

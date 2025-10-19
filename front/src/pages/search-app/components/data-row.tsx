@@ -40,11 +40,27 @@ export const DataRow = (props: DataRowProps) => {
           {sourceDocument}
         </Link>
       </TableCell>
-      <TableCell sx={{ verticalAlign: "top" }}>{restriction}</TableCell>
+      <TableCell sx={{ verticalAlign: "top", whiteSpace: "pre-wrap" }}>
+        {restriction}
+      </TableCell>
       {isCounterSanctions && (
-        <TableCell sx={{ verticalAlign: "top" }}>{exception}</TableCell>
+        <TableCell
+          sx={{
+            verticalAlign: "top",
+            position: "relative",
+          }}
+        >
+          <DescriptionBlock description={description} />
+        </TableCell>
       )}
-      <TableCell sx={{ position: "relative", width: "50%", minWidth: 250 }}>
+      <TableCell
+        sx={{
+          verticalAlign: "top",
+          position: "relative",
+          width: "50%",
+          minWidth: 250,
+        }}
+      >
         <DescriptionBlock
           matchedWords={matchedWords}
           description={description}

@@ -165,13 +165,28 @@ export const SearchApp = () => {
         />
 
         <Tab
-          label="Контрсанкции РФ по товарам (в разработке)"
+          label={
+            <Tooltip title={isFree ? "Доступно только в платных тарифах" : ""}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {isFree && (
+                  <PaidIcon
+                    sx={{
+                      fontSize: 18,
+                      color: theme.palette.grey[600],
+                    }}
+                  />
+                )}
+                Контрсанкции и специальные экономические меры РФ
+              </Box>
+            </Tooltip>
+          }
           value={SearchCategory.counterSanctions}
-          disabled={!isAdmin}
+          disabled={isFree}
           sx={{
             "&.Mui-disabled": {
               color: theme.palette.text.disabled,
               cursor: "not-allowed",
+              pointerEvents: "auto",
             },
           }}
         />

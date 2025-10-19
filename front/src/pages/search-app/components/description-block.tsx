@@ -1,4 +1,4 @@
-import { Box, Collapse, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { theme } from "shared/theme";
 import { TranslateSelector } from "./translate-selector";
@@ -31,7 +31,9 @@ export const DescriptionBlock = ({
   const [isOverflow, setIsOverflow] = useState<boolean>(true);
   const [isFirstRender, setIsFirstRender] = useState<boolean>(true);
   const highlightRef = useRef<HTMLSpanElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const maxHeight = 198;
+  const [availableHeight, setAvailableHeight] = useState<number>(maxHeight);
   const [isDescriptionOnScreen, setIsDescriptionOnScreen] = useState(false);
   const translatedDescription =
     searchCategory === SearchCategory.sanctions
@@ -57,6 +59,64 @@ export const DescriptionBlock = ({
 
     setIsOverflow(highlightRef.current.scrollHeight > maxHeight);
   }, [highlightRef]);
+
+  // Observe table cell size changes when row height changes
+  useLayoutEffect(() => {
+    const container = containerRef.current;
+    const textElement = highlightRef.current;
+    if (!container || !textElement) return;
+
+    // Find the table cell parent
+    let tableCell = container.parentElement;
+    while (tableCell && tableCell.tagName !== "TD") {
+      tableCell = tableCell.parentElement;
+    }
+
+    if (!tableCell) return;
+
+    const checkOverflow = async () => {
+      // Skip if we're animating from user interaction
+      if (!textElement || !tableCell) return;
+
+      const cellHeight = tableCell.clientHeight;
+      const newAvailableHeight = Math.max(maxHeight, cellHeight - 50);
+
+      // Update available height without transition
+      if (container) {
+        container.style.transition = "none";
+        setAvailableHeight(newAvailableHeight);
+
+        // Force reflow
+        void container.offsetHeight;
+      }
+
+      // Check if content overflows the new available height
+      const newIsOverflow = textElement.scrollHeight > newAvailableHeight;
+
+      setIsOverflow((prevOverflow) => {
+        if (prevOverflow === newIsOverflow) return prevOverflow;
+
+        // Auto-collapse if content now fits
+        if (!newIsOverflow && expanded) {
+          setExpanded(false);
+        }
+
+        return newIsOverflow;
+      });
+    };
+
+    const resizeObserver = new ResizeObserver(checkOverflow);
+
+    // Observe the table cell for size changes
+    resizeObserver.observe(tableCell);
+
+    // Initial check
+    checkOverflow();
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [expanded, maxHeight]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -117,27 +177,29 @@ export const DescriptionBlock = ({
 
   return (
     <>
-      <Box sx={{ position: "relative", overflow: "hidden" }}>
-        <Collapse
-          in={!isOverflow || expanded}
-          collapsedSize={isOverflow ? maxHeight : undefined}
-          timeout={isFirstRender ? 0 : 300}
+      <Box
+        ref={containerRef}
+        sx={{
+          position: "relative",
+          overflow: "hidden",
+          maxHeight: expanded || !isOverflow ? "none" : availableHeight,
+          transition: isFirstRender ? "none" : "max-height 0.3s ease",
+        }}
+      >
+        <Typography
+          ref={highlightRef}
+          variant="body2"
+          sx={{
+            mr: 1,
+            verticalAlign: "top",
+            whiteSpace: "pre-wrap",
+            "::highlight(higlight)": {
+              background: theme.palette.primary.light,
+            },
+          }}
         >
-          <Typography
-            ref={highlightRef}
-            variant="body2"
-            sx={{
-              mr: 1,
-              verticalAlign: "top",
-              whiteSpace: "pre-wrap",
-              "::highlight(higlight)": {
-                background: theme.palette.primary.light,
-              },
-            }}
-          >
-            {translatedDescription}
-          </Typography>
-        </Collapse>
+          {translatedDescription}
+        </Typography>
       </Box>
       {descriptionRussian && searchCategory === SearchCategory.sanctions ? (
         <TranslateSelector lang={lang} setLang={setLang} />

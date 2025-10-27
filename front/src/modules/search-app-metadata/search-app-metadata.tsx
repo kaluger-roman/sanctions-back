@@ -43,7 +43,7 @@ const ACTUAL_DATES: Array<{
   { country: "Южная Корея", date: "09.09.2024", flag: <KR /> },
   { country: "Австралия", date: "08.04.2024", flag: <AU /> },
   { country: "Китай", date: "01.12.2024", flag: <CN /> },
-  { country: "Япония", date: "10.01.2025", flag: <JP /> },
+  { country: "Япония", date: "09.10.2025", flag: <JP /> },
   { country: "Тайвань", date: "05.11.2024", flag: <TW /> },
   { country: "Швейцария", date: "04.06.2025", flag: <CH /> },
 ];

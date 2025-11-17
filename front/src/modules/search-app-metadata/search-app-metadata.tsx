@@ -39,7 +39,7 @@ const ACTUAL_DATES: Array<{
 }> = [
   { country: "ЕС", date: "23.10.2025", flag: <EU /> },
   { country: "Великобритания", date: "24.04.2025", flag: <GB /> },
-  { country: "США", date: "04.02.2025", flag: <US /> },
+  { country: "США", date: "30.09.2025", flag: <US /> },
   { country: "Южная Корея", date: "09.09.2024", flag: <KR /> },
   { country: "Австралия", date: "08.04.2024", flag: <AU /> },
   { country: "Китай", date: "01.12.2024", flag: <CN /> },

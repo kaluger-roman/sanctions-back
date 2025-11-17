@@ -50,7 +50,7 @@ export const DataRow = (props: DataRowProps) => {
             position: "relative",
           }}
         >
-          <DescriptionBlock description={description} />
+          <DescriptionBlock description={exception} />
         </TableCell>
       )}
       <TableCell

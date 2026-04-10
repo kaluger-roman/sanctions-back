@@ -24,7 +24,11 @@ httpServer.listen(80);
 let server = null;
 
 if (process.env.NODE_ENV !== "development") {
-  execSync(`certbot renew`);
+  try {
+    execSync(`certbot renew`);
+  } catch (e) {
+    console.error("certbot renew failed, continuing startup:", e);
+  }
 
   app.use((req, res, next) => {
     if (req.secure || req.path.includes("/.well-known/acme-challenge")) {

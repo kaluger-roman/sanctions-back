@@ -19,6 +19,7 @@ import {
   JP,
   TW,
   CH,
+  RU,
 } from "country-flag-icons/react/3x2";
 import DownloadIcon from "@mui/icons-material/Download";
 import CloudDownloadIcon from "@mui/icons-material/CloudDownload";
@@ -37,15 +38,16 @@ const ACTUAL_DATES: Array<{
   date: string;
   flag: React.ReactElement;
 }> = [
-  { country: "ЕС", date: "01.01.2026", flag: <EU /> },
+  { country: "ЕС", date: "23.02.2026", flag: <EU /> },
   { country: "Великобритания", date: "16.12.2025", flag: <GB /> },
-  { country: "США", date: "05.12.2025", flag: <US /> },
+  { country: "США", date: "20.01.2026", flag: <US /> },
   { country: "Южная Корея", date: "09.09.2024", flag: <KR /> },
   { country: "Австралия", date: "08.04.2024", flag: <AU /> },
   { country: "Китай", date: "12.12.2025", flag: <CN /> },
-  { country: "Япония", date: "09.10.2025", flag: <JP /> },
+  { country: "Япония", date: "14.02.2026", flag: <JP /> },
   { country: "Тайвань", date: "05.11.2024", flag: <TW /> },
   { country: "Швейцария", date: "30.10.2025", flag: <CH /> },
+  { country: "Россия", date: "11.03.2026", flag: <RU /> },
 ];
 
 export const SearchAppMetadata = () => {

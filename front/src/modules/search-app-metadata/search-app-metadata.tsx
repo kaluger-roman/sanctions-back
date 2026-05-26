@@ -40,13 +40,13 @@ const ACTUAL_DATES: Array<{
 }> = [
   { country: "ЕС", date: "23.04.2026", flag: <EU /> },
   { country: "Великобритания", date: "16.12.2025", flag: <GB /> },
-  { country: "США", date: "20.01.2026", flag: <US /> },
+  { country: "США", date: "09.04.2026", flag: <US /> },
   { country: "Южная Корея", date: "09.09.2024", flag: <KR /> },
   { country: "Австралия", date: "08.04.2024", flag: <AU /> },
   { country: "Китай", date: "12.12.2025", flag: <CN /> },
   { country: "Япония", date: "14.02.2026", flag: <JP /> },
   { country: "Тайвань", date: "05.11.2024", flag: <TW /> },
-  { country: "Швейцария", date: "30.10.2025", flag: <CH /> },
+  { country: "Швейцария", date: "22.05.2026", flag: <CH /> },
   { country: "Россия", date: "11.03.2026", flag: <RU /> },
 ];
 

@@ -47,7 +47,7 @@ const ACTUAL_DATES: Array<{
   { country: "Япония", date: "14.02.2026", flag: <JP /> },
   { country: "Тайвань", date: "05.11.2024", flag: <TW /> },
   { country: "Швейцария", date: "22.05.2026", flag: <CH /> },
-  { country: "Россия", date: "11.03.2026", flag: <RU /> },
+  { country: "Россия", date: "04.06.2026", flag: <RU /> },
 ];
 
 export const SearchAppMetadata = () => {
